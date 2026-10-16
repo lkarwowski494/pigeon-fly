@@ -20,6 +20,7 @@ import { Pigeon, PigeonStatus } from '../domain/types';
 import { generateQRPayload } from '../domain/qr';
 import { QrCodeSvg } from './QrCodeSvg';
 import { FieldButton } from './FieldButton';
+import { PedigreeTreeModal } from './PedigreeTreeModal';
 
 export interface PigeonDetailModalProps {
   visible: boolean;
@@ -39,6 +40,7 @@ export function PigeonDetailModal({
   if (!pigeon) return null;
 
   const [currentStatus, setCurrentStatus] = useState<PigeonStatus>(pigeon.status);
+  const [isPedigreeTreeOpen, setIsPedigreeTreeOpen] = useState(false);
 
   useEffect(() => {
     if (pigeon) {
@@ -142,6 +144,13 @@ export function PigeonDetailModal({
               </Text>
               <View style={styles.actionButtonsCol}>
                 <FieldButton
+                  title="🌳 Otwórz Drzewo Genealogiczne"
+                  onPress={() => setIsPedigreeTreeOpen(true)}
+                  variant="secondary"
+                  testID="btn-open-pedigree-tree"
+                  style={{ marginBottom: 10 }}
+                />
+                <FieldButton
                   title="📜 Drukuj Rodowód A4 PDF"
                   onPress={() => onPrintPedigree(pigeon, 'print')}
                   testID="btn-print-pedigree-modal"
@@ -158,6 +167,14 @@ export function PigeonDetailModal({
           </ScrollView>
         </SafeAreaView>
       </View>
+
+      {/* Interactive Pedigree Tree Viewer Modal */}
+      <PedigreeTreeModal
+        visible={isPedigreeTreeOpen}
+        pigeon={pigeon}
+        onClose={() => setIsPedigreeTreeOpen(false)}
+        onPrintPdf={(p) => onPrintPedigree(p, 'print')}
+      />
     </Modal>
   );
 }

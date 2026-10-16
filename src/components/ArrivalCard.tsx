@@ -10,10 +10,16 @@ import { ArrivalWithPigeon } from '../db/raceRepository';
 export interface ArrivalCardProps {
   arrival: ArrivalWithPigeon;
   position: number;
+  fciCoeff?: number;
   testID?: string;
 }
 
-export const ArrivalCard: React.FC<ArrivalCardProps> = ({ arrival, position, testID }) => {
+export const ArrivalCard: React.FC<ArrivalCardProps> = ({
+  arrival,
+  position,
+  fciCoeff,
+  testID,
+}) => {
   const timeFormatted = new Date(arrival.arrivalTime).toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
@@ -41,6 +47,9 @@ export const ArrivalCard: React.FC<ArrivalCardProps> = ({ arrival, position, tes
       <View style={styles.speedBadge}>
         <Text style={styles.speedValue}>{arrival.velocityMPerMin.toFixed(1)}</Text>
         <Text style={styles.speedUnit}>m/min</Text>
+        {fciCoeff !== undefined && (
+          <Text style={styles.coeffText}>Coeff: {fciCoeff.toFixed(3)}</Text>
+        )}
       </View>
     </View>
   );
@@ -100,5 +109,12 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#A0A6B2',
     fontWeight: '600',
+  },
+  coeffText: {
+    fontSize: 10,
+    color: '#E5A93C',
+    fontWeight: '700',
+    marginTop: 2,
+    fontFamily: 'monospace',
   },
 });

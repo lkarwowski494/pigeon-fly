@@ -120,6 +120,7 @@ pigeon-fly/
 │   ├── domain/                 # Czysta logika biznesowa i reguły hodowlane (zero UI)
 │   │   ├── access.ts           # Silnik uprawnień Freemium / Pro / Lifetime
 │   │   ├── breeding.ts         # Biologia lęgu i harmonogram jaj/obrączkowania
+│   │   ├── concourse.ts        # Baza konkursowa (20%), FCI Coeff i punkty GMP Asów
 │   │   ├── costCalculator.ts   # Kalkulator budżetu stada, ziarna i weterynarii
 │   │   ├── genetics.ts         # Matematyczny algorytm inbredu Wrighta (F)
 │   │   ├── health.ts           # Profilaktyka, szczepienia PMV-1 i karencje leków
@@ -128,6 +129,7 @@ pigeon-fly/
 │   │   ├── pdfExport.ts        # Generatory HTML A4 dla rodowodów, kosza i PIW
 │   │   ├── qr.ts               # Bezpieczne identyfikatory i weryfikacja rodowodów
 │   │   ├── racing.ts           # Fizyka lotu, m/min, ypm i neutralizacja nocy
+│   │   ├── telemetry.ts        # Moduł 5: IoT/GPS tracking, krzywizna i efektywność trasy
 │   │   ├── types.ts            # Wspólne interfejsy domenowe TypeScript
 │   │   └── units.ts            # Konwerter jednostek metrycznych i imperialnych
 │   ├── db/                     # Baza lokalna SQLite (expo-sqlite, czysty SQL)
@@ -155,6 +157,7 @@ pigeon-fly/
 │   │   ├── NewRaceModal.tsx    # Konfiguracja nowego lotu i treningu
 │   │   ├── PairingModal.tsx    # Zarządzanie parowaniem w celkach z inbredem
 │   │   ├── PaywallModal.tsx    # Cennik i zakup Pigeon-Fly Pro (Apple HIG)
+│   │   ├── PedigreeTreeModal.tsx  # Interaktywne drzewo rodowodowe 3-4 pokoleń
 │   │   ├── PigeonCard.tsx      # Karta ptaka z oznaczeniem płci i rocznika
 │   │   ├── PigeonDetailModal.tsx # Karta ptaka, mikronaklejka QR i rodowód PDF
 │   │   └── QrCodeSvg.tsx       # Czysty wektorowy kod QR SVG do naklejek
@@ -163,7 +166,7 @@ pigeon-fly/
 │   └── lib/                    # Współdzielone moduły pomocnicze
 │       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
 ├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
-├── tests/                      # 18 zestawów testowych (99 testów jednostkowych i fast-check)
+├── tests/                      # 20 zestawów testowych (118 testów jednostkowych i fast-check)
 ├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
 └── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
     └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)

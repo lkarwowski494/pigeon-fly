@@ -18,6 +18,7 @@ import { ClockArrivalModal } from '../../src/components/ClockArrivalModal';
 import { NewRaceModal } from '../../src/components/NewRaceModal';
 import { PdfService } from '../../src/services/pdfService';
 import { Alert } from 'react-native';
+import { calculateFciCoefficient, calculateConcourseLimit } from '../../src/domain/concourse';
 
 const DEMO_ARRIVALS: ArrivalWithPigeon[] = [
   {
@@ -67,6 +68,7 @@ export default function RacesScreen() {
     new Date(Date.now() - 1000 * 60 * 240).toISOString() // 4 hours ago
   );
   const [isTraining, setIsTraining] = useState(false);
+  const [basketedCount] = useState(120);
 
   const handleSaveNewRace = (data: {
     name: string;
@@ -206,6 +208,11 @@ export default function RacesScreen() {
               </Text>
             </Text>
           </View>
+          <View style={[styles.raceStatsRow, { borderTopWidth: 0, paddingTop: 4 }]}>
+            <Text style={styles.statLabel}>
+              Baza 20%: <Text style={[styles.statValue, { color: '#E5A93C' }]}>{calculateConcourseLimit(basketedCount, 20).prizeLimit} konkursów</Text> / {basketedCount} włożonych
+            </Text>
+          </View>
         </View>
 
         {/* Action Buttons */}
@@ -242,6 +249,7 @@ export default function RacesScreen() {
             <ArrivalCard
               arrival={item}
               position={index + 1}
+              fciCoeff={calculateFciCoefficient(index + 1, basketedCount)}
               testID={`arrival-card-${index}`}
             />
           )}

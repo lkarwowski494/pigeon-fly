@@ -362,7 +362,48 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('RODOW\u00d3D 4-POKOLENIOWY');
     expect(tree).toContain('PIGEONFLY:V1');
   });
+
+  test('PedigreeTreeModal renders pedigree columns, ancestors, and inbreeding coefficient', () => {
+    const { PedigreeTreeModal } = require('../src/components/PedigreeTreeModal');
+    const onClose = jest.fn();
+
+    const pigeon = {
+      id: 'p-01',
+      loftId: 'l-01',
+      ringNumber: 'PL-0284-23-1402',
+      countryCode: 'PL',
+      year: 2023,
+      sex: 'cock' as const,
+      plumageColor: 'Niebieski nakrapiany',
+      status: 'racing' as const,
+      qrCodeUuid: 'uuid-12345',
+      isDeleted: false,
+      createdAt: '',
+      updatedAt: '',
+    };
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <PedigreeTreeModal
+          visible={true}
+          pigeon={pigeon}
+          onClose={onClose}
+          onPrintPdf={jest.fn()}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('DRZEWO GENEALOGICZNE');
+    expect(tree).toContain('WSP\u00d3\u0141CZYNNIK INBREDU WRIGHTA');
+    expect(tree).toContain('RODZICE (I POKOLENIE)');
+    expect(tree).toContain('OJCIEC');
+    expect(tree).toContain('MATKA');
+    expect(tree).toContain('DZIADEK OJCOWSKI');
+  });
 });
+
 
 
 
