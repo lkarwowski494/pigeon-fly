@@ -1,5 +1,5 @@
 # Rozdziały 14 i 16: Rejestr Ryzyk (RYZ-01 do RYZ-40) i Plan Mitygacji (D3)
-## Pigeon-Fly · Macierz Oceny Ryzyka i Procedury Ochronne
+## Pigeon-Fly · Macierz Oceny Ryzyka w Architekturze Hybrydowej (SQLite + Supabase)
 
 ---
 
@@ -14,11 +14,12 @@ Każde zidentyfikowane ryzyko zostało ocenione pod kątem prawdopodobieństwa w
  ├──────────────┼──────────────────┼──────────────────┼──────────────────┤
  │ KRYTYCZNY    │ RYZ-02 (Baza)    │ RYZ-01 (Apple)   │                  │
  │              │ RYZ-05 (Wyciek)  │ RYZ-03 (Wzory)   │                  │
+ │              │ RYZ-15 (RLS Leak)│                  │                  │
  ├──────────────┼──────────────────┼──────────────────┼──────────────────┤
  │ WYSOKI       │ RYZ-07 (Bateria) │ RYZ-04 (Brud QR) │ RYZ-06 (Senior)  │
- │              │ RYZ-11 (Inbred)  │ RYZ-08 (Zegarek) │                  │
+ │              │ RYZ-11 (Inbred)  │ RYZ-08 (Zegarek) │ RYZ-14 (Zerwana) │
  ├──────────────┼──────────────────┼──────────────────┼──────────────────┤
- │ ŚREDNI       │ RYZ-15 (i18n)    │ RYZ-09 (BLE IoT) │ RYZ-10 (Brak GPS)│
+ │ ŚREDNI       │ RYZ-16 (Limity)  │ RYZ-09 (BLE IoT) │ RYZ-17 (Spam L&F)│
  └──────────────┴──────────────────┴──────────────────┴──────────────────┘
 ```
 
@@ -28,48 +29,44 @@ Każde zidentyfikowane ryzyko zostało ocenione pod kątem prawdopodobieństwa w
 
 #### RYZ-01: Odrzucenie Aplikacji przez Apple jako „Prosty Kalkulator” (Wytyczna 4.3b)
 - **Prawdopodobieństwo:** Średnie · **Skutek:** Krytyczny · **Kategoria:** Sklep / Apple
-- **Opis:** Recenzent App Store może powierzchownie ocenić aplikację jako prosty kalkulator czasu lotu i odrzucić ją z zarzutem braku głębi funkcjonalnej.
-- **Plan Mitygacji:** Od wersji 1.0 aplikacja zawiera rozbudowany, unikalny moduł rekurencyjnych rodowodów do 5 pokoleń, zaawansowany generator wektorowy PDF A4, analizator 10 lotek skrzydła, skaner kodów aparatem w czasie rzeczywistym z analizą klatek 60 fps, moduł zdrowia i wsparcie dla Apple Watch. Do formularza recenzji dołączane jest wideo demonstracyjne pokazujące pracę w gołębniku.
+- **Plan Mitygacji:** Demonstracja hybrydowej architektury chmurowej Supabase, zaawansowanego generatora wektorowego PDF A4, analizatora 10 lotek skrzydła, skanera kodów aparatem w czasie rzeczywistym z Vision Framework, sieci ratunkowej Lost & Found oraz wsparcia dla Apple Watch.
 
 #### RYZ-02: Uszkodzenie lub Utrata Bazy Danych Hodowli w Gołębniku
 - **Prawdopodobieństwo:** Niskie · **Skutek:** Krytyczny · **Kategoria:** Architektura Danych
-- **Opis:** Nagłe rozładowanie telefonu w trakcie trwania lotu lub upadek na betonową podłogę gołębnika mógłby doprowadzić do uszkodzenia pliku bazy danych.
-- **Plan Mitygacji:** Tryb SQLite WAL (Write-Ahead Logging) z atomowymi transakcjami. Automatyczny backup rotacyjny (10 kopii w `/Library/Application Support/Backups/`). Przed każdą migracją schematu tworzona jest bezwzględna kopia zapasowa w chronionym katalogu.
+- **Plan Mitygacji:** Tryb SQLite WAL (Write-Ahead Logging) z atomowymi transakcjami. Podwójna ochrona: automatyczny backup rotacyjny lokalny (10 kopii) + asynchroniczna replikacja do chmury Supabase PostgreSQL.
 
 #### RYZ-03: Błędy Obliczeń Geodezyjnych Wywołujące Spory w Oddziałach
 - **Prawdopodobieństwo:** Średnie · **Skutek:** Wysoki · **Kategoria:** Domena / Regulamin
-- **Opis:** Rozbieżność 10 metrów w wyliczeniu odległości ortodromicznej mogłaby podważyć wiarygodność aplikacji w oczach hodowców.
-- **Plan Mitygacji:** Zastosowanie algorytmu elipsoidalnego Vincenty'ego (WGS-84) o dokładności geodezyjnej do $0,001\text{ m}$. Zestaw testów różnicowych (Cross-Validation) porównujący wyniki z certyfikowanym korpusem list konkursowych PZHGP i FCI. Możliwość ręcznego nadpisania dystansu oficjalnym pomiarem związkowym.
+- **Plan Mitygacji:** Zastosowanie algorytmu elipsoidalnego Vincenty'ego (WGS-84) o dokładności geodezyjnej do $0,001\text{ m}$. Zestaw testów różnicowych (Cross-Validation) z oficjalnym korpusem list konkursowych PZHGP i FCI.
 
-#### RYZ-04: Zabrudzenie Mikronaklejki QR Pyłem Piórowym i Trudności ze Skanowaniem
+#### RYZ-04: Zabrudzenie Mikronaklejki QR Pyłem Piórowym w Lufce
 - **Prawdopodobieństwo:** Średnie · **Skutek:** Wysoki · **Kategoria:** Sprzęt / Ergofizyka
-- **Opis:** W gołębniku unosi się pył z piór (puder) i kurz, a ptaki wchodzące przez lufkę poruszają się gwałtownie.
-- **Plan Mitygacji:** Kody QR generowane są z korekcją błędów **Level H (do 30% odporności na fizyczne zniszczenie)**. Strumień wideo z kamery analizowany jest w pamięci NPU z automatycznym doświetleniem LED przy słabym świetle. Dodatkowo zawsze dostępna jest opcja manualnego 1-tap zatwierdzenia z listy ptaków w locie.
+- **Plan Mitygacji:** Kody QR z korekcją błędów **Level H (do 30% odporności na fizyczne zniszczenie)**, automatyczne doświetlenie LED w ciemnym wlocie oraz opcjonalne 1-tap potwierdzenie manualne.
 
 #### RYZ-05: Wyciek Położenia Gołębnika i Kradzież Cennego Stada
 - **Prawdopodobieństwo:** Niskie · **Skutek:** Krytyczny · **Kategoria:** Bezpieczeństwo / Prawne
-- **Opis:** Wartość stada czołowych hodowców sięga setek tysięcy euro. Wyciek dokładnych współrzędnych gołębnika stanowi zagrożenie przestępcze.
-- **Plan Mitygacji:** Bezwzględna zasada **100% Offline (Data Not Collected)**. Żadne współrzędne geograficzne nie opuszczają urządzenia. Klucze i dane wrażliwe są chronione w Keychainie urządzenia.
+- **Plan Mitygacji:** Rygorystyczne polityki Row Level Security (RLS) w PostgreSQL — współrzędne gołębnika są w 100% niewidoczne dla osób postronnych. W publicznych linkach i rodowodach wyświetlana jest wyłącznie nazwa miejscowości/sekcji bez koordynatów GPS.
 
 #### RYZ-06: Bariera Technologiczna i Odrzucenie Aplikacji przez Starszych Hodowców
 - **Prawdopodobieństwo:** Wysokie · **Skutek:** Wysoki · **Kategoria:** UX / Psychologia
-- **Opis:** Seniorzy (60–75 lat) szybko rezygnują z aplikacji, jeśli wymaga ona logowania, zapamiętywania haseł lub posiada zbyt małe przyciski.
-- **Plan Mitygacji:** Radykalny Tryb Polowy (Field Mode) z kaflami $\ge 56 \times 56\,\text{pt}$, zero formularzy logowania, potężny feedback dźwiękowy i haptyczny, pełne wsparcie dla Dynamic Type (wielkie litery).
+- **Plan Mitygacji:** Tryb Polowy (Field Mode) z kaflami $\ge 56 \times 56\,\text{pt}$, zero wymuszonych rejestracji na starcie (anonimowy start sesji), głośny feedback dźwiękowy i haptyczny, powiększone fonty Dynamic Type.
 
-#### RYZ-07: Szybkie Zużycie Baterii Podczas Dyżuru Przylotowego
-- **Prawdopodobieństwo:** Niskie · **Skutek:** Wysoki · **Kategoria:** Bateria / iOS
-- **Opis:** Ciągła praca kamery wideo 60 fps i blokada wygaszania ekranu mogą rozładować baterię telefonu podczas wielogodzinnego oczekiwania na maraton.
-- **Plan Mitygacji:** Tryb oszczędzania energii w skanerze: po 30 sekundach bezruchu kamera przechodzi w tryb detekcji ruchu o niskiej częstotliwości (10 fps), a pełna rozdzielczość 60 fps aktywuje się natychmiast po wykryciu ruchu w polu widzenia lufki.
+#### RYZ-14: Zerwane Połączenie Sieciowe w Gołębniku w Trakcie Synchronizacji Supabase
+- **Prawdopodobieństwo:** Wysokie · **Skutek:** Wysoki · **Kategoria:** Chmura / Sieć
+- **Opis:** Hodowca rejestruje powrót ptaków w gołębniku na granicy zasięgu LTE/EDGE.
+- **Plan Mitygacji:** Żadne zapytanie nie blokuje interfejsu. Wszelkie operacje zapisywane są natychmiast w lokalnej tabeli `sync_queue` w SQLite. Wypychanie do Supabase następuje w tle z mechanizmem wykładniczego ponawiania (Exponential Backoff).
 
-#### RYZ-08: Desynchronizacja Czasowa Zegarka Apple Watch
-- **Prawdopodobieństwo:** Średnie · **Skutek:** Średni · **Kategoria:** Wearables
-- **Opis:** Zegarek odcięty od telefonu na podwórku rejestruje przyloty w lokalnym buforze.
-- **Plan Mitygacji:** `WatchOfflineQueue` przechowuje znaczniki czasu wraz z uniksowym timestampem UTC (`epoch_ms`). Po zbliżeniu się do telefonu kolejka opróżnia się automatycznie bez żadnego dryfu czasowego (Zero Clock Skew).
+#### RYZ-15: Przypadkowy Wyciek Danych Stada przez Lukę w Politykach RLS Supabase
+- **Prawdopodobieństwo:** Niskie · **Skutek:** Krytyczny · **Kategoria:** Bezpieczeństwo Chmury
+- **Opis:** Błędnie skonstruowana polityka RLS mogłaby pozwolić obcemu hodowcy podejrzeć ptaki innego gołębnika.
+- **Plan Mitygacji:** Zasada **Default Deny** we wszystkich tabelach. Każda tabela posiada testy bezpieczeństwa w standardzie `pgTAP` sprawdzające izolację danych między różnymi `auth.uid()`.
 
-#### RYZ-09 do RYZ-40: Skatalogowane Ryzyka Uzupełniające
-- **RYZ-09 (Błędy Ramki BLE):** Uszkodzone pakiety z obcych trackerów IoT są walidowane sumą kontrolną CRC16 i odrzucane bez wywoływania awarii aplikacji.
-- **RYZ-10 (Brak Fixa GPS):** Możliwość ręcznego wskazania gołębnika na mapie offline lub wpisania współrzędnych z mapy papierowej.
-- **RYZ-11 (Nieskończona Pętla w Inbredzie):** Algorytm Wrighta posiada twardy limit głębokości do 5 pokoleń i weryfikację cykli grafu DAG.
-- **RYZ-12 (Ograniczenie Pamięci Zdjęć):** Automatyczna kompresja JPEG 0.8 do maks. 1600x1200 px chroni urządzenie przed zapełnieniem pamięci flash.
-- **RYZ-13 (Niepoprawne Tłumaczenia Żargonu):** Rygorystyczny audyt terminologii z udziałem aktywnych hodowców z poszczególnych krajów.
-- **RYZ-14 do RYZ-40:** Ryzyka związane z odrzuceniem Family Sharing, zmianami formatu plików Apple, zmianami w przepisach antydopingowych FCI i procedurami odzyskiwania danych po utracie urządzenia.
+#### RYZ-16: Przekroczenie Limitów Darmowego Planu Supabase
+- **Prawdopodobieństwo:** Niskie · **Skutek:** Średni · **Kategoria:** Finanse / Infrastruktura
+- **Opis:** Nagły wzrost liczby użytkowników mógłby doprowadzić do wyczerpania darmowej puli 500 MB bazy danych.
+- **Plan Mitygacji:** Zdjęcia przechowywane są wyłącznie w Supabase Storage (nigdy jako BLOB w bazie!). Baza Postgres przechowuje tylko lekkie metadane tekstowe (500 MB mieści ponad 1 mln ptaków). Przy przekroczeniu 50k MAU opłata 25 USD za plan Pro jest z wielokrotnym zapasem pokrywana z subskrypcji użytkowników.
+
+#### RYZ-17: Spam i Fałszywe Zgłoszenia w Sieci Lost & Found
+- **Prawdopodobieństwo:** Średnie · **Skutek:** Średni · **Kategoria:** Społeczność
+- **Opis:** Nieuczciwi użytkownicy próbujący wysyłać fałszywe powiadomienia o odnalezieniu ptaka.
+- **Plan Mitygacji:** Weryfikacja formatu obrączki (musi istnieć w bazie gołębi ze statusem `ZAGINIONY`), rate limiting na adres IP w Supabase Edge Function oraz brak udostępniania bezpośredniego kontaktu do hodowcy przed potwierdzeniem przez system.

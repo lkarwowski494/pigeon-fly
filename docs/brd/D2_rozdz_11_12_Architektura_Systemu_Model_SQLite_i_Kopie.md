@@ -1,65 +1,111 @@
-# Rozdziały 11–12: Architektura Systemu, Schemat DDL SQLite i Model Danych Swift (D2)
-## Pigeon-Fly · Specyfikacja Architektoniczna Bazy Danych i Silnika Persystencji
+# Rozdziały 11–12: Architektura Hybrydowa, Schemat DDL Supabase PostgreSQL, SQLite i Protokół Synchronizacji (D2)
+## Pigeon-Fly · Pełna Architektura Bazy Danych i Silnika Chmurowego
 
 ---
 
-# Rozdział 11: Architektura Systemu i Schemat Relacyjny SQLite
+# Rozdział 11: Architektura Hybrydowa i Schemat PostgreSQL dla Supabase
 
-### 11.1. Fundament Techniczny Bazy Danych
-Aplikacja wykorzystuje natywny silnik **SQLite 3** w trybie **WAL (Write-Ahead Logging)** zoptymalizowany pod kątem mikro-opóźnień zapisu i odporności na nagłe odcięcie zasilania.
+### 11.1. Model Hybrydowy: SQLite WAL $\leftrightarrow$ Supabase PostgreSQL 16
+Aplikacja Pigeon-Fly łączy suwerenność danych i odporność polową bazy **SQLite 3 (tryb WAL)** z globalną skalowalnością i funkcjami czasu rzeczywistego platformy **Supabase**:
 
 ```
-                             ARCHITEKTURA SYSTEMU PIGEON-FLY
+                       ARCHITEKTURA HYBRYDOWA PIGEON-FLY
  ┌─────────────────────────────────────────────────────────────────────────────┐
- │                           WARSTWA INTERFEJSU (UI)                          │
- │  SwiftUI 6 · Field Mode Layout · Vision QR Scanner · Apple Watch Companion  │
- └──────────────────────────────────────┬──────────────────────────────────────┘
-                                        │ (Obserwowane strumienie Async/Await)
- ┌──────────────────────────────────────▼──────────────────────────────────────┐
- │                      WARSTWA DOMENOWA (LOGIKA BIZNESOWA)                    │
- │  VincentyEngine · InbreedingCalculator · SpeedCalculator · MoultingAnalyzer │
- └──────────────────────────────────────┬──────────────────────────────────────┘
-                                        │ (Transakcyjne repozytoria)
- ┌──────────────────────────────────────▼──────────────────────────────────────┐
- │                    WARSTWA PERSYSTENCJI (LOKALNA BAZA)                      │
- │    SQLite 3 WAL Mode · Zero Partial Writes · Szyfrowany Magazyn Breloka     │
- └──────────────────────────────────────┬──────────────────────────────────────┘
-                                        │ (Darmowy Eksport 1-klik)
- ┌──────────────────────────────────────▼──────────────────────────────────────┐
- │                          KOPIA ZAPASOWA (BACKUP)                           │
- │     Prywatny iCloud Drive · Pliki Lokalne iOS · Rotacja 10 Kopii Bazy      │
+ │                         URZĄDZENIE MOBILNE (KLIENT)                         │
+ │                                                                             │
+ │  ┌─────────────────────────┐          ┌──────────────────────────────────┐  │
+ │  │ Interfejs Użytkownika   │          │ Silnik Synchronizacji w Tle      │  │
+ │  │ (SwiftUI / Field Mode)  │          │ (Delta Sync Engine + SyncQueue)  │  │
+ │  └────────────┬────────────┘          └─────────────────┬────────────────┘  │
+ │               │ (Zapis natychmiastowy)                  │                   │
+ │  ┌────────────▼─────────────────────────────────────────▼────────────────┐  │
+ │  │                 LOKALNA BAZA DANYCH SQLITE 3 (TRYB WAL)               │  │
+ │  │  birds · races · race_arrivals · moulting_records · sync_queue        │  │
+ │  └──────────────────────────────────────────────────────┬────────────────┘  │
+ └─────────────────────────────────────────────────────────┼───────────────────┘
+                                                           │ (Asynchroniczna replikacja)
+                                                           │ (HTTPS PostgREST / WSS Realtime)
+ ┌─────────────────────────────────────────────────────────▼───────────────────┐
+ │                           CHMURA SUPABASE (BACKEND)                         │
+ │                                                                             │
+ │  ┌───────────────────────────────────────────────────────────────────────┐  │
+ │  │                      POSTGRESQL 16 Z ROW LEVEL SECURITY (RLS)         │  │
+ │  │  lofts · loft_members · birds · races · race_arrivals · pedigrees     │  │
+ │  └───────────────────────────────────┬───────────────────────────────────┘  │
+ │                                      │                                      │
+ │  ┌───────────────────┬───────────────┴───┬───────────────────────────────┐  │
+ │  │ SUPABASE REALTIME │ SUPABASE STORAGE  │     SUPABASE EDGE FUNCTIONS   │  │
+ │  │ (Live Broadcast   │ (Zdjęcia 4K Oka   │ (Powiadomienia Push APNs      │  │
+ │  │  WebSockets)      │  i Certyfikaty)   │  dla Lost & Found, Brama IoT) │  │
+ │  └───────────────────┴───────────────────┴───────────────────────────────┘  │
  └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-### 11.2. Kompletny Schemat DDL SQLite (Tabele, Relacje, Indeksy)
+### 11.2. Kompletny Schemat DDL PostgreSQL dla Supabase (Tabele i RLS)
 
 ```sql
--- Włączenie kluczy obcych i trybu WAL
-PRAGMA foreign_keys = ON;
-PRAGMA journal_mode = WAL;
-PRAGMA synchronous = NORMAL;
+-- Włączenie rozszerzeń kryptograficznych i UUID
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- 1. Tabela Ustawień Gołębnika
-CREATE TABLE IF NOT EXISTS loft_profile (
-    id INTEGER PRIMARY KEY CHECK (id = 1), -- Zawsze jeden rekord profilu
+-- 1. Tabela Gołębników (Lofts)
+CREATE TABLE IF NOT EXISTS public.lofts (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    owner_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     loft_name TEXT NOT NULL DEFAULT 'Mój Gołębnik',
     breeder_name TEXT NOT NULL DEFAULT 'Mistrz',
     club_name TEXT,
-    pzhgp_section TEXT,
-    latitude REAL NOT NULL DEFAULT 52.229676,
-    longitude REAL NOT NULL DEFAULT 21.012229,
-    official_distance_m REAL,
-    is_field_mode_enabled INTEGER NOT NULL DEFAULT 1,
-    audio_chime_enabled INTEGER NOT NULL DEFAULT 1,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    section_code TEXT,
+    latitude DOUBLE PRECISION NOT NULL DEFAULT 52.229676,
+    longitude DOUBLE PRECISION NOT NULL DEFAULT 21.012229,
+    official_distance_m DOUBLE PRECISION,
+    is_public_live_enabled BOOLEAN NOT NULL DEFAULT false,
+    live_channel_slug TEXT UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
 );
 
--- 2. Tabela Główna Gołębi (Stado)
-CREATE TABLE IF NOT EXISTS birds (
-    id TEXT PRIMARY KEY, -- UUIDv4
+-- Włączenie RLS
+ALTER TABLE public.lofts ENABLE ROW LEVEL SECURITY;
+
+-- 2. Tabela Członków Tandemu Hodowlanego (Loft Members)
+CREATE TABLE IF NOT EXISTS public.loft_members (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    loft_id UUID NOT NULL REFERENCES public.lofts(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    role TEXT NOT NULL CHECK (role IN ('OWNER', 'MEMBER', 'VIEWER')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    UNIQUE(loft_id, user_id)
+);
+
+ALTER TABLE public.loft_members ENABLE ROW LEVEL SECURITY;
+
+-- Polityki RLS dla Gołębników i Członków Tandemu
+CREATE POLICY "Właściciel i członkowie mają dostęp do swojego gołębnika"
+    ON public.lofts FOR ALL
+    USING (
+        auth.uid() = owner_id OR 
+        EXISTS (
+            SELECT 1 FROM public.loft_members 
+            WHERE loft_members.loft_id = lofts.id AND loft_members.user_id = auth.uid()
+        )
+    );
+
+CREATE POLICY "Zarządzanie członkami tandemu tylko przez właściciela"
+    ON public.loft_members FOR ALL
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.lofts 
+            WHERE lofts.id = loft_members.loft_id AND lofts.owner_id = auth.uid()
+        )
+    );
+
+-- 3. Tabela Główna Gołębi (Birds)
+CREATE TABLE IF NOT EXISTS public.birds (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    loft_id UUID NOT NULL REFERENCES public.lofts(id) ON DELETE CASCADE,
     ring_country TEXT NOT NULL DEFAULT 'PL',
     ring_branch TEXT NOT NULL DEFAULT '0123',
     ring_year INTEGER NOT NULL,
@@ -71,269 +117,211 @@ CREATE TABLE IF NOT EXISTS birds (
     status TEXT NOT NULL DEFAULT 'LOTOWY' CHECK (
         status IN ('ROZPLODOWY', 'LOTOWY', 'MLODY', 'W_GNIEZDZIE', 'SPRZEDANY', 'ZAGINIONY', 'ZSZEDL')
     ),
-    sire_id TEXT, -- Klucz obcy do ojca
-    dam_id TEXT,  -- Klucz obcy do matki
+    sire_id UUID REFERENCES public.birds(id) ON DELETE SET NULL,
+    dam_id UUID REFERENCES public.birds(id) ON DELETE SET NULL,
     compartment_name TEXT,
     nest_box_number INTEGER,
-    photo_profile_path TEXT,
-    photo_eye_path TEXT,
-    photo_wing_path TEXT,
+    photo_profile_url TEXT,
+    photo_eye_url TEXT,
+    photo_wing_url TEXT,
     eye_sign_notes TEXT,
-    inbreeding_coeff REAL DEFAULT 0.0,
+    inbreeding_coeff DOUBLE PRECISION DEFAULT 0.0,
     structural_score INTEGER DEFAULT 0,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (sire_id) REFERENCES birds(id) ON DELETE SET NULL,
-    FOREIGN KEY (dam_id) REFERENCES birds(id) ON DELETE SET NULL
+    is_public_pedigree BOOLEAN DEFAULT false,
+    version INTEGER NOT NULL DEFAULT 1,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    UNIQUE(loft_id, ring_country, ring_year, ring_number)
 );
 
--- Indeksy unikalności i wyszukiwania stada
-CREATE UNIQUE INDEX IF NOT EXISTS idx_birds_ring_unique 
-    ON birds(ring_country, ring_year, ring_number);
-CREATE INDEX IF NOT EXISTS idx_birds_status ON birds(status);
-CREATE INDEX IF NOT EXISTS idx_birds_parents ON birds(sire_id, dam_id);
-CREATE INDEX IF NOT EXISTS idx_birds_auxiliary ON birds(auxiliary_ring_code);
+ALTER TABLE public.birds ENABLE ROW LEVEL SECURITY;
 
--- 3. Tabela Zawodów i Treningów
-CREATE TABLE IF NOT EXISTS races (
-    id TEXT PRIMARY KEY, -- UUIDv4
+CREATE POLICY "Dostęp do ptaków dla uprawnionych członków gołębnika"
+    ON public.birds FOR ALL
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.lofts 
+            WHERE lofts.id = birds.loft_id AND (
+                lofts.owner_id = auth.uid() OR 
+                EXISTS (
+                    SELECT 1 FROM public.loft_members 
+                    WHERE loft_members.loft_id = lofts.id AND loft_members.user_id = auth.uid()
+                )
+            )
+        )
+    );
+
+-- 4. Tabela Zawodów i Treningów (Races)
+CREATE TABLE IF NOT EXISTS public.races (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    loft_id UUID NOT NULL REFERENCES public.lofts(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     race_type TEXT NOT NULL CHECK (race_type IN ('TRENING', 'ZAWODY_OFICJALNE')),
     fci_category TEXT NOT NULL DEFAULT 'A' CHECK (fci_category IN ('A', 'B', 'C', 'M', 'E', 'F')),
     release_point_name TEXT NOT NULL,
-    release_latitude REAL NOT NULL,
-    release_longitude REAL NOT NULL,
-    release_timestamp TEXT NOT NULL, -- ISO-8601
-    neutralization_start TEXT,       -- Czas zmierzchu
-    neutralization_end TEXT,         -- Czas świtu
-    wind_speed_kmh REAL DEFAULT 0.0,
-    wind_direction_deg REAL DEFAULT 0.0,
-    is_active INTEGER NOT NULL DEFAULT 1,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    release_latitude DOUBLE PRECISION NOT NULL,
+    release_longitude DOUBLE PRECISION NOT NULL,
+    release_timestamp TIMESTAMPTZ NOT NULL,
+    neutralization_start TIMESTAMPTZ,
+    neutralization_end TIMESTAMPTZ,
+    wind_speed_kmh DOUBLE PRECISION DEFAULT 0.0,
+    wind_direction_deg DOUBLE PRECISION DEFAULT 0.0,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    is_live_broadcast BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
 );
 
--- 4. Tabela Włożonych Ptaków (Koszowanie)
-CREATE TABLE IF NOT EXISTS race_entries (
-    id TEXT PRIMARY KEY,
-    race_id TEXT NOT NULL,
-    bird_id TEXT NOT NULL,
-    series_order INTEGER, -- Kolejność typowania (np. 1..5)
-    basketing_timestamp TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (race_id) REFERENCES races(id) ON DELETE CASCADE,
-    FOREIGN KEY (bird_id) REFERENCES birds(id) ON DELETE CASCADE,
-    UNIQUE (race_id, bird_id)
-);
+ALTER TABLE public.races ENABLE ROW LEVEL SECURITY;
 
--- 5. Tabela Rejestracji Przylotów i Wyników
-CREATE TABLE IF NOT EXISTS race_arrivals (
-    id TEXT PRIMARY KEY,
-    race_id TEXT NOT NULL,
-    bird_id TEXT NOT NULL,
-    arrival_timestamp TEXT NOT NULL, -- Dokładność ms: 2026-06-14T11:42:18.421Z
-    duration_minutes REAL NOT NULL,
-    distance_meters REAL NOT NULL,
-    speed_mpm REAL NOT NULL,         -- Prędkość m/min
-    aero_speed_mpm REAL,             -- Prędkość skorygowana o wiatr
-    coeff REAL,                      -- Oficjalny współczynnik
+CREATE POLICY "Dostęp do zawodów dla członków gołębnika"
+    ON public.races FOR ALL
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.lofts 
+            WHERE lofts.id = races.loft_id AND (
+                lofts.owner_id = auth.uid() OR 
+                EXISTS (
+                    SELECT 1 FROM public.loft_members 
+                    WHERE loft_members.loft_id = lofts.id AND loft_members.user_id = auth.uid()
+                )
+            )
+        )
+    );
+
+-- 5. Tabela Rejestracji Przylotów z Obsługą Realtime (Race Arrivals)
+CREATE TABLE IF NOT EXISTS public.race_arrivals (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    race_id UUID NOT NULL REFERENCES public.races(id) ON DELETE CASCADE,
+    bird_id UUID NOT NULL REFERENCES public.birds(id) ON DELETE CASCADE,
+    arrival_timestamp TIMESTAMPTZ NOT NULL,
+    duration_minutes DOUBLE PRECISION NOT NULL,
+    distance_meters DOUBLE PRECISION NOT NULL,
+    speed_mpm DOUBLE PRECISION NOT NULL,
+    aero_speed_mpm DOUBLE PRECISION,
+    coeff DOUBLE PRECISION,
     arrival_source TEXT NOT NULL CHECK (arrival_source IN ('QR_CAMERA', 'APPLE_WATCH', 'MANUAL', 'BLE_IOT')),
     position_in_loft INTEGER NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (race_id) REFERENCES races(id) ON DELETE CASCADE,
-    FOREIGN KEY (bird_id) REFERENCES birds(id) ON DELETE CASCADE,
-    UNIQUE (race_id, bird_id)
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    UNIQUE(race_id, bird_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_arrivals_race_speed 
-    ON race_arrivals(race_id, speed_mpm DESC);
+ALTER TABLE public.race_arrivals ENABLE ROW LEVEL SECURITY;
 
--- 6. Tabela Karty Pierzenia (10 Lotek Skrzydła)
-CREATE TABLE IF NOT EXISTS moulting_records (
-    id TEXT PRIMARY KEY,
-    bird_id TEXT NOT NULL,
-    recorded_date TEXT NOT NULL DEFAULT (date('now')),
-    p1_state REAL NOT NULL DEFAULT 1.0, -- 1.0=Pełna, 0.75=3/4, 0.5=1/2, 0.25=1/4, 0.0=Wypadła
-    p2_state REAL NOT NULL DEFAULT 1.0,
-    p3_state REAL NOT NULL DEFAULT 1.0,
-    p4_state REAL NOT NULL DEFAULT 1.0,
-    p5_state REAL NOT NULL DEFAULT 1.0,
-    p6_state REAL NOT NULL DEFAULT 1.0,
-    p7_state REAL NOT NULL DEFAULT 1.0,
-    p8_state REAL NOT NULL DEFAULT 1.0,
-    p9_state REAL NOT NULL DEFAULT 1.0,
-    p10_state REAL NOT NULL DEFAULT 1.0,
-    ari_score REAL NOT NULL,            -- Aerodynamic Readiness Index (0.0 .. 1.0)
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (bird_id) REFERENCES birds(id) ON DELETE CASCADE
+CREATE POLICY "Dostęp do przylotów dla członków gołębnika"
+    ON public.race_arrivals FOR ALL
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.races 
+            JOIN public.lofts ON lofts.id = races.loft_id
+            WHERE races.id = race_arrivals.race_id AND (
+                lofts.owner_id = auth.uid() OR 
+                EXISTS (
+                    SELECT 1 FROM public.loft_members 
+                    WHERE loft_members.loft_id = lofts.id AND loft_members.user_id = auth.uid()
+                )
+            )
+        )
+    );
+
+-- Publiczny odczyt dla transmisji Live Broadcast (jeśli włączona)
+CREATE POLICY "Publiczny podgląd przylotów dla aktywnych transmisji live"
+    ON public.race_arrivals FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.races 
+            WHERE races.id = race_arrivals.race_id AND races.is_live_broadcast = true
+        )
+    );
+
+-- Włączenie publikacji Realtime dla przylotów
+ALTER PUBLICATION supabase_realtime ADD TABLE public.race_arrivals;
+
+-- 6. Tabela Zweryfikowanych Certyfikatów Rodowodów Online (Anti-Counterfeit Registry)
+CREATE TABLE IF NOT EXISTS public.verified_pedigrees (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    loft_id UUID NOT NULL REFERENCES public.lofts(id) ON DELETE CASCADE,
+    bird_id UUID NOT NULL REFERENCES public.birds(id) ON DELETE CASCADE,
+    public_token TEXT UNIQUE NOT NULL, -- Krótki identyfikator pod kodem QR
+    pedigree_hash_sha256 TEXT NOT NULL,
+    pedigree_data_json JSONB NOT NULL,
+    is_revoked BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
 );
 
--- 7. Tabela Szczepień i Profilaktyki
-CREATE TABLE IF NOT EXISTS health_vaccinations (
-    id TEXT PRIMARY KEY,
-    bird_id TEXT, -- NULL oznacza szczepienie całego stada
-    disease_type TEXT NOT NULL CHECK (disease_type IN ('PMV1', 'OSPA', 'SALMONELLA', 'INNE')),
-    vaccine_name TEXT NOT NULL,
-    batch_number TEXT NOT NULL,
-    administered_date TEXT NOT NULL,
-    expires_date TEXT NOT NULL,
-    vet_certificate_number TEXT,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (bird_id) REFERENCES birds(id) ON DELETE CASCADE
+ALTER TABLE public.verified_pedigrees ENABLE ROW LEVEL SECURITY;
+
+-- Każdy może odczytać publiczny certyfikat rodowodu pod tokenem QR
+CREATE POLICY "Każdy może zweryfikować rodowód pod publicznym tokenem"
+    ON public.verified_pedigrees FOR SELECT
+    USING (is_revoked = false);
+
+-- 7. Tabela Globalnej Sieci Pomocy Zagubionym Ptakom (Lost & Found)
+CREATE TABLE IF NOT EXISTS public.lost_pigeon_reports (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    ring_country TEXT NOT NULL,
+    ring_year INTEGER NOT NULL,
+    ring_number TEXT NOT NULL,
+    finder_phone TEXT NOT NULL,
+    finder_email TEXT,
+    finder_location_name TEXT,
+    finder_latitude DOUBLE PRECISION,
+    finder_longitude DOUBLE PRECISION,
+    photo_url TEXT,
+    is_contact_made BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
 );
 
--- 8. Tabela Kuracji Weterynaryjnych i Karencji Antydopingowych
-CREATE TABLE IF NOT EXISTS medical_treatments (
-    id TEXT PRIMARY KEY,
-    bird_id TEXT, -- NULL = kuracja całego przedziału
-    medication_name TEXT NOT NULL,
-    active_substance TEXT NOT NULL,
-    treatment_start_date TEXT NOT NULL,
-    treatment_end_date TEXT NOT NULL,
-    withdrawal_period_days INTEGER NOT NULL DEFAULT 0,
-    withdrawal_expires_date TEXT NOT NULL,
-    notes TEXT,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (bird_id) REFERENCES birds(id) ON DELETE CASCADE
-);
+ALTER TABLE public.lost_pigeon_reports ENABLE ROW LEVEL SECURITY;
+
+-- Znalazca może zgłosić ptaka anonimowo
+CREATE POLICY "Znalazca może dodać zgłoszenie ptaka"
+    ON public.lost_pigeon_reports FOR INSERT
+    WITH CHECK (true);
+
+-- Właściciel ptaka widzi zgłoszenie
+CREATE POLICY "Właściciel ptaka widzi zgłoszenia swoich zagubionych gołębi"
+    ON public.lost_pigeon_reports FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.birds 
+            JOIN public.lofts ON lofts.id = birds.loft_id
+            WHERE birds.ring_country = lost_pigeon_reports.ring_country
+              AND birds.ring_year = lost_pigeon_reports.ring_year
+              AND birds.ring_number = lost_pigeon_reports.ring_number
+              AND lofts.owner_id = auth.uid()
+        )
+    );
 ```
 
 ---
 
-# Rozdział 12: Wzorcowy Model Danych w Języku Swift
+# Rozdział 12: Protokół Synchronizacji Dwukierunkowej (Delta Sync)
 
-```swift
-import Foundation
-import SwiftData
+### 12.1. Architektura Kolejki Mutacji (`sync_queue` w SQLite)
+Na urządzeniu mobilnym każda operacja zapisu wykonuje w jednej transakcji lokalny zapis oraz wstawienie rekordu do tabeli `sync_queue`:
 
-// MARK: - Wzorcowy Model Gołębia (Pigeon Entity)
-@Model
-public final class Pigeon {
-    @Attribute(.unique) public var id: UUID
-    public var ringCountry: String
-    public var ringBranch: String
-    public var ringYear: Int
-    public var ringNumber: String
-    public var auxiliaryRingCode: String?
-    public var markerColorHex: String?
-    public var sex: Sex
-    public var colorCode: String
-    public var status: PigeonStatus
-    
-    // Relacje rekurencyjne drzewa genealogicznego
-    @Relationship(deleteRule: .nullify) public var sire: Pigeon?
-    @Relationship(deleteRule: .nullify) public var dam: Pigeon?
-    @Relationship(deleteRule: .cascade, inverse: \Pigeon.sire) public var offspringAsSire: [Pigeon]
-    @Relationship(deleteRule: .cascade, inverse: \Pigeon.dam) public var offspringAsDam: [Pigeon]
-    
-    // Zdjęcia i multimedia
-    public var photoProfilePath: String?
-    public var photoEyePath: String?
-    public var photoWingPath: String?
-    
-    // Wskaźniki dziedzinowe
-    public var inbreedingCoefficient: Double
-    public var structuralScore: Int
-    public var createdAt: Date
-    public var updatedAt: Date
-    
-    public init(
-        id: UUID = UUID(),
-        ringCountry: String = "PL",
-        ringBranch: String = "0123",
-        ringYear: Int = 2026,
-        ringNumber: String,
-        sex: Sex = .male,
-        colorCode: String = "NIEBIESKA",
-        status: PigeonStatus = .racing
-    ) {
-        self.id = id
-        self.ringCountry = ringCountry
-        self.ringBranch = ringBranch
-        self.ringYear = ringYear
-        self.ringNumber = ringNumber
-        self.sex = sex
-        self.colorCode = colorCode
-        self.status = status
-        self.inbreedingCoefficient = 0.0
-        self.structuralScore = 0
-        self.offspringAsSire = []
-        self.offspringAsDam = []
-        self.createdAt = Date()
-        self.updatedAt = Date()
-    }
-    
-    public var fullRingIdentifier: String {
-        "\(ringCountry)-\(ringBranch)-\(ringYear % 100)-\(ringNumber)"
-    }
-}
-
-public enum Sex: String, Codable {
-    case male = "MALE"
-    case female = "FEMALE"
-    case unknown = "UNKNOWN"
-}
-
-public enum PigeonStatus: String, Codable {
-    case breeding = "ROZPLODOWY"
-    case racing = "LOTOWY"
-    case young = "MLODY"
-    case inNest = "W_GNIEZDZIE"
-    case sold = "SPRZEDANY"
-    case lost = "ZAGINIONY"
-    case deceased = "ZSZEDL"
-}
-
-// MARK: - Wzorcowy Model Rejestracji Przylotu i Prędkości (Arrival Entity)
-@Model
-public final class RaceArrival {
-    @Attribute(.unique) public var id: UUID
-    public var raceId: UUID
-    public var pigeonId: UUID
-    public var arrivalTimestamp: Date
-    public var durationMinutes: Double
-    public var distanceMeters: Double
-    public var speedMpm: Double
-    public var aeroSpeedMpm: Double?
-    public var positionInLoft: Int
-    public var source: ArrivalSource
-    public var createdAt: Date
-    
-    public init(
-        id: UUID = UUID(),
-        raceId: UUID,
-        pigeonId: UUID,
-        arrivalTimestamp: Date,
-        durationMinutes: Double,
-        distanceMeters: Double,
-        positionInLoft: Int,
-        source: ArrivalSource = .qrCamera
-    ) {
-        self.id = id
-        self.raceId = raceId
-        self.pigeonId = pigeonId
-        self.arrivalTimestamp = arrivalTimestamp
-        self.durationMinutes = durationMinutes
-        self.distanceMeters = distanceMeters
-        self.positionInLoft = positionInLoft
-        self.source = source
-        self.speedMpm = durationMinutes > 0 ? (distanceMeters / durationMinutes) : 0.0
-        self.createdAt = Date()
-    }
-}
-
-public enum ArrivalSource: String, Codable {
-    case qrCamera = "QR_CAMERA"
-    case appleWatch = "APPLE_WATCH"
-    case manual = "MANUAL"
-    case bleIot = "BLE_IOT"
-}
+```sql
+CREATE TABLE IF NOT EXISTS sync_queue (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    entity_name TEXT NOT NULL,       -- 'birds', 'races', 'race_arrivals'
+    entity_id TEXT NOT NULL,         -- UUID
+    operation TEXT NOT NULL,         -- 'INSERT', 'UPDATE', 'DELETE'
+    payload_json TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'SYNCING', 'FAILED')),
+    retry_count INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
 ```
 
----
-
-### 11.3. Procedura Automatycznego i Manualnego Backupu
-- **Kopia Rotacyjna (10 Slotów):** Przy każdym uruchomieniu aplikacji po wykryciu zakończenia lotu lub dodania nowych ptaków silnik wykonuje:
-  ```
-  /Library/Application Support/Backups/PigeonFly_backup_0.sqlite ... PigeonFly_backup_9.sqlite
-  ```
-  Nowa kopia nadpisuje najstarszą w pętli FIFO.
-- **Eksport do Chmury Użytkownika:** 1-klikowy eksport pliku `.sqlite` i `.json` przez standardowy `UIActivityViewController` do wybranego folderu w iCloud Drive lub pamięci urządzenia. Kopia nigdy nie wymaga płatnej subskrypcji.
+### 12.2. Algorytm Wypychania i Pobierania (Push / Pull Engine w Swift)
+1. **Faza PUSH (Wypychanie lokalnych zmian do Supabase):**
+   - Po wykryciu sieci (`NWPathMonitor.currentPath.status == .satisfied`), silnik pobiera do 50 oczekujących rekordów z `sync_queue`.
+   - Wysyła paczkę do procedury składowanej RPC w PostgreSQL: `sync_push_batch(payload)`.
+   - Po otrzymaniu statusu HTTP 200, przetworzone rekordy są usuwane z lokalnej `sync_queue`.
+2. **Faza PULL (Pobieranie zmian z chmury):**
+   - Silnik wysyła zapytanie:
+     ```
+     GET /rest/v1/birds?updated_at=gt.[LAST_SYNC_TIMESTAMP]&loft_id=eq.[LOFT_ID]
+     ```
+   - Pobrane rekordy aktualizują lokalną bazę SQLite z rozstrzyganiem konfliktów według zasady Last-Write-Wins (LWW) w oparciu o `updated_at`.

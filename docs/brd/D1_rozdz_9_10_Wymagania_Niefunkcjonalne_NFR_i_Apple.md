@@ -1,67 +1,57 @@
 # Rozdziały 9–10: Wymagania Niefunkcjonalne (NFR) i Wytyczne Apple HIG (D1)
-## Pigeon-Fly · Standardy Jakościowe, Ergonomia Polowa i Prywatność
+## Pigeon-Fly · Standardy Jakościowe, Ergonomia Polowa i Bezpieczeństwo Supabase
 
 ---
 
-# Rozdział 9: Katalog Wymagań Niefunkcjonalnych (NFR-001 do NFR-060)
+# Rozdział 9: Katalog Wymagań Niefunkcjonalnych (NFR-001 do NFR-065)
 
-### 9.1. Niezawodność i Architektura Offline (NFR-OFF)
-- **NFR-OFF-001:** Aplikacja zachowuje 100% funkcjonalności obliczeniowej, bazodanowej i generowania dokumentów PDF bez aktywnego połączenia z siecią komórkową lub Wi-Fi.
-- **NFR-OFF-002:** Brak jakichkolwiek wywołań blokujących interfejs użytkownika w oczekiwaniu na odpowiedź sieciową (Zero Network Blocking).
-- **NFR-OFF-003:** Baza danych SQLite otwarta w trybie **WAL (Write-Ahead Logging)** z synchronicznością `NORMAL` — gwarancja odporności na nagłą utratę zasilania telefonu bez uszkodzenia indeksów.
-
----
-
-### 9.2. Ergofizyka i Tryb Gołębnika (NFR-FIELD)
-- **NFR-FIELD-001 (Minimalny Rozmiar Przycisków):** W trybie Field Mode wszystkie przyciski i kafle interaktywne mają fizyczny wymiar $\ge 56 \times 56\,\text{pt}$ (w trybie standardowym $\ge 44 \times 44\,\text{pt}$ zgodnie z Apple HIG).
-- **NFR-FIELD-002 (Blokada Wygaszania Ekranu):** Podczas trwania dyżuru przylotowego w module Skanera i Lotu aplikacja ustawia:
-  ```swift
-  UIApplication.shared.isIdleTimerDisabled = true
-  ```
-  zapobiegając uśpieniu telefonu, gdy hodowca obserwuje niebo. Po wyjściu z ekranu przylotów flaga automatycznie powraca do wartości `false`.
-- **NFR-FIELD-003 (Strefa Kciuka):** Wszystkie krytyczne akcje (skanuj, zatwierdź, dodaj czas) znajdują się w dolnych $40\%$ wysokości ekranu, umożliwiając bezproblemową obsługę jedną ręką (gdy druga trzyma ptaka).
-- **NFR-FIELD-004 (Wysoki Kontrast w Słońcu):** Interfejs Field Mode wykorzystuje paletę o ultrawysokim kontraście (głęboka czerń `#000000` i jaskrawy bursztyn/żółć `#FFCC00`), gwarantując czytelność przy bezpośrednim oświetleniu promieniami słonecznymi.
+### 9.1. Niezawodność i Architektura Hybrydowa Offline-First (NFR-OFF)
+- **NFR-OFF-001 (Niezależność Polowa):** Aplikacja zachowuje 100% funkcjonalności obliczeniowej, bazodanowej i generowania dokumentów PDF bez aktywnego połączenia z siecią.
+- **NFR-OFF-002 (Zero Network Blocking):** Wszelkie operacje zapisu i odczytu w gołębniku trafiają bezpośrednio do lokalnej bazy SQLite WAL. Żadne zapytanie sieciowe nie ma prawa blokować wątku głównego interfejsu (UI).
+- **NFR-OFF-003 (Protokół Synchronizacji Delta):** Lokalne mutacje rejestrowane są w tabeli `sync_queue`. Gdy dostępne jest połączenie z internetem, silnik w tle wysyła zmienione rekordy do Supabase PostgREST w paczkach (batch up to 50 items) z mechanizmem wykładniczego ponawiania (Exponential Backoff: 1s, 2s, 4s, 8s...).
 
 ---
 
-### 9.3. Dostępność i Wsparcie dla Seniorów (NFR-DOST)
-- **NFR-DOST-001 (Dynamic Type):** Pełne skalowanie wszystkich tekstów interfejsu zgodnie z ustawieniami systemowymi wielkości fontu, w tym dla największych rozmiarów dostępnościowych (Accessibility Sizes).
-- **NFR-DOST-002 (VoiceOver):** Każdy element interfejsu, kafelek ptaka, wynik prędkości i status lotki posiada precyzyjną, syntetyczną etykietę czytnika ekranu (np. *„Gołąb PL-0123-22-4444, samiec, niebieski, prędkość 1256 metrów na minutę, pierwsze miejsce w gołębniku”*).
-- **NFR-DOST-003 (Redukcja Ruchu):** Wsparcie dla systemowej flagi `prefers-reduced-motion` — eliminacja zbędnych animacji przejść na rzecz natychmiastowych zmian widoków.
+### 9.2. Bezpieczeństwo, Uwierzytelnianie i Izolacja Danych (NFR-SEC)
+- **NFR-SEC-001 (Row Level Security w PostgreSQL):** Wszystkie tabele w bazie Supabase posiadają bezwzględnie aktywne RLS (`ENABLE ROW LEVEL SECURITY`). Brak jakichkolwiek polityk `USING (true)` poza publicznym portalem odczytu zweryfikowanych rodowodów.
+- **NFR-SEC-002 (Anonimowy Start Zero-Friction):** Aplikacja generuje anonimowy token sesji Supabase Auth (`signInAnonymously()`). Użytkownik korzysta z chmury natychmiast bez podawania danych.
+- **NFR-SEC-003 (Bezszwowe Łączenie Tożsamości z Apple Sign-In):** W chwili gdy hodowca decyduje się na tandem hodowlany lub zakup Pro, anonimowe konto zostaje bezutratnie scalone z Apple ID (`linkIdentity(with: .apple)`), zachowując wszystkie dotychczasowe dane stada i rodowodów.
+- **NFR-SEC-004 (Szyfrowanie Współrzędnych):** Dokładne koordynaty GPS gołębnika są w bazie Supabase dostępne wyłącznie dla właściciela i autoryzowanych członków tandemu. W publicznych relacjach live oraz na rodowodach współrzędne są całkowicie ukryte.
 
 ---
 
-### 9.4. Globalna Lokalizacja w 35 Językach (NFR-I18N)
-- **NFR-I18N-001:** Zero hardcodowanych ciągów tekstowych w kodzie źródłowym. Wszystkie teksty ładowane przez funkcję `t(key)` ze ściśle typowanych słowników.
-- **NFR-I18N-002 (Kanon 35 Języków):**
-  Angielski (US/UK), Polski, Niemiecki, Niderlandzki (Holandia/Flandria), Francuski, Rumuński, Włoski, Hiszpański, Portugalski, Chiński (Tradycyjny - Tajwan), Chiński (Uproszczony), Japoński, Arabski, Turecki, Czeski, Słowacki, Węgierski, Bułgarski, Chorwacki, Serbski, Grecki, Szwedzki, Duński, Norweski, Fiński, Tajski, Wietnamski, Indonezyjski, Ukraiński, Litewski, Łotewski, Estoński, Hindi, Koreański, Hebrajski.
-- **NFR-I18N-003:** Zgodność z kierunkiem pisma od prawej do lewej (RTL) dla języka arabskiego i hebrajskiego.
+### 9.3. Ergofizyka i Tryb Gołębnika (NFR-FIELD)
+- **NFR-FIELD-001 (Wymiary Dotyku):** W trybie Field Mode wszystkie kafle i przyciski mają fizyczny wymiar $\ge 56 \times 56\,\text{pt}$ (w trybie standardowym $\ge 44 \times 44\,\text{pt}$).
+- **NFR-FIELD-002 (Blokada Wygaszania Ekranu):** Podczas dyżuru przylotowego aplikacja ustawia `UIApplication.shared.isIdleTimerDisabled = true`.
+- **NFR-FIELD-003 (Strefa Kciuka):** Kluczowe akcje ulokowane w dolnych 40% ekranu dla swobodnej obsługi jedną ręką.
+- **NFR-FIELD-004 (Wysoki Kontrast w Słońcu):** Czerń `#000000` i jaskrawy bursztyn `#FFCC00` — doskonała widoczność na dachu w ostrym słońcu.
 
 ---
 
-### 9.5. Budżety Wydajnościowe CPU i Pamięci (NFR-WYD)
-- **NFR-WYD-001:** Zimny start aplikacji do pierwszego interaktywnego widoku stada: $< 400\,\text{ms}$ na iPhone 11.
-- **NFR-WYD-002:** Wyliczenie odległości Vincenty'ego i prędkości $m/min$: $< 1\,\text{ms}$.
-- **NFR-WYD-003:** Rekonstrukcja drzewa genealogicznego 5 pokoleń (62 przodków) i obliczenie inbredu Wrighta: $< 25\,\text{ms}$.
-- **NFR-WYD-004:** Generowanie i zapis wektorowego pliku PDF A4 rodowodu: $< 450\,\text{ms}$.
-- **NFR-WYD-005:** Maksymalne zużycie pamięci RAM: $< 65\,\text{MB}$ podczas intensywnego skanowania wideo w lufce.
+### 9.4. Dostępność i Wsparcie dla Seniorów (NFR-DOST)
+- **NFR-DOST-001 (Dynamic Type):** Pełne skalowanie wszystkich tekstów do największych rozmiarów systemowych Accessibility XXL.
+- **NFR-DOST-002 (VoiceOver):** Precyzyjne etykiety semantyczne dla czytnika ekranu na każdym kafelku i przycisku.
+- **NFR-DOST-003 (Redukcja Ruchu):** Zgodność z systemową flagą `prefers-reduced-motion`.
 
 ---
 
-### 9.6. Prywatność i Bezpieczeństwo Danych (NFR-BEZP)
-- **NFR-BEZP-001 (Deklaracja App Store):** Karta prywatności App Store zawiera oficjalne oświadczenie: **Data Not Collected**.
-- **NFR-BEZP-002 (Szyfrowanie Współrzędnych):** Współrzędne geograficzne gołębnika macierzystego są szyfrowane kluczem systemowym iOS Keychain (`kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`).
-- **NFR-BEZP-003 (Zero Telemetrii):** Brak jakichkolwiek wywołań sieciowych wysyłających crashlogi, identyfikatory IDFA/IDFV czy statystyki użycia.
+### 9.5. Globalna Lokalizacja w 35 Językach (NFR-I18N)
+- **NFR-I18N-001:** Zero hardcodowanych ciągów tekstowych. Wszystkie teksty ładowane ze słowników z uwzględnieniem żargonu hodowlanego PZHGP, FCI, KBDB, Verband.
+- **NFR-I18N-002:** Pełne wsparcie dla 35 języków (w tym pismo od prawej do lewej RTL dla arabskiego i hebrajskiego).
+
+---
+
+### 9.6. Budżety Wydajnościowe CPU i Pamięci (NFR-WYD)
+- **NFR-WYD-001:** Start aplikacji do pierwszego widoku stada: $< 400\,\text{ms}$.
+- **NFR-WYD-002:** Przeliczenie formuły Vincenty'ego i prędkości $m/min$: $< 1\,\text{ms}$.
+- **NFR-WYD-003:** Rekonstrukcja drzewa 5 pokoleń i inbredu Wrighta: $< 25\,\text{ms}$.
+- **NFR-WYD-004:** Generowanie wektorowego PDF A4: $< 450\,\text{ms}$.
+- **NFR-WYD-005:** Opóźnienie transmisji przylotu przez Supabase Realtime: $< 200\,\text{ms}$ w sieci LTE/5G.
 
 ---
 
 # Rozdział 10: Wytyczne Apple Human Interface Guidelines (HIG)
 
-1. **Spójność Nawigacji:** Zastosowanie standardowego paska 5 zakładek (Tab Bar) u dołu ekranu z czytelnymi symbolami SF Symbols 6:
-   - *Gołębnik* (`bird.fill`),
-   - *Loty* (`stopwatch.fill`),
-   - *Skaner QR* (`qrcode.viewfinder`),
-   - *Zdrowie* (`cross.case.fill`),
-   - *Ustawienia / Więcej* (`gearshape.fill`).
-2. **Standard Zamykania Okien Modalnych:** Zgodnie ze standardem studia Apps4Brew, każde okno modalne i wysuwane od dołu (sheet) posiada **widoczny, dotykowy przycisk „Anuluj / Zamknij” umieszczony w lewym górnym rogu nagłówka** (obszar $\ge 44 \times 44\,\text{pt}$). Gest przeciągnięcia w dół jest jedynie opcjonalnym dodatkiem.
-3. **Wsparcie dla Apple Watch (watchOS 11):** Niezależna aplikacja zegarkowa wykorzystująca SwiftUI i protokół `WatchConnectivity` z kolejką offline na wypadek braku natychmiastowego połączenia z iPhone'em.
+1. **Standard Nawigacji:** Spójny dolny pasek 5 zakładek SF Symbols 6: *Gołębnik*, *Loty*, *Skaner QR*, *Zdrowie*, *Ustawienia / Chmura*.
+2. **Standard Zamykania Modali:** Każde okno modalne posiada fizyczny, widoczny przycisk „Anuluj / Zamknij” w lewym górnym rogu nagłówka ($\ge 44 \times 44\,\text{pt}$).
+3. **Wsparcie watchOS 11:** Niezależna aplikacja na Apple Watch z protokołem `WatchConnectivity` i odporną na brak sieci kolejką `WatchOfflineQueue`.

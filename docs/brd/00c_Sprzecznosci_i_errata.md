@@ -1,7 +1,5 @@
 # Rejestr Sprzeczności, Errata i Rozstrzygnięcia Regulaminowe (00c)
-## Pigeon-Fly · Standard Zgodności Dziedzinowej
-
-> **Cel dokumentu:** Identyfikacja pozornych i rzeczywistych sprzeczności pomiędzy zwyczajami hodowców a regulaminami oficjalnymi (FCI, PZHGP, KBDB), ograniczeniami technologicznymi platformy iOS oraz przyjęcie jednoznacznych rozstrzygnięć inżynierskich.
+## Pigeon-Fly · Standard Zgodności Dziedzinowej i Chmurowej (Supabase)
 
 ---
 
@@ -39,6 +37,25 @@
 
 ---
 
-### SPRZ-06: Prywatność Położenia Gołębnika (Zagrożenie Kradzieżą Cennego Stada)
-- **Sprzeczność:** Elitarne gołębie pocztowe osiągają na aukcjach zawrotne kwoty (od kilkunastu tysięcy do nawet 1,6 mln EUR za ptaka). Hodowcy panicznie boją się wycieku lokalizacji gołębnika.
-- **Rozstrzygnięcie:** Bezwzględna zasada **Data Not Collected**. Współrzędne GPS gołębnika nigdy nie są transmitowane przez sieć, nie są zapisywane w plikach telemetrycznych, a kopia zapasowa w pliku jest szyfrowana kluczem lokalnym urządzenia użytkownika.
+### SPRZ-06: Prywatność Położenia Gołębnika a Baza Danych w Chmurze (Supabase)
+- **Sprzeczność:** Elitarne gołębie osiągają na aukcjach setki tysięcy euro. Przechowywanie współrzędnych gołębnika w chmurze budzi lęk przed kradzieżą ptaków lub włamaniem do gołębnika.
+- **Rozstrzygnięcie:**
+  1. W Supabase dokładne współrzędne geograficzne gołębnika podlegają rygorystycznemu **Row Level Security (RLS)** — tylko właściciel konta i uwierzytelnieni członkowie tandemu mają prawo odczytu `latitude` i `longitude`.
+  2. W publicznych relacjach live (Live Race Broadcast) oraz w publicznym portalu weryfikacji rodowodu współrzędne są **całkowicie maskowane** (wyświetlana jest tylko nazwa oddziału / miejscowość, np. *„Oddział 0123 Poznań-Północ”*).
+
+---
+
+### SPRZ-07: Koegzystencja Obietnicy „100% Offline-First” z Chmurą Supabase
+- **Sprzeczność:** Pierwotna obietnica głosiła: *„Aplikacja działa w 100% bez internetu”*. Czy wdrożenie bazy Supabase nie zaprzecza tej filozofii?
+- **Rozstrzygnięcie:** **ABSOLUTNIE NIE.** Model architektoniczny to **Hybrydowy Offline-First**:
+  - Baza lokalna SQLite WAL na urządzeniu jest jedynym i bezpośrednim odbiorcą wszystkich kliknięć, wpisów, skanów QR i edycji.
+  - Aplikacja w gołębniku **nigdy nie czeka na odpowiedź sieci** i nigdy nie blokuje interfejsu.
+  - Supabase działa asynchronicznie w tle jako silnik synchronizacji, backupu chmurowego i współpracy zespołowej (tandem, live broadcast, weryfikacja rodowodów). Gdy zasięgu brak – aplikacja działa lokalnie; gdy sieć powraca – dane replikują się automatycznie bez ingerencji hodowcy.
+
+---
+
+### SPRZ-08: Równoległe Edycje w Tandemie Hodowlanym (Konflikty Zapisu)
+- **Sprzeczność:** Ojciec w gołębniku oznacza ptaka jako `LOTOWY`, a syn na iPadzie w domu w tym samym momencie edytuje numer celi gniazdowej.
+- **Rozstrzygnięcie:**
+  - Dla pól profilowych gołębia stosowana jest reguła **Last-Write-Wins (LWW)** w oparciu o uniksowy znacznik czasu `updated_at`.
+  - Dla zdarzeń krytycznych (przyloty z lotu, koszowanie) stosowany jest model **Append-Only Event Sourcing** — każde zarejestrowane lądowanie ptaka ma unikalny identyfikator UUID i nigdy nie jest nadpisywane.

@@ -1,4 +1,4 @@
-# Rozdział 7.2: Wymagania Funkcjonalne — Rodowody, Inbred Wrighta i Generator PDF (B2)
+# Rozdział 7.2: Wymagania Funkcjonalne — Rodowody, Inbred Wrighta, Generator PDF i Weryfikacja Chmurowa (B2)
 ## Pigeon-Fly · Specyfikacja Modułu 2 (BR-ROD)
 
 ---
@@ -19,11 +19,11 @@
 
 ### BR-ROD-002: Rekurencyjny Silnik Genealogiczny do 5 Pokoleń w Głąb
 - **Priorytet:** MUST · **Etap:** MVP · **Persona:** P2, P5 (Chen)
-- **Opis:** Silnik bazy danych potrafi w czasie $<30\,\text{ms}$ zrekonstruować pełne drzewo przodków ptaka do 5 pokoleń (łącznie do 62 bezpośrednich przodków: 2 rodziców, 4 dziadków, 8 pradziadków, 16 prapradziadków, 32 praprapradziadków).
+- **Opis:** Silnik bazy danych potrafi w czasie $<30\,\text{ms}$ zrekonstruować pełne drzewo przodków ptaka do 5 pokoleń (łącznie do 62 bezpośrednich przodków).
 - **Kryteria Akceptacji:**
   - *GIVEN:* Ptak z zarejestrowaną wielopokoleniową historią.
   - *WHEN:* Użytkownik otwiera widok *Drzewo Genealogiczne*.
-  - *THEN:* Interfejs renderuje interaktywny, przewijalny wykres drzewa z podziałem na gałęzie ojcowskie (górna połowa) i matczyne (dolna połowa), z możliwością kliknięcia w dowolnego przodka i przejścia do jego karty.
+  - *THEN:* Interfejs renderuje interaktywny, przewijalny wykres drzewa z podziałem na gałęzie ojcowskie i matczyne, z możliwością przejścia do karty dowolnego przodka.
 
 ---
 
@@ -32,23 +32,11 @@
 - **Opis:** Deterministyczne wyliczanie współczynnika inbredu Sewalla Wrighta ($F$) dla każdego ptaka na podstawie analizy wspólnych przodków po stronie ojca i matki.
 - **Formuła Matematyczna:**
   $$F_X = \sum_{A} \left( \frac{1}{2} \right)^{n_1 + n_2 + 1} (1 + F_A)$$
-  gdzie:
-  - $A$ to wspólny przodek ojca i matki,
-  - $n_1$ to liczba pokoleń od ojca do wspólnego przodka $A$,
-  - $n_2$ to liczba pokoleń od matki do wspólnego przodka $A$,
-  - $F_A$ to współczynnik inbredu samego przodka $A$.
 - **Kryteria Akceptacji:**
   - *GIVEN:* Kojarzenie pełnego rodzeństwa (brat x siostra o niespokrewnionych rodzicach).
   - *WHEN:* System wylicza współczynnik inbredu potomstwa.
   - *THEN:* Wynik wynosi dokładnie **$F = 25,0\%$** ($0,2500$).
-  - *GIVEN:* Kojarzenie półrodzeństwa (wspólny ojciec, dwie różne matki).
-  - *WHEN:* System wylicza inbred potomstwa.
-  - *THEN:* Wynik wynosi dokładnie **$F = 12,5\%$** ($0,1250$).
-  - *THEN:* Wartość wyświetla się z kolorowym oznaczeniem ryzyka genetycznego:
-    - Zielony ($0,0\% \le F < 6,25\%$ — outcross / bezpieczny),
-    - Żółty ($6,25\% \le F < 12,5\%$ — umiarkowany inbred liniowy),
-    - Pomarańczowy ($12,5\% \le F \le 25,0\%$ — bliski inbred hodowlany),
-    - Czerwony ($F > 25,0\%$ — skrajny inbred kazirodczy z ostrzeżeniem o możliwej depresji inbredowej).
+  - *THEN:* Wartość wyświetla się z kolorowym oznaczeniem ryzyka (Zielony $<6,25\%$, Żółty $6,25–12,5\%$, Pomarańczowy $12,5–25\%$, Czerwony $>25\%$).
 
 ---
 
@@ -60,39 +48,41 @@
   - *WHEN:* Klika „Symuluj Skojarzenie”.
   - *THEN:* Ekran w czasie rzeczywistym prezentuje:
     1. Hipotetyczny współczynnik inbredu $F$ przyszłego potomstwa.
-    2. Listę wspólnych przodków (np. *„Samiec B-15-6021444 pojawia się 3 razy w rodowodzie”*).
-    3. Prawdopodobieństwo dziedziczenia barwy upierzenia (zgodnie z genetyką krzyżówek gołębi).
+    2. Listę wspólnych przodków.
+    3. Prawdopodobieństwo dziedziczenia barwy upierzenia.
     4. Przycisk „Zatwierdź Parę i Przypisz Celę”.
 
 ---
 
-### BR-ROD-005: Generator Wystawowych Rodowodów PDF A4 (Format PIPA / Międzynarodowy)
+### BR-ROD-005: Generator Wystawowych Rodowodów PDF A4 (Format PIPA)
 - **Priorytet:** MUST · **Etap:** MVP · **Persona:** P2 (Luc), P5 (Chen)
-- **Opis:** Moduł generowania profesjonalnych, wektorowych dokumentów PDF w standardzie A4 Landscape (poziomym), powszechnie stosowanym na międzynarodowych aukcjach gołębi (np. PIPA, De Duif).
-- **Elementy Składowe Dokumentu PDF:**
-  1. **Nagłówek:** Nazwa gołębnika / hodowli (np. *„Loft Karwowski — Racing Pigeons”*), logotyp/herb hodowcy, adres, telefon, e-mail.
-  2. **Karta Główna Ptaka:** Numer obrączki (duży font), płeć, maść, rok, nazwa własna (np. *„Szybki Błękit”*), współczynnik inbredu $F$.
-  3. **Zdjęcia Wbudowane:** Zdjęcie sylwetki (lewy panel), zdjęcie oka makro Eye-Sign (okrągłe pole z ramką), zdjęcie rozpostartego skrzydła.
-  4. **Drzewo 4 Pokoleń:**
-     - Pokolenie 1: Ojciec i Matka (pełny opis, numery obrączek, osiągnięcia lotowe).
-     - Pokolenie 2: 4 Dziadków.
-     - Pokolenie 3: 8 Pradziadków.
-     - Pokolenie 4: 16 Prapradziadków (numery obrączek i szczepy).
-  5. **Stopka:** Data wygenerowania dokumentu, unikalny kod weryfikacyjny dokumentu i pole na odręczny podpis hodowcy.
+- **Opis:** Moduł generowania wektorowych dokumentów PDF w standardzie A4 Landscape z 4 pokoleniami przodków, zdjęciem sylwetki, makro oka i skrzydła.
 - **Kryteria Akceptacji:**
   - *GIVEN:* Profil gołębia z kompletem danych i zdjęć.
   - *WHEN:* Użytkownik klika „Generuj Rodowód PDF”.
-  - *THEN:* W czasie $<500\,\text{ms}$ na iPhone powstaje plik PDF o nieskazitelnej jakości wektorowej (teksty ostre przy dowolnym powiększeniu, zdjęcia zoptymalizowane w 300 DPI do druku).
-  - *GIVEN:* Użytkownik w darmowym Free Tierze.
-  - *WHEN:* Generuje rodowód.
-  - *THEN:* Dokument zawiera półprzezroczysty znak wodny *„Wygenerowano w Pigeon-Fly Free”*. W wersji PRO znak wodny jest usuwany, a dokument zyskuje certyfikat czystości wydruku.
+  - *THEN:* W czasie $<500\,\text{ms}$ powstaje plik PDF o jakości wektorowej 300 DPI, gotowy do druku AirPrint lub eksportu.
 
 ---
 
 ### BR-ROD-006: Bezpośredni Druk AirPrint i Udostępnianie
 - **Priorytet:** MUST · **Etap:** MVP · **Persona:** P1, P2
-- **Opis:** Bezpośrednia integracja z systemowym arkuszem udostępniania iOS (`UIActivityViewController`).
+- **Opis:** Integracja z systemowym arkuszem udostępniania iOS (`UIActivityViewController`).
+
+---
+
+### BR-ROD-007: Zweryfikowany Cyfrowy Paszport Rodowodu (Anti-Counterfeit Portal w Supabase)
+- **Priorytet:** MUST · **Etap:** MVP · **Persona:** P2 (Luc), P5 (Chen)
+- **Opis:** Ochrona przed fałszerstwami rodowodów przy międzynarodowych transferach i aukcjach (np. Chiny, Tajwan, Rumunia).
+- **Mechanizm Działania:**
+  1. Przy generowaniu rodowodu aplikacja oblicza skrót kryptograficzny **SHA-256** z danych ptaka, unikalnych numerów przodków i daty wydania.
+  2. W tabeli `verified_pedigrees` w Supabase publikowany jest rekord certyfikatu z unikalnym tokenem publicznym (UUIDv4).
+  3. Na wygenerowanym dokumencie PDF A4 (w prawym dolnym rogu) umieszczany jest oficjalny kod QR oraz czytelny link:
+     ```
+     https://pigeonfly.app/pedigree/[TOKEN_UUID]
+     ```
+  4. Kupiec z dowolnego miejsca na świecie skanuje kod QR aparatem swojego telefonu.
+  5. Przeglądarka otwiera publiczny portal weryfikacyjny z certyfikatem autentyczności: potwierdza nazwę hodowli wystawcy, status ptaka, kompletne drzewo 4 pokoleń oraz oryginalne zdjęcia 4K oka i skrzydła hostowane w Supabase Storage CDN.
 - **Kryteria Akceptacji:**
-  - *GIVEN:* Wygenerowany podgląd rodowodu PDF.
-  - *WHEN:* Użytkownik klika ikonę udostępniania.
-  - *THEN:* Może natychmiast wydrukować dokument na bezprzewodowej drukarce domowej AirPrint, wysłać plik PDF przez aplikację Wiadomości / WhatsApp lub zapisać w chmurze iCloud Drive.
+  - *GIVEN:* Rodowód wygenerowany w wersji PRO.
+  - *WHEN:* Kupiec skanuje kod QR z wydrukowanej kartki papieru.
+  - *THEN:* W przeglądarce telefonu otwiera się strona ze stemplem *„Zweryfikowany Cyfrowy Rodowód Pigeon-Fly — Certyfikat Autentyczny”*. Jakakolwiek próba sfałszowania danych na papierze (np. zmiana numeru przodka) jest natychmiast demaskowana przez rozbieżność z bazą w chmurze Supabase.

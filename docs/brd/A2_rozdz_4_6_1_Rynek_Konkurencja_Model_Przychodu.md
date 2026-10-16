@@ -1,58 +1,37 @@
-# Rozdziały 4–6.1: Rynek, Konkurencja i Model Przychodu (A2)
-## Pigeon-Fly · Cyfrowy Notes Mistrza
+# Rozdziały 4–6.1: Rynek, Konkurencja i Model Przychodu w Modelu Hybrydowym (A2)
+## Pigeon-Fly · Cyfrowy Notes Mistrza z Architekturą Supabase
 
 ---
 
-# Rozdział 4: Globalna Analiza Rynku Sportu Gołębiarskiego
+# Rozdział 4: Globalna Analiza Rynku i Przewagi Chmurowe
 
-### 4.1. Wielkość Rynku i Demografia Środowiskowa
-Sport gołębiarski (ang. *pigeon racing*, fr. *colombophilie*, niem. *Brieftaubensport*, niderl. *duivensport*) to jedna z najstarszych i najbardziej fascynujących dyscyplin hodowlano-sportowych na świecie, łącząca tradycję z pasją rywalizacji genetyczno-fizycznej.
-
-```
-                    SZACUNKOWA LICZBA AKTYWNYCH HODOWCÓW (2026)
- ┌────────────────────────────────────────────────────────────────────────┐
- │ 🇵🇱 POLSKA (PZHGP):           ~40 000 hodowców (Lider w Europie)       │
- │ 🇩🇪 NIEMCY (Verband):         ~25 000 hodowców                          │
- │ 🇧🇪 BELGIA (KBDB):            ~18 000 hodowców (Kolebka światowa)      │
- │ 🇷🇴 RUMUNIA (FNCPR):          ~16 000 hodowców (Najszybszy wzrost)      │
- │ 🇳🇱 HOLANDIA (NPO):           ~15 000 hodowców                          │
- │ 🇬🇧 WIELKA BRYTANIA (RPRA):   ~18 000 hodowców                          │
- │ 🇹🇼 / 🇨🇳 TAJWAN I CHINY:      ~300 000+ hodowców (Aukcje wielomilionowe)│
- └────────────────────────────────────────────────────────────────────────┘
-```
-
-* **Polska:** Posiada największą liczbę aktywnych hodowców w całej Unii Europejskiej zorganizowanych w ponad 200 oddziałach PZHGP. Rocznie w Polsce obrączkuje się ponad 1,5 miliona młodych gołębi pocztowych.
-* **Belgia i Holandia:** Światowe centrum elitarnej genetyki (szczepy Janssen, Meulemans, Van Dyck, Houben, Koopman). Najwyższe ceny na aukcjach (rekordowy gołąb „Armando” sprzedany za 1,25 mln EUR, samica „New Kim” za 1,6 mln EUR).
-* **Demografia:** 65% hodowców w Europie ma powyżej 55 lat, jednak w ostatnich latach obserwuje się wyraźny napływ pokolenia 25–45 lat (dzieci i wnukowie mistrzów), którzy wprowadzają do gołębników smartfony, Apple Watch i analizę danych.
+### 4.1. Wielkość Rynku i Cyfrowa Transformacja
+Sport gołębiarski przechodzi głęboką transformację pokoleniową:
+- Ponad **400 000 zrzeszonych hodowców** w Europie i Azji (Polska: 40 tys., Niemcy: 25 tys., Belgia: 18 tys., Tajwan i Chiny: 300 tys.+).
+- Coraz powszechniejsze stają się **spółki hodowlane (Tandemy)**: 2–3 hodowców wspólnie inwestuje w materiał rozpłodowy i lotuje pod jednym szyldem. Wymaga to współdzielenia bazy danych stada w czasie rzeczywistym.
+- Rynek aukcyjny (sprzedaż gołębi) osiąga obroty rzędu **kilkudziesięciu milionów euro rocznie** na czołowych platformach (PIPA, De Duif). Weryfikacja cyfrowa rodowodu staje się rynkową koniecznością.
 
 ---
 
-### 4.2. Kliniczny Audyt Konkurencji i Słabości Rynkowe
+### 4.2. Dlaczego Supabase Deklasuje Istniejącą Konkurencję?
 
-Przeanalizowano 6 głównych rozwiązań obecnych na rynku:
-
-| System / Aplikacja | Platforma | Model Cenowy | Główne Wady i Skargi Użytkowników |
-| :--- | :--- | :--- | :--- |
-| **Archaiczne Programy Desktopowe** (np. stary Pigeon Planner, programy DOS/Win98) | Windows PC (brak mobile) | Często darmowe / shareware | Wymaga siedzenia przy starym komputerze PC w domu. Brak możliwości użycia w gołębniku przy ptakach. Interfejs z lat 90. Brak synchronizacji. |
-| **Portale Webowe Chmurowe** (np. MyPigeons, PigeonWeb) | Przeglądarka WWW | Abonament roczny (120–250 zł/rok) | **Tragiczny brak trybu offline.** Gdy w gołębniku na działce zanika zasięg LTE/5G, strona zawiesza się lub gubi wprowadzane dane. Wymuszone logowanie hasłem. |
-| **Aplikacje Producentów Zegarów ESK** (np. Benzing Live, Bricon, Tauris) | iOS / Android | Drogie akcesoria sprzętowe (anteny 3000–8000 zł) | Służą wyłącznie do odczytu danych z drogich stacjonarnych anten związkowych. Brak funkcji notatnika lęgowego, brak karty pierzenia skrzydła, brak bilansu karm. |
-| **Proste Mobilne Notatniki** | iOS / Android | Reklamy / 2,99 USD | Brak zrozumienia specyfiki gołębiarstwa (brak obliczeń $m/min$, brak inbredu Wrighta, brak podziału na lotki I i II rzędu, brzydkie rodowody tekstowe). |
-
-### Kluczowe Wnioski z Audytu:
-Na rynku istnieje **olbrzymia, niezagospodarowana nisza** na aplikację, która:
-1. Nie wymaga kupowania drogich urządzeń ESK do prywatnych treningów.
-2. Działa w 100% offline bez logowania i bez chmury.
-3. Oferuje elegancję Apple HIG połączoną z ergofizyką polową gołębnika (Field Mode).
-4. Posiada uczciwy zakup dożywotni (Lifetime) za ułamek ceny worka karmy.
+| Parametr / Funkcja | Tradycyjne Programy Desktopowe (DOS/Win) | Portale Webowe (MyPigeons itp.) | Aplikacje Zegarów ESK (Benzing/Tauris) | **Pigeon-Fly (Hybryda SQLite + Supabase)** |
+| :--- | :---: | :---: | :---: | :---: |
+| **Praca w gołębniku bez zasięgu GSM** | ❌ Brak (tylko stacjonarny PC) | ❌ Zawiesza się / błąd sieci | ⚠️ Tylko antena zegarowa | ✅ **100% Płynne Offline (SQLite WAL)** |
+| **Współpraca w tandemie (Multi-User)** | ❌ Brak | ⚠️ Płatne drogie konta | ❌ Brak | ✅ **Pełna współpraca w czasie rzecz. (RLS)** |
+| **Relacje z lotu na żywo (Live Broadcast)** | ❌ Brak | ⚠️ Z opóźnieniem | ⚠️ Wymaga drogiej subskrypcji ESK | ✅ **Błyskawiczne WebSockets (Realtime)** |
+| **Weryfikacja rodowodu kodem QR online** | ❌ Brak | ❌ Brak | ❌ Brak | ✅ **Publiczny portal kryptograficzny** |
+| **Globalna sieć zgłaszania zagubionych ptaków** | ❌ Brak | ❌ Brak | ❌ Brak | ✅ **Lost & Found Portal z push alertem** |
+| **Model cenowy** | Zazwyczaj stare licencje PC | Drogi abonament roczny | Anteny za 3 000–8 000 zł | ✅ **Freemium + Lifetime (19,99 EUR)** |
 
 ---
 
-# Rozdział 5: Model Przychodu i Ekonomia Jednostkowa (Unit Economics)
+# Rozdział 5: Model Przychodu, Chmura Supabase i Unit Economics
 
-### 5.1. Konstrukcja Paywalla i Pakiety Cenowe
+### 5.1. Pakiety Cenowe i Podział Funkcjonalności
 
 ```
-                  PAKIETY CENOWE PIGEON-FLY (APLIKACJA GLOBALNA)
+                  PAKIETY CENOWE PIGEON-FLY Z CHMURĄ SUPABASE
  ┌──────────────────────┬──────────────────────┬────────────────────────┐
  │ SUBSKRYPCJA MIESIĘCZ.│  SUBSKRYPCJA ROCZNA  │    ZAKUP DOŻYWOTNI     │
  │       (Sezonowa)     │   (Główny Motor)     │       (Lifetime)       │
@@ -63,53 +42,62 @@ Na rynku istnieje **olbrzymia, niezagospodarowana nisza** na aplikację, która:
  └──────────────────────┴──────────────────────┴────────────────────────┘
 ```
 
-### 5.2. Granice Dostępu: Co Blokuje Paywall Pro?
+### 5.2. Macierz Uprawnień: Free Tier vs Wersja PRO (Supabase)
 
 | Funkcjonalność | Darmowy Rdzeń (Free Tier) | Wersja PRO (Subskrypcja / Lifetime) |
 | :--- | :---: | :---: |
 | **Liczba gołębi w kartotece** | **Do 10 ptaków** (stado startowe) | **Bez limitu** (nielimitowane stada) |
-| **Podstawowy notes i karta ptaka** | ✅ Pełny dostęp | ✅ Pełny dostęp |
+| **Praca w gołębniku offline (SQLite)** | ✅ Pełny dostęp | ✅ Pełny dostęp |
 | **Ręczny kalkulator prędkości $m/min$** | ✅ Pełny dostęp | ✅ Pełny dostęp |
-| **Skaner kodów QR w lufce** | ✅ Do 10 ptaków | ✅ Bez limitu |
-| **Kopia zapasowa SQLite / JSON** | ✅ **Zawsze 100% darmowa** | ✅ **Zawsze 100% darmowa** |
-| **Generator Rodowodów PDF A4** | ❌ Znak wodny "Wersja Free" | ✅ **Pełny format wystawowy A4** |
-| **Kalkulator Inbredu Wrighta ($F$)** | ❌ Podstawowy (1 pokolenie) | ✅ **Głęboki inbred do 5 pokoleń** |
-| **Wizualna Karta Skrzydła (10 lotek)**| ❌ Tylko podgląd | ✅ **Pełne śledzenie pierzenia i ARI** |
-| **Wektor znosu wiatru i aero-korekta** | ❌ Zablokowany | ✅ **Pełna analiza wektorowa** |
-| **Śledzenie tras GPS / BTS (IoT)** | ❌ Zablokowane | ✅ **Import i wizualizacja tras** |
+| **Lokalna kopia zapasowa SQLite / JSON** | ✅ **Zawsze 100% darmowa** | ✅ **Zawsze 100% darmowa** |
+| **Replikacja w chmurze Supabase** | ❌ Brak synchronizacji | ✅ **Automatyczna bezpieczna replikacja** |
+| **Multi-Device Sync (iPhone, iPad, Mac)**| ❌ Tylko jedno urządzenie | ✅ **Bezszwowa synchronizacja w locie** |
+| **Tandem Hodowlany (wspólnicy)** | ❌ Brak | ✅ **Do 3 członków tandemu z rolami RLS** |
+| **Live Race Broadcasting (WebSockets)** | ❌ Brak | ✅ **Transmisja przylotów na żywo** |
+| **Weryfikacja Rodowodu Online (Portal QR)**| ❌ Tylko lokalny PDF | ✅ **Certyfikat online w chmurze** |
+| **Sieć Pomocy Zagubionym (Lost & Found)** | ❌ Brak alertów push | ✅ **Natychmiastowe powiadomienia Push** |
+| **Supabase Storage dla zdjęć 4K oka** | ❌ Tylko miniatury lokalne | ✅ **Bezstratne zdjęcia w chmurze CDN** |
 | **Aplikacja Apple Watch Companion** | ❌ Podgląd | ✅ **Pełne odhaczanie przylotów** |
-
-### 5.3. Ekonomia Jednostkowa i Zwrot Inwestycji
-Dzięki architekturze **100% Offline-First (Zero Serwerów)** studio nie ponosi żadnych kosztów utrzymania baz danych, hostingu czy zapytań LLM.
-
-- **Koszt stały studia:** 99 USD rocznie (opłata Apple Developer Program).
-- **Prowizja Apple:** 15% w ramach programu *App Store Small Business Program*.
-- **Czysty zysk z transakcji:**
-  - Z subskrypcji rocznej (6,99 EUR brutto $\rightarrow$ ok. 5,94 EUR netto): **~21 zł netto per użytkownik**.
-  - Z zakupu dożywotniego (19,99 EUR brutto $\rightarrow$ ok. 16,99 EUR netto): **~60 zł netto per użytkownik**.
-- **Punkt rentowności (Break-Even):**
-  Roczna opłata Apple 99 USD zwraca się już przy zaledwie **18 subskrypcjach rocznych** lub zaledwie **7 zakupach Lifetime** w skali całego świata! Każda kolejna sprzedaż generuje czysty zysk operacyjny.
 
 ---
 
-# Rozdział 6.1: Zakres Pierwszego Wydania (MVP) vs Kolejne Wersje
+### 5.3. Ekonomia Infrastruktury Chmurowej Supabase i Rentowność
 
-- **Wydanie 1.0 (MVP — Rekomendowane):**
-  - Moduł 1: Cyfrowy Notes Gołębnika (karty ptaków, numery obrączek, cechy budowy, statusy, galeria zdjęć oka i skrzydła).
-  - Moduł 2: Skanowanie Kodów QR aparatem w lufce z natywnym Vision Framework i timestampingiem.
-  - Moduł 3: Treningi i Loty, geodezyjny kalkulator prędkości $m/min$ (formuła Vincenty'ego), ranking przylotów i neutralizacja nocna.
-  - Moduł 4: Zdrowie i Pierzenie (Wizualna Karta 10 lotek, kalendarz szczepień PMV-1, okresy karencji leków).
-  - Moduł 5 (Wybrane): Dedykowana aplikacja **Apple Watch Companion** do 1-tap rejestrowania przylotów.
+Dzięki architekturze Supabase koszty infrastruktury są niemal zerowe na starcie i idealnie skalują się z przychodami:
+1. **Darmowy Tier Supabase (Free Plan):**
+   - Do **50 000 Aktywnych Użytkowników Miesięcznie (MAU)**.
+   - 500 MB bazy danych PostgreSQL (mieści ponad 1 000 000 rekordów ptaków!).
+   - 1 GB magazynu Supabase Storage (dla zdjęć i certyfikatów PDF).
+   - 200 jednoczesnych połączeń Realtime WebSockets.
+   - **Koszt: 0 USD / miesiąc.**
+2. **Skalowanie do Planu Płatnego (Supabase Pro Plan — 25 USD / msc):**
+   - Aktywowany dopiero przy przekroczeniu 50 000 MAU lub przy zapotrzebowaniu na większy Storage.
+   - Koszt 25 USD/msc pokrywa zaledwie **4 subskrypcje roczne (6,99 EUR)** lub **2 zakupy Lifetime (19,99 EUR)** miesięcznie!
+3. **Masa Marżowa:**
+   - Przy 1 000 użytkowników PRO roczny przychód netto studia wynosi **~21 000 – 60 000 PLN** przy kosztach infrastruktury wynoszących ok. **1 200 PLN rocznie** (marża brutto $> 95\%$).
+
+---
+
+# Rozdział 6.1: Zakres Pierwszego Wydania (MVP) vs Wersje Kolejne
+
+- **Wydanie 1.0 (MVP z Supabase):**
+  - Moduł 1: Cyfrowy Notes Gołębnika (karty ptaków, relacje rodzicielskie, statusy, cechy budowy).
+  - Moduł 2: Skanowanie Kodów QR aparatem w lufce (Vision Framework 60 fps, timestamp ms).
+  - Moduł 3: Treningi i Loty, geodezyjny kalkulator prędkości $m/min$ (formuła Vincenty'ego), ranking na żywo, neutralizacja nocna.
+  - Moduł 4: Zdrowie i Pierzenie (Wizualna Karta 10 lotek ARI, kalendarz szczepień PMV-1, karencje leków).
+  - Moduł 5 (Chmura Supabase):
+    * Asynchroniczna synchronizacja dwukierunkowa delta (SQLite $\leftrightarrow$ Supabase),
+    * Multi-device sync (iPhone + iPad),
+    * Portal Weryfikacji Rodowodów Online pod kodem QR (`pigeonfly.app/pedigree/[ID]`),
+    * Globalna sieć pomocy zagubionym gołębiom (Lost & Found portal z powiadomieniem Push).
   - Generator Wystawowych Rodowodów PDF A4.
+  - Apple Watch Companion.
   - 100% lokalny backup SQLite/JSON do Plików i iCloud Drive.
   - Pełne 35 języków.
 
 - **Wydanie 1.1 (Zaraz po MVP):**
-  - Zaawansowany wektor znosu wiatru i korekta aerodynamiczna.
-  - Bilansowanie mieszanek paszowych i kalkulator profilu białkowo-tłuszczowego.
-  - Import plików tras z mini-trackerów GPS/BTS przez Bluetooth i pliki GPX.
-  - Wektorowe mapy offline tras przelotu.
-
-- **Wydanie 1.2 i 2.x:**
-  - Obsługa zegarków Garmin Connect IQ via BLE.
-  - Synchronizacja stada między urządzeniami tego samego hodowcy (iPhone + iPad) przez prywatny CloudKit.
+  - Supabase Realtime Live Race Broadcasting (transmisje przylotów na żywo dla znajomych).
+  - Moduł Tandemu Hodowlanego (współdzielenie gołębnika między 2–3 hodowcami z rolami RLS).
+  - Wektor znosu wiatru i korekta aerodynamiczna.
+  - Bilansowanie mieszanek paszowych 20 ziaren (Weende).
+  - Import tras z miniaturowych modułów GPS/BTS przez BLE i wektorowe mapy offline.

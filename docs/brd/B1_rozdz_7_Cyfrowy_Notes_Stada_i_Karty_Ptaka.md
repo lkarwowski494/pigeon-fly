@@ -10,7 +10,7 @@
 - **Kryteria Akceptacji:**
   - *GIVEN:* Użytkownik znajduje się na formularzu dodawania gołębia.
   - *WHEN:* Wpisuje numer obrączki `PL-0123-26-00123` i wybiera rok urodzenia `2026`.
-  - *THEN:* System weryfikuje brak duplikatu w bazie SQLite (indeks `UNIQUE(country_code, year, ring_number)`). Jeśli numer już istnieje, wyświetla czytelne ostrzeżenie i uniemożliwia nadpisanie.
+  - *THEN:* System weryfikuje brak duplikatu w bazie SQLite oraz w Supabase (indeks `UNIQUE(country_code, year, ring_number)` per gołębnik). Jeśli numer już istnieje, wyświetla czytelne ostrzeżenie i uniemożliwia nadpisanie.
 
 ---
 
@@ -37,19 +37,18 @@
 
 ### BR-STADO-004: Pełny Cykl Statusów Życiowych Ptaka
 - **Priorytet:** MUST · **Etap:** MVP · **Persona:** P1, P2
-- **Opis:** Każdy gołąb w stadzie posiada ściśle zdefiniowany status operacyjny.
-- **Dopuszczalne Statusy:**
-  1. `ROZPLODOWY` (sektor rozpłodu, ptaki do rozrodu)
-  2. `LOTOWY` (drużyna lotowa dorosłych)
-  3. `MLODY` (gołębnik młodych, tegoroczne przychówki)
-  4. `W_GNIEZDZIE` (nielotne pisklęta pod opieką rodziców)
-  5. `SPRZEDANY` (ptak przekazany innemu hodowcy, zachowany w historii genealogicznej)
-  6. `ZAGINIONY` (nie powrócił z lotu/treningu)
-  7. `ZSZEDL` (padł naturalnie lub drapieżnik, zachowany w rodowodach)
+- **Opis:** Każdy gołąb w stadzie posiada ściśle zdefiniowany status operacyjny:
+  1. `ROZPLODOWY` (sektor rozpłodu, ptaki do rozrodu),
+  2. `LOTOWY` (drużyna lotowa dorosłych),
+  3. `MLODY` (gołębnik młodych, tegoroczne przychówki),
+  4. `W_GNIEZDZIE` (nielotne pisklęta pod opieką rodziców),
+  5. `SPRZEDANY` (ptak przekazany innemu hodowcy, zachowany w historii genealogicznej),
+  6. `ZAGINIONY` (nie powrócił z lotu/treningu),
+  7. `ZSZEDL` (padł naturalnie lub drapieżnik, zachowany w rodowodach).
 - **Kryteria Akceptacji:**
   - *GIVEN:* Gołąb ze statusem `LOTOWY`.
   - *WHEN:* Hodowca oznacza ptaka jako `SPRZEDANY` (podając datę i opcjonalnie nazwisko nabywcy).
-  - *THEN:* Ptak znika z list wkładaniowych na loty, ale jego rekord w bazie SQLite pozostaje nienaruszony, a wszystkie drzewa genealogiczne jego potomków zachowują pełną ciągłość.
+  - *THEN:* Ptak znika z list wkładaniowych na loty, ale jego rekord w bazie SQLite i w Supabase pozostaje nienaruszony, a wszystkie drzewa genealogiczne jego potomków zachowują pełną ciągłość.
 
 ---
 
@@ -63,7 +62,7 @@
 
 ---
 
-### BR-STADO-006: Lokalna Galeria Zdjęć (Sylwetka, Oko Makro, Skrzydło)
+### BR-STADO-006: Lokalna i Chmurowa Galeria Zdjęć (Sylwetka, Oko Makro, Skrzydło)
 - **Priorytet:** MUST · **Etap:** MVP · **Persona:** P2 (Luc), P5 (Chen)
 - **Opis:** Możliwość wykonania i przypisania do karty ptaka 3 dedykowanych fotografii o wysokiej rozdzielczości:
   1. *Zdjęcie sylwetki:* Profil ptaka stojącego na spoczynku.
@@ -71,17 +70,15 @@
   3. *Zdjęcie rozpostartego skrzydła:* Układ 10 lotek I rzędu i pokryw.
 - **Kryteria Akceptacji:**
   - *GIVEN:* Widok profilu ptaka.
-  - *WHEN:* Hodowca klika slot „Dodaj zdjęcie oka” i robi zdjęcie aparatem iPhone'a.
-  - *THEN:* Obraz zostaje skompresowany lokalnie do formatu JPEG (jakość 0.8, maks. 1600x1200 px), zapisany w piaskownicy `/Library/Application Support/Photos/[UUID].jpg`, a ścieżka powiązana w rekordzie ptaka w SQLite. Żadne zdjęcie nie jest wysyłane do chmury.
+  - *WHEN:* Hodowca robi zdjęcie aparatem iPhone'a.
+  - *THEN:* Obraz zostaje skompresowany lokalnie do formatu JPEG (jakość 0.8, maks. 1600x1200 px) i zapisany w piaskownicy `/Library/Application Support/Photos/[UUID].jpg`.
+  - *THEN (Wersja PRO):* Plik asynchronicznie replikuje się do **Supabase Storage Bucket `loft-photos`** z prawem dostępu chronionym przez RLS.
 
 ---
 
 ### BR-STADO-007: Ocena Anatomiczna i Cechy Budowy Mistrzowskiej
 - **Priorytet:** SHOULD · **Etap:** MVP · **Persona:** P1, P2
-- **Opis:** Narzędzie oceny cech fizycznych ptaka oparte na tradycyjnej selekcji manualnej mistrzów:
-  - *Widełki (kości miednicy):* Twarde / Zwarte (odległość $<5\text{ mm}$ do grzebienia mostka) vs Rozwarte (słabe).
-  - *Grzebień mostka:* Głęboki, prosty, idealnie symetryczny.
-  - *Unerwienie i upierzenie:* Jedwabiste, tłuste, pokryte pudrem piórowym.
+- **Opis:** Narzędzie oceny cech fizycznych ptaka oparte na tradycyjnej selekcji manualnej mistrzów (widełki miednicy, grzebień mostka, elastyczność upierzenia).
 - **Kryteria Akceptacji:**
   - *GIVEN:* Karta oceny ptaka.
   - *WHEN:* Hodowca zaznacza wskaźniki anatomiczne w skali 1–5 gwiazdek.
@@ -91,8 +88,29 @@
 
 ### BR-STADO-008: Błyskawiczne Wyszukiwanie i Inteligentne Filtrowanie Stada
 - **Priorytet:** MUST · **Etap:** MVP · **Persona:** P1, P4
-- **Opis:** Wyszukiwarka działająca w czasie $<5\text{ ms}$ z podpowiedziami w locie.
+- **Opis:** Wyszukiwarka działająca w czasie $<5\text{ ms}$ na lokalnej bazie SQLite.
 - **Kryteria Akceptacji:**
   - *GIVEN:* Lista stada licząca 250 gołębi.
   - *WHEN:* Użytkownik wpisuje w polu wyszukiwania ostatnie 3 cyfry obrączki (np. `444`).
-  - *THEN:* Lista natychmiast filtruje się do ptaków zawierających `444` w numerze rodowym lub pomocniczym, zachowując pełną płynność 120 fps na ekranie ProMotion.
+  - *THEN:* Lista natychmiast filtruje się do ptaków zawierających `444` w numerze rodowym lub pomocniczym.
+
+---
+
+### BR-STADO-009: Multi-Device Sync i Asynchroniczna Replikacja Supabase
+- **Priorytet:** MUST · **Etap:** MVP · **Persona:** P3, P9 (Tandem)
+- **Opis:** Automatyczna replikacja stada między urządzeniami tego samego hodowcy (iPhone w gołębniku, iPad w domu, Mac w biurze) za pośrednictwem chmury Supabase.
+- **Kryteria Akceptacji:**
+  - *GIVEN:* Zalogowany użytkownik w wersji PRO na iPhone i iPadzie.
+  - *WHEN:* Na iPhone dodaje nowego gołębia w gołębniku offline.
+  - *WHEN:* Telefon odzyskuje połączenie z internetem.
+  - *THEN:* Rekord ptaka replikuje się do tabeli `birds` w Supabase, a iPad w domu otrzymuje aktualizację przez WebSocket Realtime w czasie $<1\text{ s}$ bez konieczności ręcznego odświeżania.
+
+---
+
+### BR-STADO-010: Central Bloodline Registry (Wyszukiwarka Przodków w Chmurze)
+- **Priorytet:** SHOULD · **Etap:** 1.1 · **Persona:** P2 (Luc), P6 (Tomek)
+- **Opis:** Globalna baza publicznych rodowodów w Supabase. Gdy hodowca kupuje ptaka ze znanym numerem obrączki (np. `BE-22-6021444`), nie musi ręcznie przepisywać 30 przodków z kartki.
+- **Kryteria Akceptacji:**
+  - *GIVEN:* Formularz rejestracji zakupionego ptaka.
+  - *WHEN:* Użytkownik klika „Pobierz z Centralnej Bazy Rodowodów”.
+  - *THEN:* Aplikacja odpytuje Supabase i jeśli dany ptak lub jego przodkowie zostali wcześniej zarejestrowani jako publiczni przez hodowlę macierzystą, całe drzewo genealogiczne zostaje zaimportowane 1 tapnięciem.
