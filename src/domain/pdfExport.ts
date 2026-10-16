@@ -5,6 +5,7 @@
 
 import { Pigeon, PedigreeNode } from './types';
 import { getPedigreeVerificationUrl } from './qr';
+import QRCode from 'qrcode';
 
 export interface PedigreePdfOptions {
   loftName: string;
@@ -455,4 +456,146 @@ export function generateVeterinaryTreatmentBookHtml(options: {
 </html>
   `.trim();
 }
+
+export interface QrStickerItem {
+  pigeonId: string;
+  ringNumber: string;
+  countryCode: string;
+  year: number;
+  qrPayload: string;
+  auxiliaryRing?: string;
+}
+
+export interface StickerSheetOptions {
+  loftName: string;
+  breederName: string;
+  stickers: QrStickerItem[];
+}
+
+export function generateInlineQrSvg(value: string, displaySizeMm: number = 14): string {
+  try {
+    const qr = QRCode.create(value || 'PIGEONFLY:EMPTY', { errorCorrectionLevel: 'H' });
+    const count = qr.modules.size;
+    let d = '';
+
+    for (let row = 0; row < count; row++) {
+      for (let col = 0; col < count; col++) {
+        if (qr.modules.get(row, col)) {
+          d += `M${col},${row}h1v1h-1z `;
+        }
+      }
+    }
+
+    return `<svg viewBox="0 0 ${count} ${count}" width="${displaySizeMm}mm" height="${displaySizeMm}mm" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><path d="${d}" fill="#000000"/></svg>`;
+  } catch {
+    return `<div style="width: ${displaySizeMm}mm; height: ${displaySizeMm}mm; background: #E2E8F0; font-size: 8px;">QR</div>`;
+  }
+}
+
+export function generateQrStickerSheetHtml(options: StickerSheetOptions): string {
+  const stickersHtml = options.stickers
+    .map((s) => {
+      const qrSvg = generateInlineQrSvg(s.qrPayload, 14);
+      return `
+      <div class="sticker">
+        <div class="sticker-top">${s.countryCode} '${String(s.year).slice(-2)}</div>
+        <div class="sticker-qr">${qrSvg}</div>
+        <div class="sticker-ring">${s.ringNumber}</div>
+        ${s.auxiliaryRing ? `<div class="sticker-aux">${s.auxiliaryRing}</div>` : ''}
+      </div>
+    `;
+    })
+    .join('');
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Arkusz Mikronaklejek QR na Obrączki — ${options.loftName}</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 8mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      margin: 0;
+      padding: 0;
+      color: #0F172A;
+    }
+    .sheet-header {
+      border-bottom: 2px solid #0F172A;
+      padding-bottom: 4px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .sheet-title {
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .sheet-meta {
+      font-size: 10px;
+      color: #475569;
+    }
+    .stickers-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 3mm;
+    }
+    .sticker {
+      border: 1px dashed #94A3B8;
+      border-radius: 4px;
+      padding: 2mm 1mm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #FFFFFF;
+      box-sizing: border-box;
+      min-height: 25mm;
+    }
+    .sticker-top {
+      font-size: 8px;
+      font-weight: 900;
+      color: #0F172A;
+      letter-spacing: 0.5px;
+      margin-bottom: 1mm;
+    }
+    .sticker-qr {
+      line-height: 0;
+    }
+    .sticker-ring {
+      font-size: 7.5px;
+      font-weight: 800;
+      color: #0F172A;
+      margin-top: 1.5mm;
+      text-align: center;
+      word-break: break-all;
+    }
+    .sticker-aux {
+      font-size: 6.5px;
+      font-weight: 700;
+      color: #16A34A;
+      margin-top: 0.5mm;
+    }
+  </style>
+</head>
+<body>
+  <div class="sheet-header">
+    <div class="sheet-title">Pigeon-Fly · Mikronaklejki QR na Obrączki Rodowe (8-10 mm)</div>
+    <div class="sheet-meta">${options.loftName} (${options.breederName}) • Etykiet: ${options.stickers.length}</div>
+  </div>
+  <div class="stickers-grid">
+    ${stickersHtml}
+  </div>
+</body>
+</html>
+  `.trim();
+}
+
 

@@ -639,6 +639,24 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('T\u0142uszcz');
     expect(tree).toContain('SZABLONY MISTRZOWSKICH');
   });
+
+  test('LostPigeonReportModal renders emergency rescue portal, finder details, and report form', () => {
+    const { LostPigeonReportModal } = require('../src/components/LostPigeonReportModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <LostPigeonReportModal visible={true} onClose={onClose} />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('PORTAL RATUNKOWY SOS');
+    expect(tree).toContain('ZAGUBIONE I ODNALEZIONE PTAKI');
+    expect(tree).toContain('PL-0284-23-1402');
+    expect(tree).toContain('Karolina');
+  });
 });
 
 

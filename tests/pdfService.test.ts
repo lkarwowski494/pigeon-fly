@@ -148,4 +148,39 @@ describe('PdfService', () => {
     expect(Print.printToFileAsync).toHaveBeenCalled();
     expect(Sharing.shareAsync).toHaveBeenCalled();
   });
+
+  it('exports QR sticker sheet in print mode', async () => {
+    await PdfService.exportQrStickerSheet(
+      {
+        loftName: 'Gołębnik Mistrza',
+        breederName: 'Jan Kowalski',
+        stickers: [
+          {
+            pigeonId: 'p-1',
+            ringNumber: 'PL-0284-23-1402',
+            countryCode: 'PL',
+            year: 2023,
+            qrPayload: 'PIGEONFLY:V1:uuid-1:PL-0284-23-1402',
+            auxiliaryRing: 'GUM-42',
+          },
+        ],
+      },
+      'print'
+    );
+    expect(Print.printAsync).toHaveBeenCalled();
+  });
+
+  it('exports QR sticker sheet in share mode', async () => {
+    const uri = await PdfService.exportQrStickerSheet(
+      {
+        loftName: 'Gołębnik Mistrza',
+        breederName: 'Jan Kowalski',
+        stickers: [],
+      },
+      'share'
+    );
+    expect(Print.printToFileAsync).toHaveBeenCalled();
+    expect(Sharing.shareAsync).toHaveBeenCalled();
+    expect(uri).toBe('file:///mock/pedigree.pdf');
+  });
 });

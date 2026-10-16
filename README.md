@@ -128,10 +128,11 @@ pigeon-fly/
 │   │   ├── feedCompounder.ts   # Laboratorium paszowe 20 ziaren, bilans makro i energia MJ/kg
 │   │   ├── genetics.ts         # Matematyczny algorytm inbredu Wrighta (F)
 │   │   ├── health.ts           # Profilaktyka, szczepienia PMV-1 i karencje leków
+│   │   ├── lostAndFound.ts     # Rejestr zagubionych ptaków (SOS), geodezyjny drift i ochrona prywatności
 │   │   ├── moult.ts            # Regeneracja 10 lotek skrzydła i fotoperiod
 │   │   ├── nestBoxMatrix.ts    # Wirtualna siatka cel lęgowych, jajka gipsowe i alarmy 6-8 dni
 │   │   ├── nutrition.ts        # 4-fazowe protokoły żywieniowe i bilans makro
-│   │   ├── pdfExport.ts        # Generatory HTML A4 dla rodowodów, kosza i PIW
+│   │   ├── pdfExport.ts        # Generatory HTML A4 dla rodowodów, kosza, naklejek QR i PIW
 │   │   ├── performance.ts      # Silnik formy sportowej, dynamika prędkości m/min i taktyka
 │   │   ├── qr.ts               # Bezpieczne identyfikatory i weryfikacja rodowodów
 │   │   ├── racing.ts           # Fizyka lotu, m/min, ypm i neutralizacja nocy
@@ -165,6 +166,7 @@ pigeon-fly/
 │   │   ├── FeedCalculatorModal.tsx # Laboratorium paszowe 20 ziaren i ocena biologiczna
 │   │   ├── FieldButton.tsx     # Przycisk dotykowy >=56pt z wibracją haptyczną
 │   │   ├── LiveDerbyModal.tsx  # Klubowe Mini-Derby i live feed przylotów sekcji
+│   │   ├── LostPigeonReportModal.tsx # Portal ratunkowy SOS dla odnalezionych ptaków (BR-SKAN-008)
 │   │   ├── NestBoxMatrixModal.tsx # Wirtualna siatka cel lęgowych (2D Matrix)
 │   │   ├── NewRaceModal.tsx    # Konfiguracja nowego lotu i treningu
 │   │   ├── PairingModal.tsx    # Zarządzanie parowaniem w celkach z inbredem
@@ -182,7 +184,7 @@ pigeon-fly/
 │   └── lib/                    # Współdzielone moduły pomocnicze
 │       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
 ├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
-├── tests/                      # 27 zestawów testowych (163 testy jednostkowe i fast-check)
+├── tests/                      # 28 zestawów testowych (170 testów jednostkowych i fast-check)
 ├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
 └── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
     └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)

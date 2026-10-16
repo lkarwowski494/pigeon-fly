@@ -15,9 +15,11 @@ import {
   generatePedigreeHtml,
   generateRaceBasketingListHtml,
   generateVeterinaryTreatmentBookHtml,
+  generateQrStickerSheetHtml,
   PedigreePdfOptions,
   BasketingListPdfOptions,
   TreatmentRecordItem,
+  StickerSheetOptions,
 } from '../domain/pdfExport';
 import { PedigreeNode } from '../domain/types';
 
@@ -105,6 +107,24 @@ export class PdfService {
     return await this.shareHtmlAsPdf(
       html,
       `E-Księga Leczenia Zwierząt — ${options.loftName}`
+    );
+  }
+
+  /**
+   * Generuje i drukuje lub udostępnia arkusz mikronaklejek QR A4 na obrączki rodowe
+   */
+  static async exportQrStickerSheet(
+    options: StickerSheetOptions,
+    mode: 'print' | 'share' = 'print'
+  ): Promise<string | void> {
+    const html = generateQrStickerSheetHtml(options);
+    if (mode === 'print') {
+      await this.printHtml(html);
+      return;
+    }
+    return await this.shareHtmlAsPdf(
+      html,
+      `Arkusz mikronaklejek QR — ${options.loftName}`
     );
   }
 }

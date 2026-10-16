@@ -19,6 +19,7 @@ import { PigeonCard } from '../../src/components/PigeonCard';
 import { FieldButton } from '../../src/components/FieldButton';
 import { PaywallModal } from '../../src/components/PaywallModal';
 import { PigeonDetailModal } from '../../src/components/PigeonDetailModal';
+import { LostPigeonReportModal } from '../../src/components/LostPigeonReportModal';
 import { PdfService } from '../../src/services/pdfService';
 
 // Initial demo pigeons for immediate offline usability
@@ -78,6 +79,7 @@ export default function FlockScreen() {
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'racing' | 'breeding'>('all');
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [isProUser, setIsProUser] = useState(false);
+  const [isSosModalOpen, setIsSosModalOpen] = useState(false);
 
   const handlePigeonPress = (pigeon: Pigeon) => {
     setSelectedPigeon(pigeon);
@@ -118,6 +120,64 @@ export default function FlockScreen() {
     }
   };
 
+  const exportStickerSheet = async () => {
+    Alert.alert(
+      'Arkusz Mikronaklejek QR A4',
+      'Wybierz akcję dla arkusza naklejek na obrączki stada:',
+      [
+        {
+          text: '🖨️ Drukuj',
+          onPress: async () => {
+            try {
+              await PdfService.exportQrStickerSheet(
+                {
+                  loftName: 'Gołębnik Mistrza',
+                  breederName: 'Hodowca Pigeon-Fly',
+                  stickers: pigeons.map((p) => ({
+                    pigeonId: p.id,
+                    ringNumber: p.ringNumber,
+                    countryCode: p.countryCode,
+                    year: p.year,
+                    qrPayload: `PIGEONFLY:V1:${p.qrCodeUuid}:${p.ringNumber}`,
+                    auxiliaryRing: p.auxiliaryRingNumber,
+                  })),
+                },
+                'print'
+              );
+            } catch (e: any) {
+              Alert.alert('Błąd', e?.message || 'Nie udało się wydrukować naklejek');
+            }
+          },
+        },
+        {
+          text: '📤 Udostępnij PDF',
+          onPress: async () => {
+            try {
+              await PdfService.exportQrStickerSheet(
+                {
+                  loftName: 'Gołębnik Mistrza',
+                  breederName: 'Hodowca Pigeon-Fly',
+                  stickers: pigeons.map((p) => ({
+                    pigeonId: p.id,
+                    ringNumber: p.ringNumber,
+                    countryCode: p.countryCode,
+                    year: p.year,
+                    qrPayload: `PIGEONFLY:V1:${p.qrCodeUuid}:${p.ringNumber}`,
+                    auxiliaryRing: p.auxiliaryRingNumber,
+                  })),
+                },
+                'share'
+              );
+            } catch (e: any) {
+              Alert.alert('Błąd', e?.message || 'Nie udało się wyeksportować naklejek');
+            }
+          },
+        },
+        { text: 'Anuluj', style: 'cancel' },
+      ]
+    );
+  };
+
   const filteredPigeons = pigeons.filter((p) => {
     const matchesSearch =
       p.ringNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -144,6 +204,27 @@ export default function FlockScreen() {
             onPress={() => router.push('/modal/new-pigeon')}
             style={styles.actionBtn}
             testID="btn-add-pigeon"
+          />
+        </View>
+
+        {/* Secondary Utility Actions */}
+        <View style={styles.utilityRow}>
+          <FieldButton
+            title="🏷️ Drukuj Naklejki QR A4"
+            variant="secondary"
+            onPress={exportStickerSheet}
+            style={styles.utilityBtn}
+            textStyle={{ fontSize: 13 }}
+            testID="btn-export-stickers"
+          />
+          <View style={{ width: 8 }} />
+          <FieldButton
+            title="🚨 Zgłoszenia SOS"
+            variant="danger"
+            onPress={() => setIsSosModalOpen(true)}
+            style={styles.utilityBtn}
+            textStyle={{ fontSize: 13 }}
+            testID="btn-sos-modal"
           />
         </View>
 
@@ -225,6 +306,12 @@ export default function FlockScreen() {
         onPrintPedigree={exportPigeonPedigree}
         onUpdateStatus={handleUpdateStatus}
       />
+
+      {/* Lost & Found SOS Recovery Modal */}
+      <LostPigeonReportModal
+        visible={isSosModalOpen}
+        onClose={() => setIsSosModalOpen(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -241,11 +328,19 @@ const styles = StyleSheet.create({
   },
   actionsRow: {
     flexDirection: 'row',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   actionBtn: {
     flex: 1,
     minHeight: 52,
+  },
+  utilityRow: {
+    flexDirection: 'row',
+    marginBottom: 12,
+  },
+  utilityBtn: {
+    flex: 1,
+    minHeight: 42,
   },
   searchContainer: {
     backgroundColor: '#1E2127',
