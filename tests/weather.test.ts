@@ -79,3 +79,58 @@ describe('Weather Engine — Wind Impact & Aerodynamics', () => {
     expect(res.flightCondition).toBe('moderate');
   });
 });
+
+describe('Weather Engine — Drift Crab Angle & Corridor Waypoints', () => {
+  const { calculateDriftAngle, calculateFlightCorridorWaypoints, EUROPEAN_RACE_CORRIDORS } = require('../src/domain/weather');
+
+  test('calculates drift angle and heading correction under crosswind', () => {
+    // Flight bearing is East (90°). Wind is from North (0°), blowing South
+    const drift = calculateDriftAngle({
+      flightBearingDeg: 90,
+      pigeonAirspeedKmh: 75,
+      windFromDeg: 0,
+      windSpeedKmh: 25,
+    });
+
+    expect(drift.driftAngleDeg).toBeGreaterThan(15);
+    expect(drift.driftAngleDeg).toBeLessThan(25);
+    expect(drift.driftDirection).toBe('right');
+    // Crab correction should aim left of bearing (less than 90°)
+    expect(drift.headingCorrectionDeg).toBeLessThan(90);
+    expect(drift.groundSpeedKmh).toBeGreaterThan(60);
+  });
+
+  test('interpolates accurate corridor waypoints along route', () => {
+    const release = { latitude: 52.1205, longitude: 11.6276 }; // Magdeburg
+    const loft = { latitude: 52.2297, longitude: 21.0122 }; // Warsaw
+    const waypoints = calculateFlightCorridorWaypoints({
+      releasePoint: release,
+      loftPoint: loft,
+      totalDistanceMeters: 620000,
+      releaseTimeIso: '2026-06-01T06:00:00.000Z',
+      avgSpeedMPerMin: 1250,
+      segmentsCount: 4,
+    });
+
+    expect(waypoints).toHaveLength(5);
+    expect(waypoints[0].name).toContain('Start');
+    expect(waypoints[0].distanceFromStartKm).toBe(0);
+    expect(waypoints[0].progressPct).toBe(0);
+
+    expect(waypoints[4].name).toContain('Meta');
+    expect(waypoints[4].distanceFromStartKm).toBe(620);
+    expect(waypoints[4].progressPct).toBe(100);
+
+    // Intermediate waypoints have valid arrival ISO and coordinates
+    expect(waypoints[2].coordinates.latitude).toBeCloseTo(52.175, 1);
+    expect(waypoints[2].estimatedArrivalIso).toBeDefined();
+  });
+
+  test('includes standard European race corridors presets', () => {
+    expect(EUROPEAN_RACE_CORRIDORS.length).toBeGreaterThanOrEqual(4);
+    const magdeburg = EUROPEAN_RACE_CORRIDORS.find((c: any) => c.id.includes('magdeburg'));
+    expect(magdeburg).toBeDefined();
+    expect(magdeburg.distanceKm).toBeGreaterThan(500);
+  });
+});
+

@@ -21,6 +21,7 @@ import { PaywallModal } from '../../src/components/PaywallModal';
 import { PigeonDetailModal } from '../../src/components/PigeonDetailModal';
 import { LostPigeonReportModal } from '../../src/components/LostPigeonReportModal';
 import { CompartmentsModal } from '../../src/components/CompartmentsModal';
+import { SquadsModal } from '../../src/components/SquadsModal';
 import { PdfService } from '../../src/services/pdfService';
 
 // Initial demo pigeons for immediate offline usability
@@ -82,6 +83,7 @@ export default function FlockScreen() {
   const [isProUser, setIsProUser] = useState(false);
   const [isSosModalOpen, setIsSosModalOpen] = useState(false);
   const [isCompartmentsModalOpen, setIsCompartmentsModalOpen] = useState(false);
+  const [isSquadsModalOpen, setIsSquadsModalOpen] = useState(false);
 
   const handlePigeonPress = (pigeon: Pigeon) => {
     setSelectedPigeon(pigeon);
@@ -216,25 +218,34 @@ export default function FlockScreen() {
             variant="secondary"
             onPress={() => setIsCompartmentsModalOpen(true)}
             style={styles.utilityBtn}
-            textStyle={{ fontSize: 13 }}
+            textStyle={{ fontSize: 12 }}
             testID="btn-compartments-modal"
           />
-          <View style={{ width: 6 }} />
+          <View style={{ width: 4 }} />
           <FieldButton
-            title="🏷️ Naklejki A4"
+            title="🏆 Składy"
+            variant="secondary"
+            onPress={() => setIsSquadsModalOpen(true)}
+            style={styles.utilityBtn}
+            textStyle={{ fontSize: 12 }}
+            testID="btn-squads-modal"
+          />
+          <View style={{ width: 4 }} />
+          <FieldButton
+            title="🏷️ Naklejki"
             variant="secondary"
             onPress={exportStickerSheet}
             style={styles.utilityBtn}
-            textStyle={{ fontSize: 13 }}
+            textStyle={{ fontSize: 12 }}
             testID="btn-export-stickers"
           />
-          <View style={{ width: 6 }} />
+          <View style={{ width: 4 }} />
           <FieldButton
             title="🚨 SOS"
             variant="danger"
             onPress={() => setIsSosModalOpen(true)}
             style={styles.utilityBtn}
-            textStyle={{ fontSize: 13 }}
+            textStyle={{ fontSize: 12 }}
             testID="btn-sos-modal"
           />
         </View>
@@ -328,6 +339,13 @@ export default function FlockScreen() {
       <CompartmentsModal
         visible={isCompartmentsModalOpen}
         onClose={() => setIsCompartmentsModalOpen(false)}
+        pigeons={pigeons}
+      />
+
+      {/* Racing Squads Championship Modal */}
+      <SquadsModal
+        visible={isSquadsModalOpen}
+        onClose={() => setIsSquadsModalOpen(false)}
         pigeons={pigeons}
       />
     </SafeAreaView>

@@ -15,7 +15,13 @@ import {
   TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { calculateWindImpact, WindAnalysis } from '../domain/weather';
+import {
+  calculateWindImpact,
+  calculateDriftAngle,
+  calculateFlightCorridorWaypoints,
+  EUROPEAN_RACE_CORRIDORS,
+  WindAnalysis,
+} from '../domain/weather';
 import { Coordinates } from '../domain/types';
 import { FieldButton } from './FieldButton';
 
@@ -34,6 +40,10 @@ export function RaceWeatherModal({
   loftCoordinates = { latitude: 52.2297, longitude: 21.0122 }, // Warsaw/Loft
   distanceMeters = 345200,
 }: RaceWeatherModalProps) {
+  const [activeRelease, setActiveRelease] = useState<Coordinates>(releaseCoordinates);
+  const [activeLoft, setActiveLoft] = useState<Coordinates>(loftCoordinates);
+  const [activeDistance, setActiveDistance] = useState<number>(distanceMeters);
+  const [selectedCorridorId, setSelectedCorridorId] = useState<string | null>(null);
   const [windFromDeg, setWindFromDeg] = useState(270); // West (W)
   const [windSpeedKmh, setWindSpeedKmh] = useState('22');
 
@@ -51,12 +61,34 @@ export function RaceWeatherModal({
   const speedVal = parseFloat(windSpeedKmh) || 0;
 
   const analysis: WindAnalysis = calculateWindImpact({
-    releasePoint: releaseCoordinates,
-    loftPoint: loftCoordinates,
-    distanceMeters,
+    releasePoint: activeRelease,
+    loftPoint: activeLoft,
+    distanceMeters: activeDistance,
     windFromDeg,
     windSpeedKmh: speedVal,
   });
+
+  const drift = calculateDriftAngle({
+    flightBearingDeg: analysis.flightBearingDeg,
+    windFromDeg,
+    windSpeedKmh: speedVal,
+  });
+
+  const waypoints = calculateFlightCorridorWaypoints({
+    releasePoint: activeRelease,
+    loftPoint: activeLoft,
+    totalDistanceMeters: activeDistance,
+    releaseTimeIso: new Date().toISOString(),
+    avgSpeedMPerMin: analysis.estimatedVelocityMPerMin,
+    segmentsCount: 3,
+  });
+
+  const handleSelectCorridor = (corridor: typeof EUROPEAN_RACE_CORRIDORS[0]) => {
+    setSelectedCorridorId(corridor.id);
+    setActiveRelease(corridor.release);
+    setActiveLoft(corridor.loft);
+    setActiveDistance(corridor.distanceKm * 1000);
+  };
 
   const getConditionColor = (cond: string) => {
     switch (cond) {
@@ -107,6 +139,27 @@ export function RaceWeatherModal({
                 {Math.round(analysis.estimatedDurationMinutes % 60)}m
               </Text>
               <Text style={styles.adviceText}>💡 {analysis.fancierAdvice}</Text>
+            </View>
+
+            {/* European Corridors Quick Presets */}
+            <View style={styles.sectionCard}>
+              <Text style={styles.sectionHeading}>KLASYCZNE KORYTARZE LOTOWE EUROPY:</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 6 }}>
+                {EUROPEAN_RACE_CORRIDORS.map((c) => {
+                  const isSelected = selectedCorridorId === c.id;
+                  return (
+                    <TouchableOpacity
+                      key={c.id}
+                      onPress={() => handleSelectCorridor(c)}
+                      style={[styles.corridorChip, isSelected && styles.corridorChipActive]}
+                    >
+                      <Text style={[styles.corridorText, isSelected && styles.corridorTextActive]}>
+                        {c.name} ({c.distanceKm} km)
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
             </View>
 
             {/* Wind Selector Form */}
@@ -174,6 +227,44 @@ export function RaceWeatherModal({
                   </Text>
                 </View>
               </View>
+
+              {/* Drift Angle Crab Navigation */}
+              <View style={styles.driftBox}>
+                <Text style={styles.driftHeading}>NAWIGACJA & ZNOSZENIE BOCZNE (CRAB)</Text>
+                <Text style={styles.driftItem}>
+                  Kąt znoszenia: <Text style={{ color: '#E5A93C', fontWeight: 'bold' }}>{drift.driftAngleDeg}°</Text> ({drift.driftDirection === 'right' ? 'w prawo' : drift.driftDirection === 'left' ? 'w lewo' : 'prosto'})
+                </Text>
+                <Text style={styles.driftItem}>
+                  Zalecana poprawka kursu: <Text style={{ color: '#4CAF50', fontWeight: 'bold' }}>{drift.headingCorrectionDeg}°</Text>
+                </Text>
+                <Text style={styles.driftItem}>
+                  Prędkość względem ziemi: <Text style={{ color: '#64B5F6', fontWeight: 'bold' }}>{drift.groundSpeedKmh} km/h</Text>
+                </Text>
+              </View>
+            </View>
+
+            {/* Flight Corridor Waypoints Breakdown */}
+            <View style={styles.sectionCard}>
+              <Text style={styles.sectionHeading}>PUNKTY PRZELOTOWE KORYTARZA (ETA):</Text>
+              {waypoints.map((wp) => (
+                <View key={wp.segmentIndex} style={styles.waypointRow}>
+                  <View style={styles.waypointIndex}>
+                    <Text style={styles.waypointIndexText}>{wp.segmentIndex === 0 ? '🛫' : wp.segmentIndex === 3 ? '🏁' : '📍'}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.waypointName}>{wp.name}</Text>
+                    <Text style={styles.waypointSub}>
+                      {wp.distanceFromStartKm} km • Zostało: {wp.distanceRemainingKm} km • Teren: {wp.terrainProfile}
+                    </Text>
+                  </View>
+                  <View style={styles.waypointTimeBox}>
+                    <Text style={styles.waypointTime}>
+                      {wp.estimatedArrivalIso.split('T')[1].slice(0, 5)}
+                    </Text>
+                    <Text style={styles.waypointPct}>{wp.progressPct}%</Text>
+                  </View>
+                </View>
+              ))}
             </View>
 
             {/* Close Button */}
@@ -348,5 +439,85 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#FFFFFF',
     fontFamily: 'monospace',
+  },
+  corridorChip: {
+    backgroundColor: '#1E2127',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#2F343F',
+    marginRight: 8,
+  },
+  corridorChipActive: {
+    backgroundColor: 'rgba(229, 169, 60, 0.15)',
+    borderColor: '#E5A93C',
+  },
+  corridorText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#8E94A0',
+  },
+  corridorTextActive: {
+    color: '#E5A93C',
+  },
+  driftBox: {
+    marginTop: 10,
+    backgroundColor: '#1E2127',
+    padding: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#2F343F',
+  },
+  driftHeading: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#E5A93C',
+    marginBottom: 4,
+    letterSpacing: 0.5,
+  },
+  driftItem: {
+    fontSize: 12,
+    color: '#D4D8E0',
+    lineHeight: 18,
+  },
+  waypointRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#20242D',
+  },
+  waypointIndex: {
+    width: 28,
+    alignItems: 'center',
+  },
+  waypointIndexText: {
+    fontSize: 16,
+  },
+  waypointName: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  waypointSub: {
+    fontSize: 11,
+    color: '#8E94A0',
+    marginTop: 1,
+  },
+  waypointTimeBox: {
+    alignItems: 'flex-end',
+    minWidth: 50,
+  },
+  waypointTime: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#4FC3F7',
+    fontFamily: 'monospace',
+  },
+  waypointPct: {
+    fontSize: 10,
+    color: '#8E94A0',
+    marginTop: 1,
   },
 });

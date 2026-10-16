@@ -18,6 +18,7 @@ import { FieldButton } from '../../src/components/FieldButton';
 import { AddTreatmentModal } from '../../src/components/AddTreatmentModal';
 import { PhotoperiodModal } from '../../src/components/PhotoperiodModal';
 import { VeterinaryLabModal } from '../../src/components/VeterinaryLabModal';
+import { AntidopingModal } from '../../src/components/AntidopingModal';
 import { analyzeWingMoult, getPhotoperiodStatus } from '../../src/domain/moult';
 import { PdfService } from '../../src/services/pdfService';
 import { FeatherStatus, MoultLog } from '../../src/domain/types';
@@ -56,6 +57,7 @@ export default function HealthScreen() {
   const [isTreatmentModalVisible, setIsTreatmentModalVisible] = useState(false);
   const [isPhotoperiodModalVisible, setIsPhotoperiodModalVisible] = useState(false);
   const [isVetLabModalVisible, setIsVetLabModalVisible] = useState(false);
+  const [isAntidopingModalVisible, setIsAntidopingModalVisible] = useState(false);
   const [treatments, setTreatments] = useState<TreatmentRecordItem[]>(INITIAL_TREATMENTS);
   const [moultLogs, setMoultLogs] = useState<MoultLog[]>(INITIAL_MOULT_LOGS);
 
@@ -245,6 +247,14 @@ export default function HealthScreen() {
               </View>
             );
           })}
+          <FieldButton
+            title="🛡️ Tarcza Antydopingowa FCI & Karencje"
+            variant="secondary"
+            onPress={() => setIsAntidopingModalVisible(true)}
+            style={{ marginTop: 12, minHeight: 44 }}
+            textStyle={{ fontSize: 13 }}
+            testID="btn-open-antidoping-modal"
+          />
         </View>
 
         {/* Action Buttons */}
@@ -337,6 +347,12 @@ export default function HealthScreen() {
         visible={isVetLabModalVisible}
         onClose={() => setIsVetLabModalVisible(false)}
         selectedPigeonRing={selectedPigeonRing}
+      />
+
+      {/* FCI Antidoping & Prohibited Substances Guard Modal (Z-304, BR-ZDR-009) */}
+      <AntidopingModal
+        visible={isAntidopingModalVisible}
+        onClose={() => setIsAntidopingModalVisible(false)}
       />
     </SafeAreaView>
   );

@@ -824,7 +824,83 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('Kalendarz 12M');
     expect(tree).toContain('Wole lejące');
   });
+
+  test('SquadsModal renders squad tabs, roster metrics, and assigned pigeons', () => {
+    const { SquadsModal } = require('../src/components/SquadsModal');
+    const onClose = jest.fn();
+    const demoPigeons = [
+      {
+        id: 'p-01',
+        loftId: 'loft-01',
+        ringNumber: 'PL-0284-23-1402',
+        countryCode: 'PL',
+        year: 2023,
+        sex: 'cock',
+        plumageColor: 'Niebieski',
+        status: 'racing',
+        isDeleted: false,
+        createdAt: '',
+        updatedAt: '',
+      },
+      {
+        id: 'p-02',
+        loftId: 'loft-01',
+        ringNumber: 'PL-0284-22-9854',
+        countryCode: 'PL',
+        year: 2022,
+        sex: 'hen',
+        plumageColor: 'Płowa',
+        status: 'racing',
+        isDeleted: false,
+        createdAt: '',
+        updatedAt: '',
+      },
+    ];
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <SquadsModal
+          visible={true}
+          onClose={onClose}
+          pigeons={demoPigeons as any}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Drużyny Lotowe & Składy');
+    expect(tree).toContain('Drużyna A');
+    expect(tree).toContain('Drużyna B');
+    expect(tree).toContain('Drużyna C');
+    expect(tree).toContain('Drużyna Młodych');
+    expect(tree).toContain('Skład');
+    expect(tree).toContain('Gotowość');
+  });
+
+  test('AntidopingModal renders calculator, FCI registry tabs, and detox protocol', () => {
+    const { AntidopingModal } = require('../src/components/AntidopingModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <AntidopingModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('TARCZA ANTYDOPINGOWA FCI');
+    expect(tree).toContain('Kalkulator Karencji');
+    expect(tree).toContain('Wykaz FCI');
+    expect(tree).toContain('NAJWCZEŚNIEJSZA DATA KOSZOWANIA');
+    expect(tree).toContain('PROTOKÓŁ DETOKSU & OSŁONY');
+  });
 });
+
 
 
 

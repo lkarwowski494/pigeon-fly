@@ -119,8 +119,9 @@ pigeon-fly/
 ├── src/
 │   ├── domain/                 # Czysta logika biznesowa i reguły hodowlane (zero UI)
 │   │   ├── access.ts           # Silnik uprawnień Freemium / Pro / Lifetime
+│   │   ├── antidoping.ts       # Tarcza antydopingowa FCI/PZHGP, baza substancji zabronionych, karencje i detoks (Z-304, BR-ZDR-009)
 │   │   ├── appraisal.ts        # Ocena fenotypowa, znak oka, widełki i Standard FCI
-│   │   ├── basketing.ts        # Koszowanie, walidacja obrączek i seria typowana (T)
+│   │   ├── basketing.ts        # Koszowanie, walidacja obrączek, blokada antydopingowa i seria typowana (T)
 │   │   ├── breeding.ts         # Biologia lęgu i harmonogram jaj/obrączkowania
 │   │   ├── compartments.ts     # Sektory i przedziały gołębnika (Wdowce, Wdówki, Młode, Rozpłód, Izolatka) i normy FCI (BR-STADO-005)
 │   │   ├── concourse.ts        # Baza konkursowa (20%), FCI Coeff i punkty GMP Asów
@@ -139,11 +140,12 @@ pigeon-fly/
 │   │   ├── photoperiod.ts      # Chronobiologia stada, systemy Verdunkelung / Belichtung (RD-13/14) i alerty rolet
 │   │   ├── qr.ts               # Bezpieczne identyfikatory i weryfikacja rodowodów
 │   │   ├── racing.ts           # Fizyka lotu, m/min, ypm i neutralizacja nocy
+│   │   ├── squads.ts           # Taktyczne zarządzanie składami i drużynami lotowymi (Drużyna A GMP, B Średni, C Maraton, Młode) (BR-STADO-006, Z-018)
 │   │   ├── tandem.ts           # Silnik współdzielenia gołębnika (Tandem), role RBAC, zaproszenia i audyt (BR-STADO-009, Z-057)
 │   │   ├── telemetry.ts        # Moduł 5: IoT/GPS tracking, krzywizna i efektywność trasy
 │   │   ├── types.ts            # Wspólne interfejsy domenowe TypeScript
 │   │   ├── units.ts            # Konwerter jednostek metrycznych i imperialnych
-│   │   └── weather.ts          # Wektory wiatru (headwind/tailwind) i aerodynamika stada
+│   │   └── weather.ts          # Wektory wiatru, korytarze lotu, punkty ETA i kąt znoszenia (Crab Angle) (BR-LOT-005, Z-047)
 │   ├── db/                     # Baza lokalna SQLite (expo-sqlite, czysty SQL)
 │   │   ├── database.ts         # Połączenie z bazą, transakcje i migracje schematu
 │   │   ├── dbPath.ts           # Ścieżka bazodanowa chroniona standardem SEC-09
@@ -160,9 +162,10 @@ pigeon-fly/
 │   ├── components/             # Ergonomiczne komponenty interfejsu (Field Mode)
 │   │   ├── AddFeedingLogModal.tsx # Formularz dziennika karmy i suplementacji
 │   │   ├── AddTreatmentModal.tsx  # Formularz szczepień PMV-1 i leczenia PIW
+│   │   ├── AntidopingModal.tsx # Tarcza antydopingowa FCI, wykaz substancji i kalkulator karencji (Z-304)
 │   │   ├── AppraisalModal.tsx     # Ocena fenotypowa, znaku oka i skrzydeł (FCI)
 │   │   ├── ArrivalCard.tsx     # Karta przylotu z wyróżnieniem prędkości
-│   │   ├── BasketingSessionModal.tsx # Sesja koszowania i typowania serii (T)
+│   │   ├── BasketingSessionModal.tsx # Sesja koszowania, typowania serii (T) i bramka antydopingowa
 │   │   ├── ClockArrivalModal.tsx  # Odbicie przylotu z live kalkulacją m/min
 │   │   ├── ClutchCard.tsx      # Karta lęgu z kamieniami milowymi
 │   │   ├── ClutchLifecycleModal.tsx # Cykl lęgowy: jaja, owoskopia, obrączkowanie
@@ -185,7 +188,8 @@ pigeon-fly/
 │   │   ├── PigeonDetailModal.tsx # Karta ptaka, mikronaklejka QR i rodowód PDF
 │   │   ├── PigeonPhotoGalleryModal.tsx # 3-kątowa galeria makro (Sylwetka/Oko/Skrzydło)
 │   │   ├── QrCodeSvg.tsx       # Czysty wektorowy kod QR SVG do naklejek
-│   │   ├── RaceWeatherModal.tsx# Prognoza prędkości i aerodynamika wiatru
+│   │   ├── RaceWeatherModal.tsx# Prognoza prędkości, korytarze lotu i kąt znoszenia wiatru
+│   │   ├── SquadsModal.tsx     # Menedżer drużyn i składów lotowych (GMP, Średni, Maraton, Młode) (BR-STADO-006)
 │   │   ├── TandemModal.tsx     # Zarządzanie tandemem hodowców, zaproszenia z tokenami i dziennik audytu (Z-057)
 │   │   ├── TelemetryTrackModal.tsx # Analiza krzywizny trasy GPS/IoT z obrączek
 │   │   └── VeterinaryLabModal.tsx  # Gabinet weterynaryjny, triage YPDS (Adeno-Coli) i koproskopia (Z-305/306)
@@ -194,7 +198,7 @@ pigeon-fly/
 │   └── lib/                    # Współdzielone moduły pomocnicze
 │       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
 ├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
-├── tests/                      # 32 zestawy testowe (225 testów jednostkowych i fast-check)
+├── tests/                      # 34 zestawy testowe (250 testów jednostkowych i fast-check)
 ├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
 └── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
     └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)

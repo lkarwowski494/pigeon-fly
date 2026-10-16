@@ -71,6 +71,75 @@ describe('Basketing Engine — Validation & Duplicates', () => {
     const res = validateBasketingEntry(emptyRing, currentBasket);
     expect(res.isValid).toBe(false);
   });
+
+  test('blocks basketing when bird has active antidoping withdrawal violation', () => {
+    const newEntry: BasketEntry = {
+      pigeonId: 'p-02',
+      ringNumber: 'PL-0284-22-9854',
+      countryCode: 'PL',
+      year: 2022,
+      sex: 'hen',
+      plumageColor: 'Pstra',
+      isDesignatedSeries: false,
+      basketingOrder: 2,
+    };
+
+    const healthLogs = [
+      {
+        id: 'hl-99',
+        loftId: 'l-01',
+        pigeonId: 'p-02',
+        eventType: 'treatment' as const,
+        date: '2026-05-25',
+        productName: 'Metacam',
+        withdrawalDays: 7,
+        createdAt: '',
+        updatedAt: '',
+      },
+    ];
+
+    const res = validateBasketingEntry(newEntry, currentBasket, {
+      healthLogs,
+      raceDate: '2026-05-28',
+    });
+
+    expect(res.isValid).toBe(false);
+    expect(res.errorMessage).toContain('BLOKADA ANTYDOPINGOWA FCI');
+  });
+
+  test('allows basketing when bird has elapsed all antidoping withdrawal windows', () => {
+    const newEntry: BasketEntry = {
+      pigeonId: 'p-02',
+      ringNumber: 'PL-0284-22-9854',
+      countryCode: 'PL',
+      year: 2022,
+      sex: 'hen',
+      plumageColor: 'Pstra',
+      isDesignatedSeries: false,
+      basketingOrder: 2,
+    };
+
+    const healthLogs = [
+      {
+        id: 'hl-99',
+        loftId: 'l-01',
+        pigeonId: 'p-02',
+        eventType: 'treatment' as const,
+        date: '2026-05-10',
+        productName: 'Metacam',
+        withdrawalDays: 7,
+        createdAt: '',
+        updatedAt: '',
+      },
+    ];
+
+    const res = validateBasketingEntry(newEntry, currentBasket, {
+      healthLogs,
+      raceDate: '2026-05-28',
+    });
+
+    expect(res.isValid).toBe(true);
+  });
 });
 
 describe('Basketing Engine — Championship Series Designation (Typka T)', () => {

@@ -25,13 +25,20 @@ export interface BasketingSummary {
   averageAgeYears: number;
 }
 
+import { HealthLog } from './types';
+import { validateBasketingAntidoping } from './antidoping';
+
 /**
  * Validates whether a pigeon can be added to the current race basket.
- * Prevents double-basketing of the same bird.
+ * Prevents double-basketing of the same bird and blocks birds with active FCI doping/withdrawal violations.
  */
 export function validateBasketingEntry(
   entry: BasketEntry,
-  currentBasket: BasketEntry[]
+  currentBasket: BasketEntry[],
+  options?: {
+    healthLogs?: HealthLog[];
+    raceDate?: string | Date;
+  }
 ): { isValid: boolean; errorMessage?: string } {
   if (!entry.ringNumber.trim()) {
     return { isValid: false, errorMessage: 'Brak numeru obrączki rodowej.' };
@@ -46,6 +53,21 @@ export function validateBasketingEntry(
       isValid: false,
       errorMessage: `Gołąb ${entry.ringNumber} został już włożony do kosza w tym locie.`,
     };
+  }
+
+  if (options?.healthLogs && options?.raceDate) {
+    const dopingCheck = validateBasketingAntidoping(
+      entry.pigeonId,
+      entry.ringNumber,
+      options.healthLogs,
+      options.raceDate
+    );
+    if (!dopingCheck.isAllowed) {
+      return {
+        isValid: false,
+        errorMessage: dopingCheck.errorMessage,
+      };
+    }
   }
 
   return { isValid: true };
