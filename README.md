@@ -106,7 +106,7 @@ pigeon-fly/
 ├── app/                        # Expo Router (Ekrany i nawigacja w standardzie Field Mode)
 │   ├── (tabs)/                 # Główne zakładki dolnego paska nawigacji
 │   │   ├── index.tsx           # Stado: cyfrowy notes mistrza i karty ptaków
-│   │   ├── rozplod.tsx         # Rozpłód: wirtualne cele, kojarzenia i inbred
+│   │   ├── rozplod.tsx         # Rozpłód: wirtualne cele, kojarzenia, inbred i druk kart cel PDF A4 (Z-270)
 │   │   ├── loty.tsx            # Loty: tablica przylotów na żywo i lista wkładaniowa
 │   │   ├── zdrowie.tsx         # Zdrowie: wskaźnik 10 lotek (ARI) i e-księga PIW
 │   │   ├── zywienie.tsx        # Żywienie: rotacja 4-fazowa i bilans karmy
@@ -134,7 +134,7 @@ pigeon-fly/
 │   │   ├── moult.ts            # Regeneracja 10 lotek skrzydła i fotoperiod
 │   │   ├── nestBoxMatrix.ts    # Wirtualna siatka cel lęgowych, jajka gipsowe i alarmy 6-8 dni
 │   │   ├── nutrition.ts        # 4-fazowe protokoły żywieniowe i bilans makro
-│   │   ├── pdfExport.ts        # Generatory HTML A4 dla rodowodów, kosza, naklejek QR i PIW
+│   │   ├── pdfExport.ts        # Generatory HTML A4: rodowody, kosz, naklejki QR, PIW i karty cel gniazdowych (Z-270)
 │   │   ├── performance.ts      # Silnik formy sportowej, dynamika prędkości m/min i taktyka
 │   │   ├── photoperiod.ts      # Chronobiologia stada, systemy Verdunkelung / Belichtung (RD-13/14) i alerty rolet
 │   │   ├── qr.ts               # Bezpieczne identyfikatory i weryfikacja rodowodów
@@ -194,7 +194,7 @@ pigeon-fly/
 │   └── lib/                    # Współdzielone moduły pomocnicze
 │       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
 ├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
-├── tests/                      # 32 zestawy testowe (223 testy jednostkowe i fast-check)
+├── tests/                      # 32 zestawy testowe (225 testów jednostkowych i fast-check)
 ├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
 └── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
     └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)

@@ -16,10 +16,12 @@ import {
   generateRaceBasketingListHtml,
   generateVeterinaryTreatmentBookHtml,
   generateQrStickerSheetHtml,
+  generateNestBoxCardsHtml,
   PedigreePdfOptions,
   BasketingListPdfOptions,
   TreatmentRecordItem,
   StickerSheetOptions,
+  NestBoxCardsPdfOptions,
 } from '../domain/pdfExport';
 import { PedigreeNode } from '../domain/types';
 
@@ -127,4 +129,23 @@ export class PdfService {
       `Arkusz mikronaklejek QR — ${options.loftName}`
     );
   }
+
+  /**
+   * Generuje i drukuje lub udostępnia karty frontu cel lęgowych A4 (Z-270)
+   */
+  static async exportNestBoxCards(
+    options: NestBoxCardsPdfOptions,
+    mode: 'print' | 'share' = 'print'
+  ): Promise<string | void> {
+    const html = generateNestBoxCardsHtml(options);
+    if (mode === 'print') {
+      await this.printHtml(html);
+      return;
+    }
+    return await this.shareHtmlAsPdf(
+      html,
+      `Karty Cel Lęgowych — ${options.loftName}`
+    );
+  }
 }
+

@@ -598,4 +598,346 @@ export function generateQrStickerSheetHtml(options: StickerSheetOptions): string
   `.trim();
 }
 
+/**
+ * -------------------------------------------------------------
+ * Z-270: Nest Box Cards PDF Generator (Karty Cel Gniazdowych A4)
+ * -------------------------------------------------------------
+ */
+
+export interface NestBoxCardItem {
+  nestBox: string; // np. "Cela A-04"
+  roundNumber: number; // 1, 2, 3
+  pairedDate: string; // YYYY-MM-DD
+  inbreedingF?: number;
+  cockRingNumber: string;
+  cockYear?: number;
+  cockColor?: string;
+  cockStrain?: string; // Linia / Pochodzenie
+  cockNotes?: string;
+  henRingNumber: string;
+  henYear?: number;
+  henColor?: string;
+  henStrain?: string;
+  henNotes?: string;
+  egg1Date?: string;
+  egg2Date?: string;
+  eggStatus?: string;
+  expectedHatchDate?: string;
+  bandingWindow?: string; // Doba 6-8 (np. "18.04 - 20.04")
+  chick1RingNumber?: string;
+  chick2RingNumber?: string;
+  weanedDate?: string;
+  notes?: string;
+  qrPayload?: string;
+}
+
+export interface NestBoxCardsPdfOptions {
+  loftName: string;
+  breederName: string;
+  seasonYear: number;
+  cards: NestBoxCardItem[];
+}
+
+export function generateNestBoxCardsHtml(options: NestBoxCardsPdfOptions): string {
+  const cardsHtml = options.cards
+    .map((c) => {
+      const inbreedingText =
+        c.inbreedingF !== undefined
+          ? (c.inbreedingF * 100).toFixed(2) + '%'
+          : '0.00%';
+      const qrSvg = generateInlineQrSvg(
+        c.qrPayload || `PIGEONFLY:NESTBOX:${c.nestBox}:${c.cockRingNumber}:${c.henRingNumber}`,
+        16
+      );
+
+      return `
+      <div class="card-wrapper">
+        <div class="cut-guide">✂ WYCIĄĆ WZDŁUŻ LINII — KARTA FRONTU CELI GNIAZDOWEJ</div>
+        <div class="nest-card">
+          <div class="card-header">
+            <div>
+              <div class="card-loft">${options.loftName} • SEZON ${options.seasonYear}</div>
+              <div class="nest-box-badge">${c.nestBox}</div>
+            </div>
+            <div class="header-right">
+              <div class="round-badge">LĘG #${c.roundNumber}</div>
+              <div class="qr-box">${qrSvg}</div>
+            </div>
+          </div>
+
+          <div class="parents-grid">
+            <div class="parent-box cock">
+              <div class="parent-role">♂ SAMIEC (OJCIEC)</div>
+              <div class="parent-ring">${c.cockRingNumber}</div>
+              <div class="parent-meta">${c.cockYear ? `'${String(c.cockYear).slice(-2)} • ` : ''}${c.cockColor || 'Niebieski'}${c.cockStrain ? ` • ${c.cockStrain}` : ''}</div>
+              ${c.cockNotes ? `<div class="parent-notes">${c.cockNotes}</div>` : ''}
+            </div>
+
+            <div class="parent-box hen">
+              <div class="parent-role">♀ SAMICA (MATKA)</div>
+              <div class="parent-ring">${c.henRingNumber}</div>
+              <div class="parent-meta">${c.henYear ? `'${String(c.henYear).slice(-2)} • ` : ''}${c.henColor || 'Pstry'}${c.henStrain ? ` • ${c.henStrain}` : ''}</div>
+              ${c.henNotes ? `<div class="parent-notes">${c.henNotes}</div>` : ''}
+            </div>
+          </div>
+
+          <div class="inbreeding-row">
+            <span>Złożenie pary: <strong>${c.pairedDate}</strong></span>
+            <span>Współczynnik inbredu Wrighta (F): <strong class="inbred-val">${inbreedingText}</strong></span>
+          </div>
+
+          <table class="milestones-table">
+            <thead>
+              <tr>
+                <th>Jajo 1</th>
+                <th>Jajo 2</th>
+                <th>Owoskopia (D.5)</th>
+                <th>Wylęg (D.18)</th>
+                <th class="th-alert">Obrączkowanie (D. 6–8)</th>
+                <th>Odsadzenie</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>${c.egg1Date || '—'}</td>
+                <td>${c.egg2Date || '—'}</td>
+                <td>${c.eggStatus || 'Zapłodnione'}</td>
+                <td>${c.expectedHatchDate || '—'}</td>
+                <td class="td-alert">${c.bandingWindow || '—'}</td>
+                <td>${c.weanedDate || '—'}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="chicks-row">
+            <div class="chick-slot">
+              <span class="slot-label">Młode 1 (Obrączka rodowa):</span>
+              <span class="slot-val">${c.chick1RingNumber || '...........................................'}</span>
+            </div>
+            <div class="chick-slot">
+              <span class="slot-label">Młode 2 (Obrączka rodowa):</span>
+              <span class="slot-val">${c.chick2RingNumber || '...........................................'}</span>
+            </div>
+          </div>
+
+          <div class="notes-field">
+            <span class="notes-label">Notatki hodowcy z odchowu:</span>
+            <div class="notes-line">${c.notes || ''}</div>
+          </div>
+        </div>
+      </div>
+      `;
+    })
+    .join('');
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Karty Cel Gniazdowych — ${options.loftName}</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 8mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #0F172A;
+      background: #FFFFFF;
+      font-size: 10px;
+    }
+    .cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12mm;
+    }
+    .card-wrapper {
+      page-break-inside: avoid;
+    }
+    .cut-guide {
+      font-size: 8px;
+      color: #64748B;
+      border-bottom: 1px dashed #CBD5E1;
+      padding-bottom: 2mm;
+      margin-bottom: 3mm;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+    .nest-card {
+      border: 2px solid #0F172A;
+      border-radius: 6px;
+      padding: 10px;
+      background: #FFFFFF;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1.5px solid #0F172A;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+    .card-loft {
+      font-size: 10px;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .nest-box-badge {
+      font-size: 20px;
+      font-weight: 900;
+      color: #0F172A;
+      letter-spacing: 0.5px;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .round-badge {
+      background: #0F172A;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .qr-box {
+      line-height: 0;
+    }
+    .parents-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .parent-box {
+      border: 1px solid #CBD5E1;
+      border-radius: 4px;
+      padding: 6px 8px;
+      background: #F8FAFC;
+    }
+    .parent-box.cock {
+      border-left: 3px solid #2563EB;
+    }
+    .parent-box.hen {
+      border-left: 3px solid #DC2626;
+    }
+    .parent-role {
+      font-size: 9px;
+      font-weight: 800;
+      color: #475569;
+      margin-bottom: 2px;
+    }
+    .parent-ring {
+      font-size: 13px;
+      font-weight: 900;
+      color: #0F172A;
+      font-family: monospace;
+    }
+    .parent-meta {
+      font-size: 9px;
+      color: #64748B;
+      margin-top: 2px;
+    }
+    .parent-notes {
+      font-size: 8.5px;
+      color: #334155;
+      font-style: italic;
+      margin-top: 2px;
+    }
+    .inbreeding-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      background: #F1F5F9;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .inbred-val {
+      color: #D97706;
+    }
+    .milestones-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 8px;
+    }
+    .milestones-table th, .milestones-table td {
+      border: 1px solid #CBD5E1;
+      padding: 4px 6px;
+      text-align: center;
+      font-size: 9px;
+    }
+    .milestones-table th {
+      background: #F8FAFC;
+      font-weight: 700;
+      color: #475569;
+    }
+    .th-alert {
+      background: #FEF3C7 !important;
+      color: #92400E !important;
+      font-weight: 800 !important;
+    }
+    .td-alert {
+      background: #FFFBEB;
+      color: #B45309;
+      font-weight: 800;
+    }
+    .chicks-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .chick-slot {
+      border: 1px dashed #94A3B8;
+      border-radius: 4px;
+      padding: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .slot-label {
+      font-size: 8.5px;
+      color: #475569;
+      font-weight: 700;
+    }
+    .slot-val {
+      font-size: 11px;
+      font-weight: 900;
+      color: #0F172A;
+      font-family: monospace;
+    }
+    .notes-field {
+      border-top: 1px solid #E2E8F0;
+      padding-top: 4px;
+    }
+    .notes-label {
+      font-size: 8px;
+      color: #94A3B8;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .notes-line {
+      min-height: 14px;
+      font-size: 9px;
+      color: #334155;
+    }
+  </style>
+</head>
+<body>
+  <div class="cards-container">
+    ${cardsHtml}
+  </div>
+</body>
+</html>
+  `.trim();
+}
+
+
 

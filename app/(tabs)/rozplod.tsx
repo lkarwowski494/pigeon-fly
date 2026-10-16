@@ -19,6 +19,7 @@ import { PairingModal } from '../../src/components/PairingModal';
 import { ClutchLifecycleModal } from '../../src/components/ClutchLifecycleModal';
 import { NestBoxMatrixModal } from '../../src/components/NestBoxMatrixModal';
 import { calculateClutchMilestones } from '../../src/domain/breeding';
+import { PdfService } from '../../src/services/pdfService';
 
 
 const INITIAL_CLUTCHES: ClutchWithParents[] = [
@@ -122,6 +123,97 @@ export default function BreedingScreen() {
     );
   };
 
+  const handlePrintNestBoxCards = () => {
+    if (clutches.length === 0) {
+      Alert.alert('Brak par', 'Dodaj przynajmniej jedną parę lęgową przed wydrukiem kart cel.');
+      return;
+    }
+
+    Alert.alert(
+      'Karty Cel Gniazdowych A4 (PDF)',
+      `Wygenerować karty cel dla ${clutches.length} aktywnych par lęgowych?`,
+      [
+        {
+          text: '🖨️ Drukuj (AirPrint)',
+          onPress: async () => {
+            try {
+              await PdfService.exportNestBoxCards(
+                {
+                  loftName: 'Gołębnik Mistrza',
+                  breederName: 'Hodowca Pigeon-Fly',
+                  seasonYear: 2026,
+                  cards: clutches.map((c) => {
+                    const milestones = calculateClutchMilestones({
+                      pairDate: c.pairedDate,
+                      egg1Date: c.egg1Date,
+                    });
+                    return {
+                      nestBox: c.nestBox,
+                      roundNumber: c.roundNumber,
+                      pairedDate: c.pairedDate,
+                      cockRingNumber: c.cockRingNumber,
+                      henRingNumber: c.henRingNumber,
+                      egg1Date: c.egg1Date,
+                      egg2Date: c.egg2Date,
+                      eggStatus: c.egg1Status === 'fertile' ? 'Zalężone / Pajączek' : 'Złożone',
+                      expectedHatchDate: milestones.expectedHatchDate,
+                      bandingWindow: `${milestones.bandingStartDate} - ${milestones.bandingEndDate}`,
+                      chick1RingNumber: c.chick1RingNumber,
+                      chick2RingNumber: c.chick2RingNumber,
+                      weanedDate: milestones.weaningDate,
+                    };
+                  }),
+                },
+                'print'
+              );
+            } catch (err: any) {
+              Alert.alert('Błąd drukowania', err.message);
+            }
+          },
+        },
+        {
+          text: '📤 Udostępnij / Zapisz PDF',
+          onPress: async () => {
+            try {
+              await PdfService.exportNestBoxCards(
+                {
+                  loftName: 'Gołębnik Mistrza',
+                  breederName: 'Hodowca Pigeon-Fly',
+                  seasonYear: 2026,
+                  cards: clutches.map((c) => {
+                    const milestones = calculateClutchMilestones({
+                      pairDate: c.pairedDate,
+                      egg1Date: c.egg1Date,
+                    });
+                    return {
+                      nestBox: c.nestBox,
+                      roundNumber: c.roundNumber,
+                      pairedDate: c.pairedDate,
+                      cockRingNumber: c.cockRingNumber,
+                      henRingNumber: c.henRingNumber,
+                      egg1Date: c.egg1Date,
+                      egg2Date: c.egg2Date,
+                      eggStatus: c.egg1Status === 'fertile' ? 'Zalężone / Pajączek' : 'Złożone',
+                      expectedHatchDate: milestones.expectedHatchDate,
+                      bandingWindow: `${milestones.bandingStartDate} - ${milestones.bandingEndDate}`,
+                      chick1RingNumber: c.chick1RingNumber,
+                      chick2RingNumber: c.chick2RingNumber,
+                      weanedDate: milestones.weaningDate,
+                    };
+                  }),
+                },
+                'share'
+              );
+            } catch (err: any) {
+              Alert.alert('Błąd udostępniania', err.message);
+            }
+          },
+        },
+        { text: 'Anuluj', style: 'cancel' },
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -141,6 +233,15 @@ export default function BreedingScreen() {
             testID="btn-open-matrix"
           />
         </View>
+
+        <FieldButton
+          title="🖨️ Drukuj Karty Cel (A4/PDF)"
+          variant="secondary"
+          onPress={handlePrintNestBoxCards}
+          style={{ marginBottom: 12, minHeight: 44 }}
+          textStyle={{ fontSize: 13 }}
+          testID="btn-print-nest-cards"
+        />
 
         {/* Season Summary Bar */}
         <View style={styles.summaryCard}>

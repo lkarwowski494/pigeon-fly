@@ -183,4 +183,55 @@ describe('PdfService', () => {
     expect(Sharing.shareAsync).toHaveBeenCalled();
     expect(uri).toBe('file:///mock/pedigree.pdf');
   });
+
+  it('exports nest box breeding cards in print mode', async () => {
+    await PdfService.exportNestBoxCards(
+      {
+        loftName: 'Gołębnik Mistrza',
+        breederName: 'Jan Kowalski',
+        seasonYear: 2026,
+        cards: [
+          {
+            nestBox: 'Cela A-04',
+            roundNumber: 1,
+            pairedDate: '2026-03-01',
+            inbreedingF: 0.0312,
+            cockRingNumber: 'PL-0284-23-1402',
+            cockYear: 2023,
+            cockColor: 'Niebieski',
+            cockStrain: 'Vandenabeele',
+            henRingNumber: 'PL-0284-22-9854',
+            henYear: 2022,
+            henColor: 'Pstra',
+            henStrain: 'Janssen',
+            egg1Date: '2026-03-10',
+            egg2Date: '2026-03-12',
+            eggStatus: 'Zapłodnione',
+            expectedHatchDate: '2026-03-30',
+            bandingWindow: '05.04 - 07.04.2026',
+            chick1RingNumber: 'PL-0284-26-101',
+            chick2RingNumber: 'PL-0284-26-102',
+          },
+        ],
+      },
+      'print'
+    );
+    expect(Print.printAsync).toHaveBeenCalled();
+  });
+
+  it('exports nest box breeding cards in share mode', async () => {
+    const uri = await PdfService.exportNestBoxCards(
+      {
+        loftName: 'Gołębnik Mistrza',
+        breederName: 'Jan Kowalski',
+        seasonYear: 2026,
+        cards: [],
+      },
+      'share'
+    );
+    expect(Print.printToFileAsync).toHaveBeenCalled();
+    expect(Sharing.shareAsync).toHaveBeenCalled();
+    expect(uri).toBe('file:///mock/pedigree.pdf');
+  });
 });
+
