@@ -126,3 +126,430 @@ export function validateParamyxoVaccination(
     lastVaccinatedDate: lastVaccine.date,
   };
 }
+
+/**
+ * -------------------------------------------------------------
+ * BR-ZDR-010 & RD-27: YPDS (Adeno-Coli) Clinical Diagnostic & Triage
+ * -------------------------------------------------------------
+ */
+
+export type YpdsSymptom =
+  | 'crop_stasis' // Wole lejące / zaleganie płynu i fermentującego ziarna
+  | 'vomiting' // Wymioty ziarnem
+  | 'green_mucoid_diarrhea' // Zielonkawa śluzowata cuchnąca biegunka
+  | 'lethargy' // Apatia, nastroszone pióra, chowanie głowy w ramionach
+  | 'rapid_weight_loss'; // Gwałtowne chudnięcie / ostry spadek masy mięśniowej
+
+export type YpdsRiskLevel = 'none' | 'suspected' | 'acute' | 'critical';
+
+export interface YpdsAssessment {
+  riskLevel: YpdsRiskLevel;
+  isEmergency: boolean;
+  quarantineRequired: boolean;
+  contraindications: string[];
+  recommendedProtocols: {
+    title: string;
+    description: string;
+    priority: 'urgent' | 'high' | 'standard';
+  }[];
+  summary: string;
+}
+
+export function evaluateYpdsRisk(params: {
+  symptoms: YpdsSymptom[];
+  isYoungBird: boolean;
+}): YpdsAssessment {
+  const { symptoms, isYoungBird } = params;
+  const count = symptoms.length;
+
+  if (count === 0) {
+    return {
+      riskLevel: 'none',
+      isEmergency: false,
+      quarantineRequired: false,
+      contraindications: [],
+      recommendedProtocols: [],
+      summary: 'Brak objawów chorobowych. Ptak zdrowy.',
+    };
+  }
+
+  const hasCropStasis = symptoms.includes('crop_stasis');
+  const hasVomiting = symptoms.includes('vomiting');
+  const hasGreenDiarrhea = symptoms.includes('green_mucoid_diarrhea');
+
+  let riskLevel: YpdsRiskLevel = 'suspected';
+  if ((hasCropStasis || hasVomiting) && hasGreenDiarrhea && isYoungBird) {
+    riskLevel = count >= 4 ? 'critical' : 'acute';
+  } else if (count >= 3 && isYoungBird) {
+    riskLevel = 'acute';
+  }
+
+  const isEmergency = riskLevel === 'acute' || riskLevel === 'critical';
+
+  const contraindications = [
+    'BEZWZGLĘDNY ZAKAZ KOSZOWANIA na loty konkursowe i treningi!',
+    'ZAKAZ podawania twardego ziarna (groch, wyka, kukurydza) przez minimum 24-48 godzin.',
+    'ZAKAZ podawania zimnej wody z kranu — może wywołać szok termiczny osłabionego wola.',
+    'ZAKAZ podawania antybiotyków w ciemno bez antybiogramu (wirusa Adeno antybiotyk nie leczy!).',
+  ];
+
+  const recommendedProtocols = [
+    {
+      title: '1. Natychmiastowa Izolacja (Quarantine)',
+      description:
+        'Przenieś chorego ptaka do przedziału Izolatka, aby zablokować transmisję Adenowirusa i enteropatogennej E. coli na resztę stada.',
+      priority: 'urgent' as const,
+    },
+    {
+      title: '2. Głódź lecznicza i odciążenie wola',
+      description:
+        'Całkowite odstawienie karmy przez 24 godziny. Po ustąpieniu wymiotów podawaj wyłącznie lekkostrawny ryż łuskany, kanar i proso.',
+      priority: 'urgent' as const,
+    },
+    {
+      title: '3. Zakwaszenie poidła do pH 4.0 - 4.2',
+      description:
+        'Podaj ocet jabłkowy lub kwas mrówkowy/propionowy z oregano. Niskie pH niszczy otoczkę bakteryjną E. coli w żołądku gruczołowym.',
+      priority: 'urgent' as const,
+    },
+    {
+      title: '4. Rehydratacja izotoniczna (300 mOsm/L)',
+      description:
+        'Elektrolity z glukozą i miodem zapobiegają wstrząsowi hipowolemicznemu w wyniku odwodnienia biegunkowego.',
+      priority: 'high' as const,
+    },
+    {
+      title: '5. Przeciwciała żółtkowe IgY + Maślan sodu',
+      description:
+        'Biologiczna ochrona nabłonka jelitowego: immunoglobuliny żółtkowe IgY neutralizują patogeny, a kwas masłowy odbudowuje kosmki jelitowe.',
+      priority: 'high' as const,
+    },
+  ];
+
+  let summary = '';
+  if (riskLevel === 'critical') {
+    summary =
+      'KRYTYCZNE ZAGROŻENIE ŻYCIA: Ostra postać posocznicy Adeno-Coli z zaleganiem w wolu i wycieńczeniem. Wymagana natychmiastowa interwencja lekarska.';
+  } else if (riskLevel === 'acute') {
+    summary =
+      'Poważne podejrzenie Zespołu Choroby Młodych (YPDS / Adeno-Coli). Wdrożono czerwony protokół ratunkowy RD-27.';
+  } else {
+    summary =
+      'Objawy niespecyficzne lub wczesne stadium niestrawności. Obserwuj ptaka w izolatce przez 24 godziny.';
+  }
+
+  return {
+    riskLevel,
+    isEmergency,
+    quarantineRequired: true,
+    contraindications,
+    recommendedProtocols,
+    summary,
+  };
+}
+
+/**
+ * -------------------------------------------------------------
+ * BR-ZDR-008 & Z-306: Koproskopia i Diagnostyka Pasożytnicza
+ * -------------------------------------------------------------
+ */
+
+export type CoccidiaLevel = 'negative' | 'mild' | 'moderate' | 'heavy';
+export type TrichomonasLevel = 'negative' | 'mild' | 'severe';
+
+export interface CoproscopyRecord {
+  id: string;
+  loftId: string;
+  date: string; // YYYY-MM-DD
+  sampleType: 'flock_composite' | 'individual';
+  pigeonId?: string;
+  coccidia: CoccidiaLevel; // 0, +, ++, +++
+  nematodesPresent: boolean; // Ascaridia columbae
+  capillariaPresent: boolean; // Capillaria obsignata
+  trichomonas: TrichomonasLevel; // Trichomonas gallinae
+  notes?: string;
+}
+
+export interface CoproscopyEvaluation {
+  overallHealthStatus: 'clean' | 'mild_infestation' | 'treatment_required';
+  requiresChemicalMedication: boolean;
+  requiresLoftDisinfection: boolean;
+  recommendations: {
+    target: string;
+    protocol: string;
+    isChemical: boolean;
+  }[];
+  summary: string;
+}
+
+export function evaluateCoproscopy(record: {
+  coccidia: CoccidiaLevel;
+  nematodesPresent: boolean;
+  capillariaPresent: boolean;
+  trichomonas: TrichomonasLevel;
+}): CoproscopyEvaluation {
+  const recommendations: CoproscopyEvaluation['recommendations'] = [];
+  let requiresChemicalMedication = false;
+  let requiresLoftDisinfection = false;
+
+  // Coccidia evaluation
+  if (record.coccidia === 'heavy') {
+    requiresChemicalMedication = true;
+    requiresLoftDisinfection = true;
+    recommendations.push({
+      target: 'Kokcydioza (Masowa +++)',
+      protocol:
+        'Kuracja toltrazurilem (Baycox 2.5%, 1 ml/L przez 2 dni) + wypalenie podłogi palnikiem gazowym.',
+      isChemical: true,
+    });
+  } else if (record.coccidia === 'moderate') {
+    requiresChemicalMedication = true;
+    recommendations.push({
+      target: 'Kokcydioza (Pojedyncza ++)',
+      protocol: 'Kuracja sulfonamidem lub toltrazurilem pod kontrolą weterynarza.',
+      isChemical: true,
+    });
+  } else if (record.coccidia === 'mild') {
+    recommendations.push({
+      target: 'Kokcydioza (Nieliczne +)',
+      protocol:
+        'Tylko naturalna terapia: zakwaszanie poidła octem jabłkowym / oregano, witamina A + suszenie rusztów bez chemii!',
+      isChemical: false,
+    });
+  }
+
+  // Nematodes evaluation
+  if (record.nematodesPresent) {
+    requiresChemicalMedication = true;
+    requiresLoftDisinfection = true;
+    recommendations.push({
+      target: 'Glistnica (Ascaridia columbae)',
+      protocol:
+        'Jednorazowe podanie lewamizolu lub fenbendazolu na czczo; powtórka po 14 dniach; dokładne odkurzenie i dezynfekcja celi.',
+      isChemical: true,
+    });
+  }
+
+  // Capillaria evaluation
+  if (record.capillariaPresent) {
+    requiresChemicalMedication = true;
+    requiresLoftDisinfection = true;
+    recommendations.push({
+      target: 'Kapilarioza (Capillaria obsignata)',
+      protocol:
+        'Kuracja lewamizolem lub iwermektyną; włosogłówki głęboko wnikają w śluzówkę jelita, podać probiotyk po kuracji.',
+      isChemical: true,
+    });
+  }
+
+  // Trichomonas evaluation
+  if (record.trichomonas === 'severe') {
+    requiresChemicalMedication = true;
+    recommendations.push({
+      target: 'Trichomonadoza (Rzęsistek / Żółty guzek)',
+      protocol:
+        'Ronidazol 10% (lub karnidazol 1 tabl./ptaka) przez 5-7 dni + zakwaszenie poidła do pH 4.2.',
+      isChemical: true,
+    });
+  } else if (record.trichomonas === 'mild') {
+    recommendations.push({
+      target: 'Trichomonadoza (Niska liczba trofozoitów)',
+      protocol:
+        'Naturalne zakwaszenie poidła (pH 4.2) + wyciąg z czosnku i brodaczki (usnea barbata) przez 3 dni.',
+      isChemical: false,
+    });
+  }
+
+  let overallHealthStatus: CoproscopyEvaluation['overallHealthStatus'] = 'clean';
+  let summary =
+    'Wynik badania parazytologicznego prawidłowy — stado wolne od inwazji pasożytów.';
+
+  if (requiresChemicalMedication) {
+    overallHealthStatus = 'treatment_required';
+    summary = 'Wykryto patogeny wymagające interwencji leczniczej i dezynfekcji gołębnika.';
+  } else if (recommendations.length > 0) {
+    overallHealthStatus = 'mild_infestation';
+    summary =
+      'Wykryto nieliczne pasożyty podprogowe. Rekomendowana profilaktyka naturalna bez antybiotyków i chemioterapii.';
+  }
+
+  return {
+    overallHealthStatus,
+    requiresChemicalMedication,
+    requiresLoftDisinfection,
+    recommendations,
+    summary,
+  };
+}
+
+/**
+ * -------------------------------------------------------------
+ * BR-ZDR-008: 12-Miesięczny Kalendarz Weterynaryjny Stada
+ * -------------------------------------------------------------
+ */
+
+export interface VeterinaryMonthGuide {
+  month: number;
+  monthName: string;
+  seasonFocus: string;
+  keyActions: string[];
+  recommendedDiagnostics: string[];
+  mandatoryVaccinations: string[];
+}
+
+const ANNUAL_VET_CALENDAR: VeterinaryMonthGuide[] = [
+  {
+    month: 1,
+    monthName: 'Styczeń',
+    seasonFocus: 'Przegląd zimowy & Szczepienia przedlęgowe',
+    keyActions: [
+      'Badanie koproskopowe (flotacja) na kokcydia i nicienie',
+      'Wypalanie rusztów i cel palnikiem gazowym',
+      'Szczepienie stada przeciw paramyksowirozie (PMV-1)',
+    ],
+    recommendedDiagnostics: ['Badanie kału (koproskopia flotacyjna)', 'Ocena ubytków upierzenia'],
+    mandatoryVaccinations: ['PMV-1 (Paramyxo)'],
+  },
+  {
+    month: 2,
+    monthName: 'Luty',
+    seasonFocus: 'Szczepienia uzupełniające & Dezynfekcja cel',
+    keyActions: [
+      'Szczepienie przeciw ospie gołębi (Pigeon Pox)',
+      'Kontrola obecności rzęsistka (Trichomonas gallinae) przed łączeniem w pary',
+      'Suplementacja witaminy E i selenu dla popędu lęgowego',
+    ],
+    recommendedDiagnostics: ['Wymaz z wola (test canker/żółty guzek)'],
+    mandatoryVaccinations: ['Ospa gołębi (Diphtheria / Pox)'],
+  },
+  {
+    month: 3,
+    monthName: 'Marzec',
+    seasonFocus: 'Przygotowanie do lęgów & Start ciemni (Verdunkelung)',
+    keyActions: [
+      'Owoskopia jaj w 5. dobie inkubacji',
+      'Montaż rolet zaciemniających dla wylęgających się młodych (Verdunkelung od 15 marca)',
+      'Grit mineralny i wapń dla niosek',
+    ],
+    recommendedDiagnostics: ['Owoskopia (prześwietlanie jaj)'],
+    mandatoryVaccinations: [],
+  },
+  {
+    month: 4,
+    monthName: 'Kwiecień',
+    seasonFocus: 'Drogi oddechowe & Przedsezonowe obloty',
+    keyActions: [
+      'Kontrola dróg oddechowych (mykoplazmoza, ornitoza, katar zakaźny)',
+      'Obrączkowanie pierwszego lęgu (6-8 doba życia)',
+      'Pierwsze krótkie wywózki treningowe (5-20 km)',
+    ],
+    recommendedDiagnostics: ['Wymaz z gardła i nosogardzieli'],
+    mandatoryVaccinations: [],
+  },
+  {
+    month: 5,
+    monthName: 'Maj',
+    seasonFocus: 'Rozpoczęcie lotów konkursowych dorosłych & Ochrona młodzieży',
+    keyActions: [
+      'Nadzór nad młodymi: wczesne wykrywanie syndromu YPDS (Adeno-Coli)',
+      'Zakwaszanie poidła do pH 4.2 po każdym locie konkursowym',
+      'Rehydratacja elektrolitami (300 mOsm/L) w dniu powrotu',
+    ],
+    recommendedDiagnostics: ['Kontrola wola po locie', 'Triage YPDS'],
+    mandatoryVaccinations: ['Szczepienie młódków PMV-1 (po odsadzeniu)'],
+  },
+  {
+    month: 6,
+    monthName: 'Czerwiec',
+    seasonFocus: 'Szczyt sezonu lotowego & Przejście z ciemni na doświetlanie',
+    keyActions: [
+      '21 czerwca: zakończenie Verdunkelung u młodych, start Belichtung (16h światła)',
+      'Monitoring zmęczenia mięśniowego (kreatynina, mleczan)',
+      'Podawanie L-karnityny i magnezu przed lotami długodystansowymi (>500 km)',
+    ],
+    recommendedDiagnostics: ['Ocena 10 lotek (wskaźnik ARI)'],
+    mandatoryVaccinations: [],
+  },
+  {
+    month: 7,
+    monthName: 'Lipiec',
+    seasonFocus: 'Maratony (>700 km) & Pierwsze loty młodych',
+    keyActions: [
+      'Ładowanie lipidowe (Carbo-Lipid Shift) przed lotami maratońskimi',
+      'Kontrola wola i poidła przeciw rzęsistkowi w upalne dni',
+      'Treningi koszowe stada młodych ptaków',
+    ],
+    recommendedDiagnostics: ['Badanie wola w upale (Trichomonas)'],
+    mandatoryVaccinations: [],
+  },
+  {
+    month: 8,
+    monthName: 'Sierpień',
+    seasonFocus: 'Sezon lotowy gołębi młodych',
+    keyActions: [
+      'Ścisły monitoring Adeno-Coli podczas powrotów z koszowania młodych',
+      'Podawanie przeciwciał IgY i kwasu masłowego w karmie',
+      'Kontrola wskaźnika ARI lotek młódków',
+    ],
+    recommendedDiagnostics: ['Triage objawów YPDS po locie'],
+    mandatoryVaccinations: [],
+  },
+  {
+    month: 9,
+    monthName: 'Wrzesień',
+    seasonFocus: 'Koniec sezonu & Początek wielkiego pierzenia',
+    keyActions: [
+      'Badanie na salmonellozę (paratyfus) po sezonie lotowym',
+      'Zwiększenie podaży nasion oleistych (siemię lniane, rzepak, słonecznik)',
+      'Kąpiele stada z solami mineralnymi 2 razy w tygodniu',
+    ],
+    recommendedDiagnostics: ['Posiew kału w kierunku Salmonella enterica'],
+    mandatoryVaccinations: [],
+  },
+  {
+    month: 10,
+    monthName: 'Październik',
+    seasonFocus: 'Główne pierzenie stada',
+    keyActions: [
+      'Dostarczanie aminokwasów siarkowych (metionina, cystyna) na budowę piór',
+      'Czyste, suche ruszty — unikanie wilgoci podczas zrzucania lotek',
+      'Odstawienie leków zaburzających wzrost piór',
+    ],
+    recommendedDiagnostics: ['Ocena symetrii lotek i struktury chorągiewki'],
+    mandatoryVaccinations: [],
+  },
+  {
+    month: 11,
+    monthName: 'Listopad',
+    seasonFocus: 'Koniec pierzenia & Spoczynek zimowy',
+    keyActions: [
+      'Przejście na dietę spoczynkową (dieta jęczmienna / niskobiałkowa)',
+      'Ostateczna selekcja stada i ocena standardu FCI',
+      'Dezynfekcja cel i wietrzenie gołębnika',
+    ],
+    recommendedDiagnostics: ['Wycena standardu i cech anatomicznych'],
+    mandatoryVaccinations: [],
+  },
+  {
+    month: 12,
+    monthName: 'Grudzień',
+    seasonFocus: 'Spoczynek & Planowanie par lęgowych',
+    keyActions: [
+      'Wstępne kojarzenia w aplikacji (kalkulacja inbredu Wrighta F)',
+      'Zamówienie obrączek rodowych na nowy rok',
+      'Badanie kału przed sezonem szczepień',
+    ],
+    recommendedDiagnostics: ['Koproskopia flotacyjna zimowa'],
+    mandatoryVaccinations: [],
+  },
+];
+
+export function getVeterinaryCalendarMonth(monthNumber: number): VeterinaryMonthGuide {
+  const safeMonth = Math.max(1, Math.min(12, monthNumber));
+  return ANNUAL_VET_CALENDAR[safeMonth - 1];
+}
+
+export function getAnnualVeterinaryCalendar(): VeterinaryMonthGuide[] {
+  return ANNUAL_VET_CALENDAR;
+}
+

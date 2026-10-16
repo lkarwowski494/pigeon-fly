@@ -2,7 +2,14 @@
  * Tests for Health Engine (PMV-1 vaccination compliance and drug withdrawal guard)
  */
 
-import { checkWithdrawalPeriod, validateParamyxoVaccination } from '../src/domain/health';
+import {
+  checkWithdrawalPeriod,
+  validateParamyxoVaccination,
+  evaluateYpdsRisk,
+  evaluateCoproscopy,
+  getVeterinaryCalendarMonth,
+  getAnnualVeterinaryCalendar,
+} from '../src/domain/health';
 import { HealthLog } from '../src/domain/types';
 
 describe('Health Engine — Drug Withdrawal Period (Karencja)', () => {
@@ -112,3 +119,91 @@ describe('Health Engine — PMV-1 Paramyxovirus Vaccination', () => {
     expect(result.reason).toContain('wygasła');
   });
 });
+
+describe('Health Engine — YPDS (Adeno-Coli) Clinical Diagnostic & Triage (BR-ZDR-010, RD-27)', () => {
+  test('evaluates healthy bird with zero symptoms', () => {
+    const assessment = evaluateYpdsRisk({ symptoms: [], isYoungBird: true });
+    expect(assessment.riskLevel).toBe('none');
+    expect(assessment.isEmergency).toBe(false);
+    expect(assessment.quarantineRequired).toBe(false);
+    expect(assessment.recommendedProtocols).toHaveLength(0);
+  });
+
+  test('flags acute Adeno-Coli emergency when young bird presents crop stasis and green diarrhea', () => {
+    const assessment = evaluateYpdsRisk({
+      symptoms: ['crop_stasis', 'green_mucoid_diarrhea', 'vomiting'],
+      isYoungBird: true,
+    });
+
+    expect(assessment.riskLevel).toBe('acute');
+    expect(assessment.isEmergency).toBe(true);
+    expect(assessment.quarantineRequired).toBe(true);
+    expect(assessment.contraindications).toContain(
+      'BEZWZGLĘDNY ZAKAZ KOSZOWANIA na loty konkursowe i treningi!'
+    );
+    expect(assessment.recommendedProtocols.some((p) => p.title.includes('pH 4.0 - 4.2'))).toBe(true);
+    expect(assessment.recommendedProtocols.some((p) => p.title.includes('Izolacja'))).toBe(true);
+  });
+
+  test('flags critical collapse when 4 or more symptoms are present in young bird', () => {
+    const assessment = evaluateYpdsRisk({
+      symptoms: ['crop_stasis', 'green_mucoid_diarrhea', 'vomiting', 'lethargy', 'rapid_weight_loss'],
+      isYoungBird: true,
+    });
+
+    expect(assessment.riskLevel).toBe('critical');
+    expect(assessment.isEmergency).toBe(true);
+    expect(assessment.summary).toContain('KRYTYCZNE ZAGROŻENIE ŻYCIA');
+  });
+});
+
+describe('Health Engine — Koproskopia & Parasitological Assessment (BR-ZDR-008, Z-306)', () => {
+  test('recommends natural therapy without chemical coccidiostats for mild coccidia (+)', () => {
+    const evaluation = evaluateCoproscopy({
+      coccidia: 'mild',
+      nematodesPresent: false,
+      capillariaPresent: false,
+      trichomonas: 'negative',
+    });
+
+    expect(evaluation.overallHealthStatus).toBe('mild_infestation');
+    expect(evaluation.requiresChemicalMedication).toBe(false);
+    expect(evaluation.requiresLoftDisinfection).toBe(false);
+    expect(evaluation.recommendations[0].isChemical).toBe(false);
+    expect(evaluation.recommendations[0].protocol).toContain('octem jabłkowym');
+  });
+
+  test('requires chemical treatment and torch disinfection when heavy coccidia or nematodes are found', () => {
+    const evaluation = evaluateCoproscopy({
+      coccidia: 'heavy',
+      nematodesPresent: true,
+      capillariaPresent: false,
+      trichomonas: 'mild',
+    });
+
+    expect(evaluation.overallHealthStatus).toBe('treatment_required');
+    expect(evaluation.requiresChemicalMedication).toBe(true);
+    expect(evaluation.requiresLoftDisinfection).toBe(true);
+    expect(evaluation.recommendations.some((r) => r.target.includes('Glistnica'))).toBe(true);
+    expect(evaluation.recommendations.some((r) => r.target.includes('Kokcydioza'))).toBe(true);
+  });
+});
+
+describe('Health Engine — 12-Month Veterinary Calendar (BR-ZDR-008)', () => {
+  test('returns all 12 calendar months with key seasonal actions', () => {
+    const calendar = getAnnualVeterinaryCalendar();
+    expect(calendar).toHaveLength(12);
+    expect(calendar[0].monthName).toBe('Styczeń');
+    expect(calendar[0].mandatoryVaccinations).toContain('PMV-1 (Paramyxo)');
+    expect(calendar[5].monthName).toBe('Czerwiec');
+    expect(calendar[5].keyActions.some((a) => a.includes('Verdunkelung'))).toBe(true);
+  });
+
+  test('retrieves single month by index safely', () => {
+    const may = getVeterinaryCalendarMonth(5);
+    expect(may.monthName).toBe('Maj');
+    expect(may.seasonFocus).toContain('Rozpoczęcie lotów');
+    expect(may.recommendedDiagnostics).toContain('Triage YPDS');
+  });
+});
+

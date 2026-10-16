@@ -17,6 +17,7 @@ import { FeatherGauge } from '../../src/components/FeatherGauge';
 import { FieldButton } from '../../src/components/FieldButton';
 import { AddTreatmentModal } from '../../src/components/AddTreatmentModal';
 import { PhotoperiodModal } from '../../src/components/PhotoperiodModal';
+import { VeterinaryLabModal } from '../../src/components/VeterinaryLabModal';
 import { analyzeWingMoult, getPhotoperiodStatus } from '../../src/domain/moult';
 import { PdfService } from '../../src/services/pdfService';
 import { FeatherStatus, MoultLog } from '../../src/domain/types';
@@ -54,6 +55,7 @@ export default function HealthScreen() {
   const [selectedPigeonRing] = useState('PL-0284-23-1402');
   const [isTreatmentModalVisible, setIsTreatmentModalVisible] = useState(false);
   const [isPhotoperiodModalVisible, setIsPhotoperiodModalVisible] = useState(false);
+  const [isVetLabModalVisible, setIsVetLabModalVisible] = useState(false);
   const [treatments, setTreatments] = useState<TreatmentRecordItem[]>(INITIAL_TREATMENTS);
   const [moultLogs, setMoultLogs] = useState<MoultLog[]>(INITIAL_MOULT_LOGS);
 
@@ -153,6 +155,14 @@ export default function HealthScreen() {
               </View>
             </View>
           </View>
+          <FieldButton
+            title="🚨 Asystent Diagnostyczny YPDS & Koproskopia"
+            variant="secondary"
+            onPress={() => setIsVetLabModalVisible(true)}
+            style={{ marginTop: 12, minHeight: 44 }}
+            textStyle={{ fontSize: 13 }}
+            testID="btn-open-vet-lab-modal"
+          />
         </View>
 
         {/* Photoperiod / Darkness System (Verdunkelung) Card */}
@@ -320,6 +330,13 @@ export default function HealthScreen() {
       <PhotoperiodModal
         visible={isPhotoperiodModalVisible}
         onClose={() => setIsPhotoperiodModalVisible(false)}
+      />
+
+      {/* Veterinary Lab, YPDS Triage & Coproscopy Modal (Z-305, Z-306) */}
+      <VeterinaryLabModal
+        visible={isVetLabModalVisible}
+        onClose={() => setIsVetLabModalVisible(false)}
+        selectedPigeonRing={selectedPigeonRing}
       />
     </SafeAreaView>
   );

@@ -129,7 +129,7 @@ pigeon-fly/
 │   │   ├── drinkerLab.ts       # Laboratorium poidła, buforowanie pH przeciw rzęsistkowi (RD-17), izotonik (RD-18) i Carbo-Lipid Shift (RD-15/16)
 │   │   ├── feedCompounder.ts   # Laboratorium paszowe 20 ziaren, bilans makro i energia MJ/kg
 │   │   ├── genetics.ts         # Matematyczny algorytm inbredu Wrighta (F)
-│   │   ├── health.ts           # Profilaktyka, szczepienia PMV-1 i karencje leków
+│   │   ├── health.ts           # Profilaktyka, szczepienia PMV-1, karencje, triage YPDS/Adeno-Coli (RD-27) i koproskopia (BR-ZDR-008/010)
 │   │   ├── lostAndFound.ts     # Rejestr zagubionych ptaków (SOS), geodezyjny drift i ochrona prywatności
 │   │   ├── moult.ts            # Regeneracja 10 lotek skrzydła i fotoperiod
 │   │   ├── nestBoxMatrix.ts    # Wirtualna siatka cel lęgowych, jajka gipsowe i alarmy 6-8 dni
@@ -187,13 +187,14 @@ pigeon-fly/
 │   │   ├── QrCodeSvg.tsx       # Czysty wektorowy kod QR SVG do naklejek
 │   │   ├── RaceWeatherModal.tsx# Prognoza prędkości i aerodynamika wiatru
 │   │   ├── TandemModal.tsx     # Zarządzanie tandemem hodowców, zaproszenia z tokenami i dziennik audytu (Z-057)
-│   │   └── TelemetryTrackModal.tsx # Analiza krzywizny trasy GPS/IoT z obrączek
+│   │   ├── TelemetryTrackModal.tsx # Analiza krzywizny trasy GPS/IoT z obrączek
+│   │   └── VeterinaryLabModal.tsx  # Gabinet weterynaryjny, triage YPDS (Adeno-Coli) i koproskopia (Z-305/306)
 │   ├── sync/                   # Klient synchronizacji chmurowej Supabase
 │   │   └── syncEngine.ts       # Dwukierunkowa replikacja delta i obsługa offline
 │   └── lib/                    # Współdzielone moduły pomocnicze
 │       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
 ├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
-├── tests/                      # 32 zestawy testowe (215 testów jednostkowych i fast-check)
+├── tests/                      # 32 zestawy testowe (223 testy jednostkowe i fast-check)
 ├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
 └── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
     └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)

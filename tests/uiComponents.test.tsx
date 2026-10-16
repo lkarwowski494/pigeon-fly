@@ -800,7 +800,32 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('Marek Partner');
     expect(tree).toContain('Zaproś Wspólnika');
   });
+
+  test('VeterinaryLabModal renders YPDS triage, symptoms checklist, coproscopy, and 12M calendar', () => {
+    const { VeterinaryLabModal } = require('../src/components/VeterinaryLabModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <VeterinaryLabModal
+          visible={true}
+          onClose={onClose}
+          selectedPigeonRing="PL-0284-24-9102"
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Gabinet Weterynaryjny & Triage');
+    expect(tree).toContain('PL-0284-24-9102');
+    expect(tree).toContain('Triage YPDS');
+    expect(tree).toContain('Koproskopia');
+    expect(tree).toContain('Kalendarz 12M');
+    expect(tree).toContain('Wole lejące');
+  });
 });
+
 
 
 
