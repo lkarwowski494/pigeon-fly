@@ -16,6 +16,7 @@ import { ClutchWithParents } from '../../src/db/breedingRepository';
 import { ClutchCard } from '../../src/components/ClutchCard';
 import { FieldButton } from '../../src/components/FieldButton';
 import { PairingModal } from '../../src/components/PairingModal';
+import { ClutchLifecycleModal } from '../../src/components/ClutchLifecycleModal';
 import { calculateClutchMilestones } from '../../src/domain/breeding';
 
 
@@ -68,6 +69,8 @@ const INITIAL_CLUTCHES: ClutchWithParents[] = [
 export default function BreedingScreen() {
   const [clutches, setClutches] = useState<ClutchWithParents[]>(INITIAL_CLUTCHES);
   const [isPairingOpen, setIsPairingOpen] = useState(false);
+  const [selectedClutch, setSelectedClutch] = useState<ClutchWithParents | null>(null);
+  const [isLifecycleModalOpen, setIsLifecycleModalOpen] = useState(false);
 
   const handlePairSaved = (pairing: {
     cockId: string;
@@ -101,25 +104,20 @@ export default function BreedingScreen() {
   };
 
   const handleClutchPress = (item: ClutchWithParents) => {
-    if (item.egg1Date) {
-      const milestones = calculateClutchMilestones({ pairDate: item.pairedDate, egg1Date: item.egg1Date });
-      Alert.alert(
-        `${item.nestBox} — Kalendarium Lęgu`,
-        `Para: ${item.cockRingNumber} × ${item.henRingNumber}\n` +
-          `Jajo 1: ${item.egg1Date} (${item.egg1Status})\n` +
-          `Jajo 2: ${item.egg2Date || 'oczekiwane (+44h)'} (${item.egg2Status})\n` +
-          `Owoskopia (Dzień 5): ${milestones.candlingDate}\n` +
-          `Spodziewany wylęg: ${milestones.expectedHatchDate}\n` +
-          `Okno obrączkowania (6-8 dni): ${milestones.bandingStartDate} do ${milestones.bandingEndDate}\n` +
-          `Odsadzenie młodków: ${milestones.weaningDate}`
-      );
-    } else {
+    setSelectedClutch(item);
+    setIsLifecycleModalOpen(true);
+  };
 
-      Alert.alert(
-        `${item.nestBox} — Nowa Para`,
-        `Para: ${item.cockRingNumber} × ${item.henRingNumber}\nData parowania: ${item.pairedDate}\n\nOczekiwanie na pierwsze jajo (ok. 8-10 dni od sparowania).`
-      );
-    }
+  const handleSaveClutchLifecycle = (updatedClutch: ClutchWithParents) => {
+    setClutches((prev) =>
+      prev.map((c) => (c.id === updatedClutch.id ? updatedClutch : c))
+    );
+    setSelectedClutch(null);
+    setIsLifecycleModalOpen(false);
+    Alert.alert(
+      'Zaktualizowano Celę!',
+      `${updatedClutch.nestBox}: Zapisano postępy w cyklu lęgowym.`
+    );
   };
 
   return (
@@ -182,6 +180,16 @@ export default function BreedingScreen() {
         visible={isPairingOpen}
         onClose={() => setIsPairingOpen(false)}
         onPairSaved={handlePairSaved}
+      />
+
+      <ClutchLifecycleModal
+        visible={isLifecycleModalOpen}
+        clutch={selectedClutch}
+        onClose={() => {
+          setIsLifecycleModalOpen(false);
+          setSelectedClutch(null);
+        }}
+        onSave={handleSaveClutchLifecycle}
       />
     </SafeAreaView>
   );

@@ -15,6 +15,7 @@ import { ArrivalWithPigeon } from '../../src/db/raceRepository';
 import { ArrivalCard } from '../../src/components/ArrivalCard';
 import { FieldButton } from '../../src/components/FieldButton';
 import { ClockArrivalModal } from '../../src/components/ClockArrivalModal';
+import { NewRaceModal } from '../../src/components/NewRaceModal';
 import { PdfService } from '../../src/services/pdfService';
 import { Alert } from 'react-native';
 
@@ -58,8 +59,32 @@ const DEMO_ARRIVALS: ArrivalWithPigeon[] = [
 export default function RacesScreen() {
   const [arrivals, setArrivals] = useState<ArrivalWithPigeon[]>(DEMO_ARRIVALS);
   const [isClockModalVisible, setIsClockModalVisible] = useState(false);
-  const raceDistanceMeters = 345200;
-  const releaseTimeIso = new Date(Date.now() - 1000 * 60 * 240).toISOString(); // 4 hours ago
+  const [isNewRaceModalVisible, setIsNewRaceModalVisible] = useState(false);
+  const [raceName, setRaceName] = useState('Lot: Magdeburg');
+  const [releaseLocation, setReleaseLocation] = useState('Magdeburg (Niemcy)');
+  const [raceDistanceMeters, setRaceDistanceMeters] = useState(345200);
+  const [releaseTimeIso, setReleaseTimeIso] = useState(
+    new Date(Date.now() - 1000 * 60 * 240).toISOString() // 4 hours ago
+  );
+  const [isTraining, setIsTraining] = useState(false);
+
+  const handleSaveNewRace = (data: {
+    name: string;
+    releaseName: string;
+    distanceKm: number;
+    releaseTimeIso: string;
+    isTraining: boolean;
+  }) => {
+    setRaceName(data.name);
+    setReleaseLocation(data.releaseName);
+    setRaceDistanceMeters(data.distanceKm * 1000);
+    setReleaseTimeIso(data.releaseTimeIso);
+    setIsTraining(data.isTraining);
+    Alert.alert(
+      'Uruchomiono Lot!',
+      `${data.name} — ${data.releaseName}\nDystans: ${data.distanceKm.toFixed(1)} km\nGodzina: ${new Date(data.releaseTimeIso).toLocaleTimeString('pl-PL')}`
+    );
+  };
 
   const handleExportBasketingList = () => {
     Alert.alert(
@@ -75,8 +100,8 @@ export default function RacesScreen() {
                   loftName: 'Gołębnik Mistrza',
                   breederName: 'Hodowca Pigeon-Fly',
                   clubBranch: 'Oddział 0284 Gostyń',
-                  raceName: 'Magdeburg (Niemcy)',
-                  releaseLocation: 'Magdeburg',
+                  raceName: releaseLocation,
+                  releaseLocation: releaseLocation,
                   basketingDate: new Date().toISOString().slice(0, 10),
                   pigeons: arrivals.map((a, idx) => ({
                     index: idx + 1,
@@ -102,8 +127,8 @@ export default function RacesScreen() {
                   loftName: 'Gołębnik Mistrza',
                   breederName: 'Hodowca Pigeon-Fly',
                   clubBranch: 'Oddział 0284 Gostyń',
-                  raceName: 'Magdeburg (Niemcy)',
-                  releaseLocation: 'Magdeburg',
+                  raceName: releaseLocation,
+                  releaseLocation: releaseLocation,
                   basketingDate: new Date().toISOString().slice(0, 10),
                   pigeons: arrivals.map((a, idx) => ({
                     index: idx + 1,
@@ -165,13 +190,21 @@ export default function RacesScreen() {
         {/* Active Race Header Card */}
         <View style={styles.raceCard}>
           <View style={styles.raceHeader}>
-            <Text style={styles.raceBadge}>LOT KONKURSOWY</Text>
+            <Text style={styles.raceBadge}>
+              {isTraining ? 'TRENING Z GOŁĘBNIKA' : 'LOT KONKURSOWY'}
+            </Text>
             <Text style={styles.liveIndicator}>🔴 NA ŻYWO</Text>
           </View>
-          <Text style={styles.releaseName}>Magdeburg (Niemcy)</Text>
+          <Text style={styles.releaseName}>{releaseLocation}</Text>
           <View style={styles.raceStatsRow}>
-            <Text style={styles.statLabel}>Dystans: <Text style={styles.statValue}>345.2 km</Text></Text>
-            <Text style={styles.statLabel}>Wypuszczenie: <Text style={styles.statValue}>06:30:00</Text></Text>
+            <Text style={styles.statLabel}>
+              Dystans: <Text style={styles.statValue}>{(raceDistanceMeters / 1000).toFixed(1)} km</Text>
+            </Text>
+            <Text style={styles.statLabel}>
+              Wypuszczenie: <Text style={styles.statValue}>
+                {new Date(releaseTimeIso).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              </Text>
+            </Text>
           </View>
         </View>
 
@@ -181,6 +214,13 @@ export default function RacesScreen() {
             title="⏱️ Odbij Przylot Ptaka"
             onPress={() => setIsClockModalVisible(true)}
             testID="btn-clock-arrival"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
+            title="🏁 + Nowy Lot / Trening"
+            onPress={() => setIsNewRaceModalVisible(true)}
+            testID="btn-new-race"
+            variant="secondary"
             style={{ marginBottom: 10 }}
           />
           <FieldButton
@@ -216,6 +256,13 @@ export default function RacesScreen() {
         raceDistanceMeters={raceDistanceMeters}
         releaseTimeIso={releaseTimeIso}
         onClockArrival={handleClockArrival}
+      />
+
+      {/* New Race Configuration Modal */}
+      <NewRaceModal
+        visible={isNewRaceModalVisible}
+        onClose={() => setIsNewRaceModalVisible(false)}
+        onSaveRace={handleSaveNewRace}
       />
     </SafeAreaView>
   );

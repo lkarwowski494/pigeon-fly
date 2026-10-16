@@ -14,10 +14,11 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Pigeon } from '../../src/domain/types';
+import { Pigeon, PigeonStatus } from '../../src/domain/types';
 import { PigeonCard } from '../../src/components/PigeonCard';
 import { FieldButton } from '../../src/components/FieldButton';
 import { PaywallModal } from '../../src/components/PaywallModal';
+import { PigeonDetailModal } from '../../src/components/PigeonDetailModal';
 import { PdfService } from '../../src/services/pdfService';
 
 // Initial demo pigeons for immediate offline usability
@@ -70,28 +71,26 @@ const INITIAL_DEMO_PIGEONS: Pigeon[] = [
 
 export default function FlockScreen() {
   const router = useRouter();
-  const [pigeons] = useState<Pigeon[]>(INITIAL_DEMO_PIGEONS);
+  const [pigeons, setPigeons] = useState<Pigeon[]>(INITIAL_DEMO_PIGEONS);
+  const [selectedPigeon, setSelectedPigeon] = useState<Pigeon | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'racing' | 'breeding'>('all');
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [isProUser, setIsProUser] = useState(false);
 
   const handlePigeonPress = (pigeon: Pigeon) => {
-    Alert.alert(
-      `${pigeon.countryCode}-${pigeon.ringNumber}`,
-      `Wybierz działanie dla gołębia (${pigeon.plumageColor}, ${pigeon.year}):`,
-      [
-        {
-          text: '📜 Drukuj Rodowód PDF (A4)',
-          onPress: () => exportPigeonPedigree(pigeon, 'print'),
-        },
-        {
-          text: '📤 Udostępnij Rodowód PDF',
-          onPress: () => exportPigeonPedigree(pigeon, 'share'),
-        },
-        { text: 'Anuluj', style: 'cancel' },
-      ]
+    setSelectedPigeon(pigeon);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleUpdateStatus = (pigeonId: string, newStatus: PigeonStatus) => {
+    setPigeons((prev) =>
+      prev.map((p) => (p.id === pigeonId ? { ...p, status: newStatus } : p))
     );
+    if (selectedPigeon && selectedPigeon.id === pigeonId) {
+      setSelectedPigeon({ ...selectedPigeon, status: newStatus });
+    }
   };
 
   const exportPigeonPedigree = async (pigeon: Pigeon, mode: 'print' | 'share') => {
@@ -213,6 +212,18 @@ export default function FlockScreen() {
           Alert.alert('Przywrócono', 'Przywrócono uprawnienia Pigeon-Fly Pro.');
         }}
         currentPigeonsCount={pigeons.length}
+      />
+
+      {/* Pigeon Detail Modal */}
+      <PigeonDetailModal
+        visible={isDetailModalOpen}
+        pigeon={selectedPigeon}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedPigeon(null);
+        }}
+        onPrintPedigree={exportPigeonPedigree}
+        onUpdateStatus={handleUpdateStatus}
       />
     </SafeAreaView>
   );

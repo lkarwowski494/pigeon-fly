@@ -136,26 +136,34 @@ pigeon-fly/
 │   │   ├── schema.ts           # Schemat tabel DDL i indeksy relacyjne
 │   │   ├── pigeonRepository.ts # CRUD stada i zapytań rodowodowych
 │   │   ├── breedingRepository.ts # Zapytania cel gniazdowych i kojarzeń
-│   │   └── raceRepository.ts   # Zapytania lotów i rankingu przylotów
+│   │   ├── raceRepository.ts   # Zapytania lotów i rankingu przylotów
+│   │   ├── healthRepository.ts # E-Księga PIW, szczepienia PMV-1 i wskaźnik ARI
+│   │   └── feedingRepository.ts# Rejestr dawek ziaren, faz i poidła
 │   ├── services/               # Usługi systemowe i integracje
 │   │   ├── appleWatchService.ts # Komunikacja i odbijanie przylotów na Apple Watch
 │   │   ├── backupService.ts    # 10-plikowa rotacyjna kopia zapasowa JSON/SQLite
 │   │   └── pdfService.ts       # Natywny wydruk (expo-print) i udostępnianie (expo-sharing)
 │   ├── components/             # Ergonomiczne komponenty interfejsu (Field Mode)
+│   │   ├── AddFeedingLogModal.tsx # Formularz dziennika karmy i suplementacji
+│   │   ├── AddTreatmentModal.tsx  # Formularz szczepień PMV-1 i leczenia PIW
 │   │   ├── ArrivalCard.tsx     # Karta przylotu z wyróżnieniem prędkości
+│   │   ├── ClockArrivalModal.tsx  # Odbicie przylotu z live kalkulacją m/min
 │   │   ├── ClutchCard.tsx      # Karta lęgu z kamieniami milowymi
+│   │   ├── ClutchLifecycleModal.tsx # Cykl lęgowy: jaja, owoskopia, obrączkowanie
 │   │   ├── FeatherGauge.tsx    # Wizualny wskaźnik 10 lotek skrzydła
 │   │   ├── FieldButton.tsx     # Przycisk dotykowy >=56pt z wibracją haptyczną
+│   │   ├── NewRaceModal.tsx    # Konfiguracja nowego lotu i treningu
 │   │   ├── PairingModal.tsx    # Zarządzanie parowaniem w celkach z inbredem
 │   │   ├── PaywallModal.tsx    # Cennik i zakup Pigeon-Fly Pro (Apple HIG)
 │   │   ├── PigeonCard.tsx      # Karta ptaka z oznaczeniem płci i rocznika
+│   │   ├── PigeonDetailModal.tsx # Karta ptaka, mikronaklejka QR i rodowód PDF
 │   │   └── QrCodeSvg.tsx       # Czysty wektorowy kod QR SVG do naklejek
 │   ├── sync/                   # Klient synchronizacji chmurowej Supabase
 │   │   └── syncEngine.ts       # Dwukierunkowa replikacja delta i obsługa offline
 │   └── lib/                    # Współdzielone moduły pomocnicze
 │       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
 ├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
-├── tests/                      # 16 zestawów testowych (87 testów jednostkowych i fast-check)
+├── tests/                      # 18 zestawów testowych (99 testów jednostkowych i fast-check)
 ├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
 └── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
     └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)

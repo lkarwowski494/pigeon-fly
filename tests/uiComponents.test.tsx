@@ -261,5 +261,108 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('DZIENNIK ŻYWIENIA I SUPLEMENTACJI');
     expect(tree).toContain('Loty (Wdowieństwo)');
   });
+
+  test('NewRaceModal renders title, presets, and distance', () => {
+    const { NewRaceModal } = require('../src/components/NewRaceModal');
+    const onClose = jest.fn();
+    let component: any;
+
+    act(() => {
+      component = renderer.create(
+        <NewRaceModal visible={true} onClose={onClose} onSaveRace={jest.fn()} />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('NOWY LOT / TRENING');
+    expect(tree).toContain('Magdeburg (Niemcy)');
+    expect(tree).toContain('345.2');
+  });
+
+  test('ClutchLifecycleModal renders clutch details, milestones, and saves changes', () => {
+    const { ClutchLifecycleModal } = require('../src/components/ClutchLifecycleModal');
+    const onSave = jest.fn();
+    const onClose = jest.fn();
+    const clutch = {
+      id: 'c-01',
+      loftId: 'l-01',
+      roundNumber: 1,
+      nestBox: 'Cela A-04',
+      cockId: 'p-01',
+      henId: 'p-02',
+      pairedDate: '2026-03-01',
+      egg1Date: '2026-03-10',
+      egg2Date: '2026-03-12',
+      egg1Status: 'fertile' as const,
+      egg2Status: 'fertile' as const,
+      chick1Banded: false,
+      chick2Banded: false,
+      createdAt: '',
+      updatedAt: '',
+      cockRingNumber: 'PL-0284-23-1402',
+      henRingNumber: 'PL-0284-22-9854',
+    };
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <ClutchLifecycleModal
+          visible={true}
+          clutch={clutch}
+          onClose={onClose}
+          onSave={onSave}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Cela A-04');
+    expect(tree).toContain('HARMONOGRAM BIOLOGICZNY');
+    expect(tree).toContain('OWOSKOPIA');
+    expect(tree).toContain('WYL\u0118G');
+  });
+
+  test('PigeonDetailModal renders pigeon info, QR micro-sticker, and status selector', () => {
+    const { PigeonDetailModal } = require('../src/components/PigeonDetailModal');
+    const onClose = jest.fn();
+    const onPrintPedigree = jest.fn();
+    const onUpdateStatus = jest.fn();
+
+    const pigeon = {
+      id: 'p-01',
+      loftId: 'l-01',
+      ringNumber: 'PL-0284-23-1402',
+      countryCode: 'PL',
+      year: 2023,
+      sex: 'cock' as const,
+      plumageColor: 'Niebieski nakrapiany',
+      status: 'racing' as const,
+      qrCodeUuid: 'uuid-12345',
+      isDeleted: false,
+      createdAt: '',
+      updatedAt: '',
+    };
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <PigeonDetailModal
+          visible={true}
+          pigeon={pigeon}
+          onClose={onClose}
+          onPrintPedigree={onPrintPedigree}
+          onUpdateStatus={onUpdateStatus}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('PL-0284-23-1402');
+    expect(tree).toContain('MIKRONAKLEJKA QR');
+    expect(tree).toContain('RODOW\u00d3D 4-POKOLENIOWY');
+    expect(tree).toContain('PIGEONFLY:V1');
+  });
 });
+
+
 
