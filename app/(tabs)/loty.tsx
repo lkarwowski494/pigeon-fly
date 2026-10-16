@@ -19,6 +19,7 @@ import { NewRaceModal } from '../../src/components/NewRaceModal';
 import { TelemetryTrackModal } from '../../src/components/TelemetryTrackModal';
 import { RaceWeatherModal } from '../../src/components/RaceWeatherModal';
 import { BasketingSessionModal } from '../../src/components/BasketingSessionModal';
+import { LiveDerbyModal } from '../../src/components/LiveDerbyModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { Alert } from 'react-native';
@@ -76,6 +77,7 @@ export default function RacesScreen() {
   const [isTelemetryModalVisible, setIsTelemetryModalVisible] = useState(false);
   const [isWeatherModalVisible, setIsWeatherModalVisible] = useState(false);
   const [isBasketingModalVisible, setIsBasketingModalVisible] = useState(false);
+  const [isDerbyModalVisible, setIsDerbyModalVisible] = useState(false);
 
   const handleSaveBasketing = (entries: BasketEntry[]) => {
     setBasketedCount(entries.length > 0 ? entries.length : 120);
@@ -265,6 +267,13 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="🏆 Mini-Derby Sekcji (Live)"
+            onPress={() => setIsDerbyModalVisible(true)}
+            testID="btn-open-live-derby"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -326,6 +335,12 @@ export default function RacesScreen() {
         onClose={() => setIsBasketingModalVisible(false)}
         raceName={releaseLocation}
         onSaveBasket={handleSaveBasketing}
+      />
+
+      {/* Live Section Derby Modal */}
+      <LiveDerbyModal
+        visible={isDerbyModalVisible}
+        onClose={() => setIsDerbyModalVisible(false)}
       />
     </SafeAreaView>
   );

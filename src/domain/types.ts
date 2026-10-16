@@ -57,6 +57,8 @@ export interface Pigeon {
   photoUrl?: string;
   eyePhotoUrl?: string;
   wingPhotoUrl?: string;
+  auxiliaryRingNumber?: string;
+  clipBandColor?: 'red' | 'yellow' | 'blue' | 'green' | 'white';
   qrCodeUuid: string;
   notes?: string;
   isDeleted: boolean;

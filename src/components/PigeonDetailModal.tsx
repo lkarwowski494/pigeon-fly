@@ -22,6 +22,8 @@ import { QrCodeSvg } from './QrCodeSvg';
 import { FieldButton } from './FieldButton';
 import { PedigreeTreeModal } from './PedigreeTreeModal';
 import { AppraisalModal } from './AppraisalModal';
+import { PigeonPhotoGalleryModal } from './PigeonPhotoGalleryModal';
+import { PerformanceChartModal } from './PerformanceChartModal';
 
 export interface PigeonDetailModalProps {
   visible: boolean;
@@ -43,6 +45,8 @@ export function PigeonDetailModal({
   const [currentStatus, setCurrentStatus] = useState<PigeonStatus>(pigeon.status);
   const [isPedigreeTreeOpen, setIsPedigreeTreeOpen] = useState(false);
   const [isAppraisalOpen, setIsAppraisalOpen] = useState(false);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [isPerformanceOpen, setIsPerformanceOpen] = useState(false);
 
   useEffect(() => {
     if (pigeon) {
@@ -101,6 +105,11 @@ export function PigeonDetailModal({
               <View style={[styles.badge, { backgroundColor: '#2A303C' }]}>
                 <Text style={[styles.badgeText, { color: '#E5A93C' }]}>{pigeon.plumageColor}</Text>
               </View>
+              {pigeon.auxiliaryRingNumber && (
+                <View style={[styles.badge, { backgroundColor: '#1E3A24' }]}>
+                  <Text style={[styles.badgeText, { color: '#81C784' }]}>ZNACZNIK: {pigeon.auxiliaryRingNumber}</Text>
+                </View>
+              )}
             </View>
 
             {/* Status Selector */}
@@ -153,6 +162,20 @@ export function PigeonDetailModal({
                   style={{ marginBottom: 10 }}
                 />
                 <FieldButton
+                  title="📸 Galeria Makro (Sylwetka / Oko / Skrzydło)"
+                  onPress={() => setIsGalleryOpen(true)}
+                  variant="secondary"
+                  testID="btn-open-gallery"
+                  style={{ marginBottom: 10 }}
+                />
+                <FieldButton
+                  title="📈 Wykres Formy i Prędkości (m/min)"
+                  onPress={() => setIsPerformanceOpen(true)}
+                  variant="secondary"
+                  testID="btn-open-performance"
+                  style={{ marginBottom: 10 }}
+                />
+                <FieldButton
                   title="🔍 Ocena Budowy & Znak Oka (FCI)"
                   onPress={() => setIsAppraisalOpen(true)}
                   variant="secondary"
@@ -190,6 +213,20 @@ export function PigeonDetailModal({
         visible={isAppraisalOpen}
         pigeon={pigeon}
         onClose={() => setIsAppraisalOpen(false)}
+      />
+
+      {/* Photo Gallery Modal */}
+      <PigeonPhotoGalleryModal
+        visible={isGalleryOpen}
+        pigeon={pigeon}
+        onClose={() => setIsGalleryOpen(false)}
+      />
+
+      {/* Velocity and Form Trend Chart Modal */}
+      <PerformanceChartModal
+        visible={isPerformanceOpen}
+        pigeon={pigeon}
+        onClose={() => setIsPerformanceOpen(false)}
       />
     </Modal>
   );

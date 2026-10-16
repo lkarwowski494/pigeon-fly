@@ -124,11 +124,13 @@ pigeon-fly/
 │   │   ├── breeding.ts         # Biologia lęgu i harmonogram jaj/obrączkowania
 │   │   ├── concourse.ts        # Baza konkursowa (20%), FCI Coeff i punkty GMP Asów
 │   │   ├── costCalculator.ts   # Kalkulator budżetu stada, ziarna i weterynarii
+│   │   ├── derby.ts            # Mini-Derby Sekcji, wielogołębnikowe live standings i feed
 │   │   ├── genetics.ts         # Matematyczny algorytm inbredu Wrighta (F)
 │   │   ├── health.ts           # Profilaktyka, szczepienia PMV-1 i karencje leków
 │   │   ├── moult.ts            # Regeneracja 10 lotek skrzydła i fotoperiod
 │   │   ├── nutrition.ts        # 4-fazowe protokoły żywieniowe i bilans makro
 │   │   ├── pdfExport.ts        # Generatory HTML A4 dla rodowodów, kosza i PIW
+│   │   ├── performance.ts      # Silnik formy sportowej, dynamika prędkości m/min i taktyka
 │   │   ├── qr.ts               # Bezpieczne identyfikatory i weryfikacja rodowodów
 │   │   ├── racing.ts           # Fizyka lotu, m/min, ypm i neutralizacja nocy
 │   │   ├── telemetry.ts        # Moduł 5: IoT/GPS tracking, krzywizna i efektywność trasy
@@ -159,12 +161,15 @@ pigeon-fly/
 │   │   ├── ClutchLifecycleModal.tsx # Cykl lęgowy: jaja, owoskopia, obrączkowanie
 │   │   ├── FeatherGauge.tsx    # Wizualny wskaźnik 10 lotek skrzydła
 │   │   ├── FieldButton.tsx     # Przycisk dotykowy >=56pt z wibracją haptyczną
+│   │   ├── LiveDerbyModal.tsx  # Klubowe Mini-Derby i live feed przylotów sekcji
 │   │   ├── NewRaceModal.tsx    # Konfiguracja nowego lotu i treningu
 │   │   ├── PairingModal.tsx    # Zarządzanie parowaniem w celkach z inbredem
 │   │   ├── PaywallModal.tsx    # Cennik i zakup Pigeon-Fly Pro (Apple HIG)
 │   │   ├── PedigreeTreeModal.tsx  # Interaktywne drzewo rodowodowe 3-4 pokoleń
-│   │   ├── PigeonCard.tsx      # Karta ptaka z oznaczeniem płci i rocznika
+│   │   ├── PerformanceChartModal.tsx # Wykres wektorowy SVG dynamiki prędkości i formy
+│   │   ├── PigeonCard.tsx      # Karta ptaka z oznaczeniem płci, rocznika i znaczników
 │   │   ├── PigeonDetailModal.tsx # Karta ptaka, mikronaklejka QR i rodowód PDF
+│   │   ├── PigeonPhotoGalleryModal.tsx # 3-kątowa galeria makro (Sylwetka/Oko/Skrzydło)
 │   │   ├── QrCodeSvg.tsx       # Czysty wektorowy kod QR SVG do naklejek
 │   │   ├── RaceWeatherModal.tsx# Prognoza prędkości i aerodynamika wiatru
 │   │   └── TelemetryTrackModal.tsx # Analiza krzywizny trasy GPS/IoT z obrączek
@@ -173,7 +178,7 @@ pigeon-fly/
 │   └── lib/                    # Współdzielone moduły pomocnicze
 │       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
 ├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
-├── tests/                      # 23 zestawy testowe (136 testów jednostkowych i fast-check)
+├── tests/                      # 25 zestawów testowych (149 testów jednostkowych i fast-check)
 ├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
 └── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
     └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)

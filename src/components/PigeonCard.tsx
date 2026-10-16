@@ -37,10 +37,39 @@ export const PigeonCard: React.FC<PigeonCardProps> = ({ pigeon, onPress, testID 
     >
       <View style={styles.headerRow}>
         <View style={styles.ringBadge}>
+          {pigeon.clipBandColor && (
+            <View
+              style={[
+                styles.clipBandDot,
+                {
+                  backgroundColor:
+                    pigeon.clipBandColor === 'red'
+                      ? '#E53935'
+                      : pigeon.clipBandColor === 'yellow'
+                      ? '#FDD835'
+                      : pigeon.clipBandColor === 'blue'
+                      ? '#1E88E5'
+                      : pigeon.clipBandColor === 'green'
+                      ? '#43A047'
+                      : '#FFFFFF',
+                },
+              ]}
+            />
+          )}
           <Text style={styles.countryText}>{pigeon.countryCode}</Text>
           <Text style={styles.ringText}>{pigeon.ringNumber}</Text>
+          {pigeon.auxiliaryRingNumber && (
+            <View style={styles.auxBadge}>
+              <Text style={styles.auxText}>{pigeon.auxiliaryRingNumber}</Text>
+            </View>
+          )}
         </View>
-        <Text style={[styles.sexText, { color: sexColor }]}>{sexSymbol}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          {(pigeon.photoUrl || pigeon.eyePhotoUrl || pigeon.wingPhotoUrl) && (
+            <Text style={styles.photoIndicator}>📷</Text>
+          )}
+          <Text style={[styles.sexText, { color: sexColor }]}>{sexSymbol}</Text>
+        </View>
       </View>
 
       <View style={styles.detailsRow}>
@@ -121,5 +150,32 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     color: '#81C784',
+  },
+  clipBandDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.3)',
+  },
+  auxBadge: {
+    backgroundColor: '#262B35',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginLeft: 6,
+    borderWidth: 1,
+    borderColor: '#383F4D',
+  },
+  auxText: {
+    fontSize: 11,
+    color: '#81C784',
+    fontWeight: '800',
+    fontFamily: 'monospace',
+  },
+  photoIndicator: {
+    fontSize: 14,
+    marginRight: 4,
   },
 });

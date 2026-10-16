@@ -490,6 +490,119 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('PL-0284-23-1402');
     expect(tree).toContain('Seria (T)');
   });
+
+  test('PigeonPhotoGalleryModal renders tabs for Sylwetka, Oko Makro and Skrzydlo', () => {
+    const { PigeonPhotoGalleryModal } = require('../src/components/PigeonPhotoGalleryModal');
+    const onClose = jest.fn();
+    const pigeon: Pigeon = {
+      id: 'p-01',
+      loftId: 'l-01',
+      ringNumber: 'PL-0284-23-1402',
+      countryCode: 'PL',
+      year: 2023,
+      sex: 'cock',
+      plumageColor: 'Niebieski',
+      status: 'racing',
+      qrCodeUuid: 'uuid-1',
+      isDeleted: false,
+      createdAt: '',
+      updatedAt: '',
+    };
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <PigeonPhotoGalleryModal visible={true} pigeon={pigeon} onClose={onClose} />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('GALERIA MAKRO');
+    expect(tree).toContain('Sylwetka');
+    expect(tree).toContain('Oko Makro');
+    expect(tree).toContain('Skrzyd\u0142o');
+  });
+
+  test('PerformanceChartModal renders velocity chart and form index', () => {
+    const { PerformanceChartModal } = require('../src/components/PerformanceChartModal');
+    const onClose = jest.fn();
+    const pigeon: Pigeon = {
+      id: 'p-01',
+      loftId: 'l-01',
+      ringNumber: 'PL-0284-23-1402',
+      countryCode: 'PL',
+      year: 2023,
+      sex: 'cock',
+      plumageColor: 'Niebieski',
+      status: 'racing',
+      qrCodeUuid: 'uuid-1',
+      isDeleted: false,
+      createdAt: '',
+      updatedAt: '',
+    };
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <PerformanceChartModal visible={true} pigeon={pigeon} onClose={onClose} />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('WYKRES FORMY');
+    expect(tree).toContain('INDEKS FORMY');
+    expect(tree).toContain('PR\u0118DKO\u015aCI LOT\u00d3W');
+    expect(tree).toContain('REKOMENDACJA TAKTYCZNA');
+  });
+
+  test('LiveDerbyModal renders live section leaderboard and broadcast link', () => {
+    const { LiveDerbyModal } = require('../src/components/LiveDerbyModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <LiveDerbyModal visible={true} onClose={onClose} />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('TRANSMISJA NA \u017bYWO');
+    expect(tree).toContain('KOD TRANSMISJI');
+    expect(tree).toContain('DERBY');
+    expect(tree).toContain('OSTATNI PRZYLOT NA \u017bYWO');
+  });
+
+  test('PigeonCard displays auxiliary ring and clip band color when present', () => {
+    const pigeonWithAux: Pigeon = {
+      id: 'p-aux',
+      loftId: 'l-01',
+      ringNumber: 'PL-0284-23-9999',
+      countryCode: 'PL',
+      year: 2023,
+      sex: 'hen',
+      plumageColor: 'Pstra',
+      auxiliaryRingNumber: 'GUM-42',
+      clipBandColor: 'yellow',
+      photoUrl: 'https://example.com/pigeon.jpg',
+      status: 'racing',
+      qrCodeUuid: 'uuid-aux',
+      isDeleted: false,
+      createdAt: '',
+      updatedAt: '',
+    };
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <PigeonCard pigeon={pigeonWithAux} onPress={jest.fn()} />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('GUM-42');
+    expect(tree).toContain('📷');
+  });
 });
 
 
