@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "Pigeon-Fly",
+    "slug": "pigeon-fly",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "scheme": "pigeonfly",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#121417"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.apps4loft.pigeonfly",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Aplikacja używa aparatu do błyskawicznego skanowania kodów QR na obrączkach gołębi w gołębniku.",
+        "NSPhotoLibraryUsageDescription": "Aplikacja umożliwia dodawanie zdjęć ptaków, oka i skrzydeł do kart rodowodowych."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#121417"
+      },
+      "package": "com.apps4loft.pigeonfly",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Zezwól na dostęp do aparatu, aby skanować kody QR obrączek w gołębniku."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
