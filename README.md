@@ -134,6 +134,7 @@ pigeon-fly/
 │   │   ├── nutrition.ts        # 4-fazowe protokoły żywieniowe i bilans makro
 │   │   ├── pdfExport.ts        # Generatory HTML A4 dla rodowodów, kosza, naklejek QR i PIW
 │   │   ├── performance.ts      # Silnik formy sportowej, dynamika prędkości m/min i taktyka
+│   │   ├── photoperiod.ts      # Chronobiologia stada, systemy Verdunkelung / Belichtung (RD-13/14) i alerty rolet
 │   │   ├── qr.ts               # Bezpieczne identyfikatory i weryfikacja rodowodów
 │   │   ├── racing.ts           # Fizyka lotu, m/min, ypm i neutralizacja nocy
 │   │   ├── telemetry.ts        # Moduł 5: IoT/GPS tracking, krzywizna i efektywność trasy
@@ -173,6 +174,7 @@ pigeon-fly/
 │   │   ├── PaywallModal.tsx    # Cennik i zakup Pigeon-Fly Pro (Apple HIG)
 │   │   ├── PedigreeTreeModal.tsx  # Interaktywne drzewo rodowodowe 3-4 pokoleń
 │   │   ├── PerformanceChartModal.tsx # Wykres wektorowy SVG dynamiki prędkości i formy
+│   │   ├── PhotoperiodModal.tsx # Zarządzanie dobowym cyklem światła, ciemnią i powiadomieniami rolet
 │   │   ├── PigeonCard.tsx      # Karta ptaka z oznaczeniem płci, rocznika i znaczników
 │   │   ├── PigeonDetailModal.tsx # Karta ptaka, mikronaklejka QR i rodowód PDF
 │   │   ├── PigeonPhotoGalleryModal.tsx # 3-kątowa galeria makro (Sylwetka/Oko/Skrzydło)
@@ -184,7 +186,7 @@ pigeon-fly/
 │   └── lib/                    # Współdzielone moduły pomocnicze
 │       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
 ├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
-├── tests/                      # 28 zestawów testowych (170 testów jednostkowych i fast-check)
+├── tests/                      # 29 zestawów testowych (180 testów jednostkowych i fast-check)
 ├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
 └── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
     └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)

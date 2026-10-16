@@ -11,10 +11,12 @@ import {
   ScrollView,
   SafeAreaView,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import { FeatherGauge } from '../../src/components/FeatherGauge';
 import { FieldButton } from '../../src/components/FieldButton';
 import { AddTreatmentModal } from '../../src/components/AddTreatmentModal';
+import { PhotoperiodModal } from '../../src/components/PhotoperiodModal';
 import { analyzeWingMoult, getPhotoperiodStatus } from '../../src/domain/moult';
 import { PdfService } from '../../src/services/pdfService';
 import { FeatherStatus, MoultLog } from '../../src/domain/types';
@@ -51,6 +53,7 @@ const INITIAL_TREATMENTS: TreatmentRecordItem[] = [
 export default function HealthScreen() {
   const [selectedPigeonRing] = useState('PL-0284-23-1402');
   const [isTreatmentModalVisible, setIsTreatmentModalVisible] = useState(false);
+  const [isPhotoperiodModalVisible, setIsPhotoperiodModalVisible] = useState(false);
   const [treatments, setTreatments] = useState<TreatmentRecordItem[]>(INITIAL_TREATMENTS);
   const [moultLogs, setMoultLogs] = useState<MoultLog[]>(INITIAL_MOULT_LOGS);
 
@@ -166,6 +169,14 @@ export default function HealthScreen() {
           </View>
           <Text style={styles.cardDesc}>{photoperiod.scheduleDescription}</Text>
           <Text style={styles.cardSub}>Cel biologiczny: {photoperiod.biologicalGoal}</Text>
+          <FieldButton
+            title="⏰ Zarządzaj Fotoperiodem i Roletami"
+            variant="secondary"
+            onPress={() => setIsPhotoperiodModalVisible(true)}
+            style={{ marginTop: 12, minHeight: 44 }}
+            textStyle={{ fontSize: 13 }}
+            testID="btn-open-photoperiod-modal"
+          />
         </View>
 
         {/* Selected Bird Wing Moult Analysis */}
@@ -303,6 +314,12 @@ export default function HealthScreen() {
           ]);
           Alert.alert('Zapisano', `Zabieg ${newLog.productName} został zapisany w E-Księdze PIW.`);
         }}
+      />
+
+      {/* Photoperiod & Blind Automation Modal */}
+      <PhotoperiodModal
+        visible={isPhotoperiodModalVisible}
+        onClose={() => setIsPhotoperiodModalVisible(false)}
       />
     </SafeAreaView>
   );

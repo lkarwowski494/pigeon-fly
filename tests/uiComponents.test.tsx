@@ -657,6 +657,25 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('PL-0284-23-1402');
     expect(tree).toContain('Karolina');
   });
+
+  test('PhotoperiodModal renders 24h cycle, preset systems, and blind alarms', () => {
+    const { PhotoperiodModal } = require('../src/components/PhotoperiodModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <PhotoperiodModal visible={true} onClose={onClose} />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('CHRONOBIOLOGIA STADA');
+    expect(tree).toContain('FOTOPERIOD I AUTOMATYKA ROLET');
+    expect(tree).toContain('Ciemnia (Verdunkelung)');
+    expect(tree).toContain('Do\u015bwietlanie (Belichtung)');
+    expect(tree).toContain('24-GODZINNY CYKL');
+  });
 });
 
 
