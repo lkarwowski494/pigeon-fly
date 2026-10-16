@@ -82,10 +82,69 @@
 
 ---
 
-### BR-ZDR-007: Moduł Sterowania Ciemnią i Światłem (Verdunkelung System)
-- **Priorytet:** SHOULD · **Etap:** 1.1 · **Persona:** P3 (Marek)
-- **Opis:** System zaciemniania gołębnika młodych w celu regulacji hormonów tarczycy i zatrzymania pierzenia lotek przed zawodami.
+### BR-ZDR-007: Moduł Sterowania Ciemnią i Światłem (Verdunkelung & Belichtung System)
+- **Priorytet:** MUST · **Etap:** MVP · **Persona:** P3 (Marek), P1 (Stanisław)
+- **Opis:** System fotoperiodycznej manipulacji długością dnia świetlnego dla młodych gołębi:
+  1. **Zaciemnianie (Verdunkelung):** Od 15 marca do 21 czerwca — 14 godzin całkowitej ciemności (18:00–08:00) i 10 godzin światła. Oszukuje szyszynkę, zmusza organizm do wymiany pierza drobnego, lecz **całkowicie blokuje zrzucanie 10 lotek pierwszorzędowych**. W sierpniu młódki lecą pełnym skrzydłem, zyskując potężną przewagę aerodynamiczną.
+  2. **Doświetlanie (Belichtung):** Od 22 czerwca do połowy września — sztuczne przedłużanie dnia do 16–17 godzin (doświetlanie rano od 05:00 i wieczorem do 22:30 lampami o temperaturze barwowej 6000K). Zapobiega spadkowi formy i blokuje jesienne pierzenie główne podczas zawodów.
 - **Kryteria Akceptacji:**
-  - *GIVEN:* Włączony tryb „System Ciemni”.
-  - *WHEN:* Użytkownik konfiguruje godziny ciemni (np. 17:30 do 08:30 — 15 godzin ciemności).
-  - *THEN:* Aplikacja wyświetla powiadomienia alarmowe o konieczności zasłonięcia i odsłonięcia żaluzji gołębnika oraz generuje wykres dobowy cyklu fotoperiodycznego.
+  - *GIVEN:* Przedział młodzieży z włączonym systemem ciemni.
+  - *WHEN:* Wybija godzina 17:45.
+  - *THEN:* Aplikacja wysyła powiadomienie Push: *„Za 15 minut zasłoń żaluzje gołębnika (reżim 14h ciemności)”*.
+
+---
+
+### BR-ZDR-008: 12-Miesięczny Kalendarz Weterynaryjny i Koproskopia
+- **Priorytet:** MUST · **Etap:** MVP · **Persona:** P1, P7 (Dr Janusz)
+- **Opis:** Całoroczna ścieżka profilaktyki weterynaryjnej stada:
+  - *Grudzień / Styczeń:* Badanie parazytologiczne kału (koproskopia flotacyjna: kokcydia, nicienie *Ascaridia columbae*, kapilarie *Capillaria*) + odrobaczanie + wypalanie cel palnikiem gazowym;
+  - *Styczeń / Luty:* Obowiązkowe szczepienie inaktywowane PMV-1 (paramyksowiroza) + szczepienie przeciw ospie gołębi;
+  - *Luty / Marzec:* Kontrola wola (trichomonadoza / rzęsistek / żółty guzek) przed parowaniem;
+  - *Kwiecień:* Przegląd dróg oddechowych (mykoplazmoza, ornitoza, katar zakaźny / coryza);
+  - *Maj / Czerwiec:* Profilaktyka syndromu młodych (Adeno-Coli / YPDS);
+  - *Wrzesień / Październik:* Kontrola salmonellozy (paratyfus) po sezonie lotowym.
+- **Kryteria Akceptacji:**
+  - *GIVEN:* Rejestr profilaktyki stada.
+  - *WHEN:* Hodowca wpisuje wynik koproskopii: *„Kokcydia: nieliczne w p.w., Nicienie: ujemny”*.
+  - *THEN:* System rekomenduje naturalne zakwaszanie poidła (ocet jabłkowy, oregano) bez konieczności stosowania chemioterapeutyków.
+
+---
+
+### BR-ZDR-009: Protokół Suplementacji Poidła i Karmnika (Matrix Dodatków)
+- **Priorytet:** MUST · **Etap:** MVP · **Persona:** P1, P3
+- **Opis:** Precyzyjny podział suplementów ze względu na drogę podania i fazę tygodniową:
+  1. **Do poidła (woda):**
+     - Elektrolity + glukoza (niedziela po locie);
+     - Zakwaszacz jelitowy (pH 4.0–4.5, poniedziałek–wtorek);
+     - Kompleks witamin B + Aminokwasy (środa);
+     - L-karnityna + Magnez (czwartek);
+     - Czysta, świeża woda (piątek przed koszowaniem — zakaz barwienia wody!).
+  2. **Na karmę (zwilżanie):**
+     - Olej czosnkowy + drożdże piwne (bomba witaminowa B, naturalny allicynowy antybiotyk);
+     - Olej z zarodków pszennych (bogaty w witaminę E — płodność i wytrzymałość mięśniowa);
+     - Siemię lniane gotowane (śluz osłaniający przewód pokarmowy w okresie pierzenia);
+     - Tran / oleje rybie (kwasy Omega-3);
+     - Algi morskie i minerały sypkie.
+- **Kryteria Akceptacji:**
+  - *GIVEN:* Widok ekranu Żywienie w dany dzień tygodnia.
+  - *THEN:* Użytkownik widzi precyzyjną listę: co wsypać do karmnika, co wlać do poidła i jakie minerały/grit postawić w wolnym dostępie.
+
+---
+
+### BR-ZDR-010: Profilaktyka Syndromu Młodych Ptaków (Adeno-Coli / YPDS)
+- **Priorytet:** MUST · **Etap:** 1.1 · **Persona:** P3, P7
+- **Opis:** Moduł wczesnego ostrzegania przed największą plagą hodowli młodzieży (*Young Pigeon Disease Syndrome* — infekcja Adenowirus + E. coli + Cirkowirus):
+  - Objawy wczesne: wole pełne wody i gnijącego ziarna (tzw. "lejące wole"), utrata apetytu, wymioty, zielonkawo-śluzowata cuchnąca biegunka, apatia;
+  - Protokół ratunkowy w aplikacji: natychmiastowe odstawienie karmy ciężkiej, podaż elektrolitów, zakwaszenie wody do pH 4.0 (bariera kwasowa żołądka gruczołowego uniemożliwiająca namnażanie *E. coli*), podanie przeciwciał żółtkowych IgY oraz maślanu sodu.
+- **Kryteria Akceptacji:**
+  - *WHEN:* Użytkownik zaznacza u młodego ptaka objaw „zaleganie karmy w wolu”.
+  - *THEN:* Aplikacja natychmiast generuje czerwoną kartę procedury postępowania z Adeno-Coli i rekomenduje natychmiastową izolację ptaka w wolierze kwarantannowej.
+
+---
+
+### BR-ZDR-011: E-Księga Leczenia Stada (Dziennik Urzędowy Weterynarii)
+- **Priorytet:** MUST · **Etap:** MVP · **Persona:** P1, P7 (Dr Janusz)
+- **Opis:** Zgodnie z rozporządzeniem Ministra Rolnictwa i wytycznymi Powiatowego Lekarza Weterynarii (PIW), każda hodowla musi posiadać księgę ewidencji leczenia zwierząt gospodarskich i ptaków.
+- **Pola Rekordu:** Data podania leku, Nazwa handlowa i substancja czynna, Numer serii (Batch No), Dawka i sposób podania, Liczba ptaków leczonych, Okres karencji w dniach, Data zakończenia karencji, Imię i nazwisko lekarza weterynarii.
+- **Funkcja Eksportu:** Generowanie urzędowego raportu PDF jednym kliknięciem podczas kontroli weterynaryjnej na gołębniku.
+

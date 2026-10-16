@@ -292,36 +292,316 @@ CREATE POLICY "Właściciel ptaka widzi zgłoszenia swoich zagubionych gołębi"
               AND lofts.owner_id = auth.uid()
         )
     );
+-- 8. Tabela Lęgów, Jaj i Piskląt (Clutches)
+CREATE TABLE IF NOT EXISTS public.clutches (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    loft_id UUID NOT NULL REFERENCES public.lofts(id) ON DELETE CASCADE,
+    round_number INTEGER NOT NULL DEFAULT 1,
+    nest_box TEXT NOT NULL,
+    cock_id UUID NOT NULL REFERENCES public.birds(id) ON DELETE CASCADE,
+    hen_id UUID NOT NULL REFERENCES public.birds(id) ON DELETE CASCADE,
+    paired_date TIMESTAMPTZ NOT NULL,
+    egg1_date TIMESTAMPTZ,
+    egg2_date TIMESTAMPTZ,
+    egg1_status TEXT NOT NULL DEFAULT 'laid' CHECK (egg1_status IN ('laid', 'fertile', 'infertile', 'broken', 'dead_in_shell')),
+    egg2_status TEXT NOT NULL DEFAULT 'laid' CHECK (egg2_status IN ('laid', 'fertile', 'infertile', 'broken', 'dead_in_shell')),
+    hatch_date TIMESTAMPTZ,
+    chick1_ring_number TEXT,
+    chick2_ring_number TEXT,
+    chick1_banded BOOLEAN NOT NULL DEFAULT false,
+    chick2_banded BOOLEAN NOT NULL DEFAULT false,
+    weaned_date TIMESTAMPTZ,
+    notes TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+ALTER TABLE public.clutches ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Dostęp do lęgów dla członków gołębnika"
+    ON public.clutches FOR ALL
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.lofts 
+            WHERE lofts.id = clutches.loft_id AND (
+                lofts.owner_id = auth.uid() OR 
+                EXISTS (
+                    SELECT 1 FROM public.loft_members 
+                    WHERE loft_members.loft_id = lofts.id AND loft_members.user_id = auth.uid()
+                )
+            )
+        )
+    );
+
+CREATE INDEX IF NOT EXISTS idx_clutches_loft ON public.clutches(loft_id);
+CREATE INDEX IF NOT EXISTS idx_clutches_parents ON public.clutches(cock_id, hen_id);
+
+-- 9. Tabela Żywienia i Suplementacji (Feeding Logs)
+CREATE TABLE IF NOT EXISTS public.feeding_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    loft_id UUID NOT NULL REFERENCES public.lofts(id) ON DELETE CASCADE,
+    date DATE NOT NULL,
+    phase TEXT NOT NULL CHECK (phase IN ('racing_widowhood', 'breeding_reproduction', 'autumn_moult', 'winter_rest')),
+    mix_name TEXT NOT NULL,
+    water_supplements JSONB,
+    feed_supplements JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+ALTER TABLE public.feeding_logs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Dostęp do żywienia dla członków gołębnika"
+    ON public.feeding_logs FOR ALL
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.lofts 
+            WHERE lofts.id = feeding_logs.loft_id AND (
+                lofts.owner_id = auth.uid() OR 
+                EXISTS (
+                    SELECT 1 FROM public.loft_members 
+                    WHERE loft_members.loft_id = lofts.id AND loft_members.user_id = auth.uid()
+                )
+            )
+        )
+    );
+
+CREATE INDEX IF NOT EXISTS idx_feeding_loft_date ON public.feeding_logs(loft_id, date);
+
+-- 10. Tabela Zdrowia, Szczepień i E-Książki Leczenia PIW (Health Logs)
+CREATE TABLE IF NOT EXISTS public.health_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    loft_id UUID NOT NULL REFERENCES public.lofts(id) ON DELETE CASCADE,
+    bird_id UUID REFERENCES public.birds(id) ON DELETE CASCADE,
+    event_type TEXT NOT NULL CHECK (event_type IN ('vaccination', 'treatment', 'deworming', 'lab_test', 'supplement')),
+    date DATE NOT NULL,
+    product_name TEXT NOT NULL,
+    batch_number TEXT,
+    withdrawal_days INTEGER NOT NULL DEFAULT 0,
+    next_due_date DATE,
+    notes TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+ALTER TABLE public.health_logs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Dostęp do dokumentacji weterynaryjnej dla członków gołębnika"
+    ON public.health_logs FOR ALL
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.lofts 
+            WHERE lofts.id = health_logs.loft_id AND (
+                lofts.owner_id = auth.uid() OR 
+                EXISTS (
+                    SELECT 1 FROM public.loft_members 
+                    WHERE loft_members.loft_id = lofts.id AND loft_members.user_id = auth.uid()
+                )
+            )
+        )
+    );
+
+CREATE INDEX IF NOT EXISTS idx_health_loft_date ON public.health_logs(loft_id, date);
 ```
 
 ---
 
-# Rozdział 12: Protokół Synchronizacji Dwukierunkowej (Delta Sync)
+# Rozdział 12: Pełny Model Relacyjny SQLite i Protokół Delta Sync
 
-### 12.1. Architektura Kolejki Mutacji (`sync_queue` w SQLite)
-Na urządzeniu mobilnym każda operacja zapisu wykonuje w jednej transakcji lokalny zapis oraz wstawienie rekordu do tabeli `sync_queue`:
+### 12.1. Zunifikowany Schemat Relacyjny SQLite (10 Tabel Wzorcowych)
+Lokalna baza SQLite na urządzeniu mobilnym (iOS/Android) działa w trybie **Write-Ahead Logging (WAL)** i zawiera wierne odwzorowanie struktur domenowych:
 
 ```sql
-CREATE TABLE IF NOT EXISTS sync_queue (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    entity_name TEXT NOT NULL,       -- 'birds', 'races', 'race_arrivals'
-    entity_id TEXT NOT NULL,         -- UUID
-    operation TEXT NOT NULL,         -- 'INSERT', 'UPDATE', 'DELETE'
-    payload_json TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'SYNCING', 'FAILED')),
-    retry_count INTEGER NOT NULL DEFAULT 0,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+PRAGMA journal_mode = WAL;
+PRAGMA foreign_keys = ON;
+
+-- 1. Lofts
+CREATE TABLE IF NOT EXISTS lofts (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  breeder_name TEXT NOT NULL,
+  latitude REAL NOT NULL,
+  longitude REAL NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
 );
+
+-- 2. Pigeons (Stado)
+CREATE TABLE IF NOT EXISTS pigeons (
+  id TEXT PRIMARY KEY,
+  loft_id TEXT NOT NULL,
+  ring_number TEXT NOT NULL UNIQUE,
+  color TEXT NOT NULL,
+  sex TEXT NOT NULL CHECK (sex IN ('cock', 'hen')),
+  year INTEGER NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'breeder', 'racer', 'young', 'sold', 'lost', 'deceased')),
+  sire_id TEXT,
+  dam_id TEXT,
+  strain TEXT,
+  compartment TEXT,
+  qr_code TEXT,
+  notes TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (loft_id) REFERENCES lofts(id) ON DELETE CASCADE,
+  FOREIGN KEY (sire_id) REFERENCES pigeons(id) ON DELETE SET NULL,
+  FOREIGN KEY (dam_id) REFERENCES pigeons(id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_pigeons_ring ON pigeons(ring_number);
+CREATE INDEX IF NOT EXISTS idx_pigeons_loft ON pigeons(loft_id);
+
+-- 3. Races (Loty)
+CREATE TABLE IF NOT EXISTS races (
+  id TEXT PRIMARY KEY,
+  loft_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  release_location TEXT NOT NULL,
+  release_latitude REAL NOT NULL,
+  release_longitude REAL NOT NULL,
+  release_time TEXT NOT NULL,
+  is_official INTEGER NOT NULL DEFAULT 1,
+  category TEXT NOT NULL DEFAULT 'A' CHECK (category IN ('A', 'B', 'C', 'M', 'marathon')),
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (loft_id) REFERENCES lofts(id) ON DELETE CASCADE
+);
+
+-- 4. Arrivals (Przyloty i Prędkość m/min)
+CREATE TABLE IF NOT EXISTS arrivals (
+  id TEXT PRIMARY KEY,
+  race_id TEXT NOT NULL,
+  pigeon_id TEXT NOT NULL,
+  arrival_time TEXT NOT NULL,
+  distance_meters REAL NOT NULL,
+  velocity_m_per_min REAL NOT NULL,
+  scan_type TEXT NOT NULL DEFAULT 'qr',
+  is_manual_override INTEGER NOT NULL DEFAULT 0,
+  override_reason TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE(race_id, pigeon_id),
+  FOREIGN KEY (race_id) REFERENCES races(id) ON DELETE CASCADE,
+  FOREIGN KEY (pigeon_id) REFERENCES pigeons(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_arrivals_race_speed ON arrivals(race_id, velocity_m_per_min DESC);
+
+-- 5. Clutches (Lęgi, Jaja i Odchów Piskląt)
+CREATE TABLE IF NOT EXISTS clutches (
+  id TEXT PRIMARY KEY,
+  loft_id TEXT NOT NULL,
+  round_number INTEGER NOT NULL,
+  nest_box TEXT NOT NULL,
+  cock_id TEXT NOT NULL,
+  hen_id TEXT NOT NULL,
+  paired_date TEXT NOT NULL,
+  egg1_date TEXT,
+  egg2_date TEXT,
+  egg1_status TEXT NOT NULL DEFAULT 'laid',
+  egg2_status TEXT NOT NULL DEFAULT 'laid',
+  hatch_date TEXT,
+  chick1_ring_number TEXT,
+  chick2_ring_number TEXT,
+  chick1_banded INTEGER NOT NULL DEFAULT 0,
+  chick2_banded INTEGER NOT NULL DEFAULT 0,
+  weaned_date TEXT,
+  notes TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (loft_id) REFERENCES lofts(id) ON DELETE CASCADE,
+  FOREIGN KEY (cock_id) REFERENCES pigeons(id) ON DELETE CASCADE,
+  FOREIGN KEY (hen_id) REFERENCES pigeons(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_clutches_loft ON clutches(loft_id);
+CREATE INDEX IF NOT EXISTS idx_clutches_parents ON clutches(cock_id, hen_id);
+
+-- 6. Feeding Logs (Dziennik Karmy i Suplementacji)
+CREATE TABLE IF NOT EXISTS feeding_logs (
+  id TEXT PRIMARY KEY,
+  loft_id TEXT NOT NULL,
+  date TEXT NOT NULL,
+  phase TEXT NOT NULL,
+  mix_name TEXT NOT NULL,
+  water_supplements TEXT,
+  feed_supplements TEXT,
+  created_at TEXT NOT NULL,
+  FOREIGN KEY (loft_id) REFERENCES lofts(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_feeding_loft_date ON feeding_logs(loft_id, date);
+
+-- 7. Health Logs (Zdrowie, Szczepienia i Karencja)
+CREATE TABLE IF NOT EXISTS health_logs (
+  id TEXT PRIMARY KEY,
+  loft_id TEXT NOT NULL,
+  pigeon_id TEXT,
+  event_type TEXT NOT NULL,
+  date TEXT NOT NULL,
+  product_name TEXT NOT NULL,
+  batch_number TEXT,
+  withdrawal_days INTEGER NOT NULL DEFAULT 0,
+  next_due_date TEXT,
+  notes TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (loft_id) REFERENCES lofts(id) ON DELETE CASCADE,
+  FOREIGN KEY (pigeon_id) REFERENCES pigeons(id) ON DELETE CASCADE
+);
+
+-- 8. Moult Logs (Cykl Pierzenia — 10 Lotek)
+CREATE TABLE IF NOT EXISTS moult_logs (
+  id TEXT PRIMARY KEY,
+  pigeon_id TEXT NOT NULL,
+  check_date TEXT NOT NULL,
+  primary_feather_number INTEGER NOT NULL CHECK (primary_feather_number BETWEEN 1 AND 10),
+  status TEXT NOT NULL DEFAULT 'intact',
+  length_pct INTEGER NOT NULL DEFAULT 100,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE(pigeon_id, primary_feather_number, check_date),
+  FOREIGN KEY (pigeon_id) REFERENCES pigeons(id) ON DELETE CASCADE
+);
+
+-- 9. Pairings (Kojarzenie Par i Symulacja Inbredu Wrighta)
+CREATE TABLE IF NOT EXISTS pairings (
+  id TEXT PRIMARY KEY,
+  loft_id TEXT NOT NULL,
+  cock_id TEXT NOT NULL,
+  hen_id TEXT NOT NULL,
+  paired_date TEXT NOT NULL,
+  nest_box TEXT,
+  inbreeding_coefficient_f REAL NOT NULL DEFAULT 0.0,
+  notes TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (loft_id) REFERENCES lofts(id) ON DELETE CASCADE,
+  FOREIGN KEY (cock_id) REFERENCES pigeons(id) ON DELETE CASCADE,
+  FOREIGN KEY (hen_id) REFERENCES pigeons(id) ON DELETE CASCADE
+);
+
+-- 10. Sync Queue (Kolejka Mutacji Delta Offline)
+CREATE TABLE IF NOT EXISTS sync_queue (
+  id TEXT PRIMARY KEY,
+  client_mutation_id TEXT NOT NULL UNIQUE,
+  loft_id TEXT NOT NULL,
+  entity_name TEXT NOT NULL,
+  record_id TEXT NOT NULL,
+  action TEXT NOT NULL, -- 'INSERT', 'UPDATE', 'DELETE'
+  payload TEXT NOT NULL, -- JSON
+  created_at TEXT NOT NULL,
+  attempts INTEGER NOT NULL DEFAULT 0,
+  last_error TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_sync_queue_created ON sync_queue(created_at);
 ```
 
-### 12.2. Algorytm Wypychania i Pobierania (Push / Pull Engine w Swift)
-1. **Faza PUSH (Wypychanie lokalnych zmian do Supabase):**
-   - Po wykryciu sieci (`NWPathMonitor.currentPath.status == .satisfied`), silnik pobiera do 50 oczekujących rekordów z `sync_queue`.
-   - Wysyła paczkę do procedury składowanej RPC w PostgreSQL: `sync_push_batch(payload)`.
-   - Po otrzymaniu statusu HTTP 200, przetworzone rekordy są usuwane z lokalnej `sync_queue`.
-2. **Faza PULL (Pobieranie zmian z chmury):**
-   - Silnik wysyła zapytanie:
-     ```
-     GET /rest/v1/birds?updated_at=gt.[LAST_SYNC_TIMESTAMP]&loft_id=eq.[LOFT_ID]
-     ```
-   - Pobrane rekordy aktualizują lokalną bazę SQLite z rozstrzyganiem konfliktów według zasady Last-Write-Wins (LWW) w oparciu o `updated_at`.
+### 12.2. Protokół Asynchronicznej Replikacji Delta (Offline-First $\leftrightarrow$ Supabase)
+1. **Zasada Niezmienności Zapisu Lokalnego:**
+   Każda zmiana w aplikacji (dodanie jaja, przylot ze skanera QR, zmiana diety) natychmiast zapisuje się w SQLite i wstawia rekord do `sync_queue`. Interfejs odblokowuje się w ułamku milisekundy.
+2. **Mechanizm Wypychania (Push):**
+   Gdy urządzenie odzyskuje łączność, kolejka mutacji `sync_queue` jest przetwarzana w transakcyjnych paczkach do 50 elementów przez `POST /rest/v1/rpc/sync_push_batch`. Po potwierdzeniu `HTTP 200 OK` przetworzone mutacje są usuwane.
+3. **Mechanizm Pobierania (Pull) i Rozstrzyganie Konfliktów:**
+   Pobierane są wyłącznie rekordy o `updated_at > last_sync_time`. Konflikty rozstrzygane są deterministycznie w oparciu o regułę **Last-Write-Wins (LWW)** według zweryfikowanego serwerowego znacznika czasu, zapobiegając nadpisaniu danych przez zegary urządzeń mobilnych o błędnej dacie.
+

@@ -13,7 +13,18 @@
 - **Merytoryczne podstawy i 5 szczebli hierarchii źródeł:**
   1. *Rachunek i formuły matematyczno-geodezyjne* (Haversine, Vincenty, wzór na prędkość FCI $v = d/t$, wzór inbredu Wrighta).
   2. *Regulaminy i normy oficjalne* (Międzynarodowa Federacja Gołębi Pocztowych FCI, Polski Związek Hodowców Gołębi Pocztowych PZHGP, KBDB, Verband).
-  3. *Weterynaryjne publikacje naukowe i podręczniki medycyny ptaków* (choroby gołębi, wirusologia PMV-1, farmakologia, pierzenie, anatomia skrzydła i oka).
-  4. *Uznane publikacje i encyklopedie mistrzowskie* (metody wdowieństwa, ciemnia, żywienie sportowe).
+  3. *Weterynaryjne publikacje naukowe i podręczniki medycyny ptaków* (biologia jaj, kinetyka owipozycji +44h, owoskopia Dnia 5, okno obrączkowania 6-8 dni, mleczko z wola, wirusologia PMV-1, Adeno-Coli/YPDS, farmakologia i okresy karencji, biochemia keratyny i pierzenia, anatomia skrzydła i oka).
+  4. *Uznane publikacje i encyklopedie mistrzowskie* (metody wdowieństwa, system ciemni Verdunkelung 14h/10h i doświetlania Belichtung 16h, 4 fazy żywienia i tygodniowa rotacja paszowa wdowców, buforowanie kwasowe poidła pH 4,0–4,5).
   5. *Praktyka i doświadczenie mistrzów* (wyłącznie jako oznaczone wskazówki hodowlane).
+- **Kluczowe Moduły Domenowe:**
+  - *Stado i Kartoteka:* Zarządzanie gołębiami, rodowody do 4 pokoleń, inbred Wrighta, generator PDF A4.
+  - *Rozpłód i Lęgi:* Wirtualna matryca cel lęgowych, cykl owipozycji (+44h podmiana na gips), owoskopia Dnia 5, okno obrączkowania 6-8 dni, wylęg i odsadzanie (Doba 24).
+  - *Żywienie i Suplementacja:* 4 fazy sezonu, 7-dniowa rotacja wdowia (depuratywna $\rightarrow$ lekka lotowa $\rightarrow$ ładowanie lipidowe), poidło (kwasy, probiotyki, elektrolity), karmnik.
+  - *Zdrowie i Profilaktyka:* 12-miesięczny kalendarz weterynaryjny stada, cyfrowa księga leczenia PIW, automatyczna kontrola karencji leków i blokada antydopingowa FCI, profilaktyka Adeno-Coli (YPDS).
+  - *Pierzenie i Fotoperiod:* Monitoring 10 lotek skrzydła (indeks ARI), system ciemni Verdunkelung (15.03–21.06) oraz doświetlania Belichtung (od 22.06).
+  - *Loty i Treningi:* Skaner QR w lufce 60 fps, kalkulator prędkości $m/min$, wektor wiatru, neutralizacja nocna w maratonach, transmisje live Supabase Realtime.
+- **Weryfikacja Jakościowa i Testy (Brama Jakości):**
+  - Przed każdym commitem bezwzględnie uruchom `npm run verify` (`tsc --noEmit`, `node scripts/check-i18n.mjs`, `jest`).
+  - Wskaźnik testów: 100% testów przechodzących (zero regresji).
 - **Ścisła zasada READ-ONLY dla innych repozytoriów:** Repozytoria `trening` oraz `Oczko` są **ŚCIŚLE READ-ONLY**. Absolutny zakaz dokonywania jakichkolwiek modyfikacji w tamtych projektach. Służą wyłącznie jako wzorce architektoniczne i standardy dokumentacji.
+

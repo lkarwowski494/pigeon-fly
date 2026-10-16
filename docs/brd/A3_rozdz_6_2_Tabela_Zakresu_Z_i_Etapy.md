@@ -75,14 +75,38 @@
 | **Z-090** | Monetyzacja | Konfiguracja StoreKit 2: darmowy rdzeń (do 10 ptaków), subskrypcje, Lifetime, Family Sharing | MUST | MVP | 2,0 |
 | **Z-091** | Monetyzacja | Elegancki ekran Paywalla Pro z podsumowaniem wartości chmurowych i darmowego backupu | MUST | MVP | 1,0 |
 | **Z-100** | Lokalizacja | Pełny system lokalizacji na 35 języków z branżowym żargonem hodowlanym | MUST | MVP | 3,0 |
+| **Z-261** | Rozpłód / Kojarzenie | Wirtualna Matryca Cel Lęgowych (Grid widok cel 1..N ze statusem pary, jaj i piskląt) | MUST | MVP | 2,0 |
+| **Z-262** | Rozpłód / Kojarzenie | Kalkulator inbredu Sewalla Wrighta dla kojarzonych par z predykcją 4 pokoleń wstecz | MUST | MVP | 1,5 |
+| **Z-263** | Rozpłód / Jaja | Rejestracja zniesienia Jaja 1, automatyczny timer +44h i przypomnienie o podmianie na gips | MUST | MVP | 1,0 |
+| **Z-264** | Rozpłód / Jaja | Rejestracja Jaja 2, zwrot naturalnego jaja i aktywacja 18-dniowego odliczania inkubacji | MUST | MVP | 1,0 |
+| **Z-265** | Rozpłód / Owoskopia | Dziennik owoskopii Dnia 5. (diagnoza: zapłodnione „pajączek”, zbuk niezalężony, zamarłe) | MUST | MVP | 1,0 |
+| **Z-266** | Rozpłód / Klucie | Alarm zsynchronizowanego wylęgu (tolerancja $\le 3\text{ h}$) i start monitorowania wola piskląt | MUST | MVP | 1,0 |
+| **Z-267** | Rozpłód / Obrączkowanie| Strażnik Krytycznego Okna Obrączkowania (Doba 6–8) z alertami Push na zegarek i telefon | MUST | MVP | 1,5 |
+| **Z-268** | Rozpłód / Paszport | 1-tap powiązanie numeru obrączki młodka z rodowodem rodziców i wygenerowanie kodu QR | MUST | MVP | 1,5 |
+| **Z-269** | Rozpłód / Odsadzanie | Rejestr odsadzania młódków (Doba 24) i automatyczny transfer do sekcji stada młodych | MUST | MVP | 1,0 |
+| **Z-270** | Rozpłód / E-Karty | Generowanie kart lęgowych celi A4/PDF do wydruku i umieszczenia na frontach cel | SHOULD | 1.1 | 1,0 |
+| **Z-280** | Żywienie / Fazy | Silnik 4 faz rocznych diety (Lotowa/Wdowia, Rozpłodowa, Pierzeniowa, Spoczynkowa) | MUST | MVP | 2,0 |
+| **Z-281** | Żywienie / Rotacja | Tygodniowa rotacja paszowa wdowców (depuratywna $\rightarrow$ lekka lotowa $\rightarrow$ ładowanie lipidowe) | MUST | MVP | 1,5 |
+| **Z-282** | Żywienie / Makroskładniki| Kalkulator makroskładników karmy (białko %, tłuszcz %, węglowodany %, włókno %, gram/ptaka) | MUST | MVP | 1,5 |
+| **Z-283** | Żywienie / Poidło | Suplementator poidła i karmnika (harmonogram kwasów organicznych pH 4,2, probiotyków, elektrolitów) | MUST | MVP | 1,5 |
+| **Z-284** | Żywienie / Regeneracja| Protokół regeneracji powrotowej: izotoniczne nawadnianie 300 mOsm/L i odbudowa glikogenu | MUST | MVP | 1,0 |
+| **Z-285** | Żywienie / Minerały | Monitoring podaży gritów mineralnych, czerwonego kamienia i witaminy D3 dla niosek | SHOULD | MVP | 1,0 |
+| **Z-300** | Fotoperiod / Ciemnia | Moduł Ciemni Verdunkelung (14h ciemności/10h światła: 15.03–21.06) z alertami rolet | MUST | MVP | 1,5 |
+| **Z-301** | Fotoperiod / Światło | Moduł Doświetlania Belichtung (16h światła od 22.06 do końca sezonu młodych) | MUST | MVP | 1,0 |
+| **Z-302** | Zdrowie / 12-Miesięcy | 12-miesięczny kalendarz weterynaryjny stada (profilaktyka, badania kału, wymazy z wola) | MUST | MVP | 1,5 |
+| **Z-303** | Zdrowie / PIW E-Księga| Cyfrowa Książka Leczenia Zwierząt zgodna z wymogami PIW (Powiatowego Lekarza Wet.) | MUST | MVP | 2,0 |
+| **Z-304** | Zdrowie / Antydoping | Blokada koszowania ptaków objętych aktywną karencją leków z listy zakazanej FCI | MUST | MVP | 1,5 |
+| **Z-305** | Zdrowie / YPDS | Protokół alarmowy i ratunkowy dla Zespołu Choroby Młodych (Adeno-Coli / YPDS) | SHOULD | MVP | 1,5 |
+| **Z-306** | Zdrowie / Pomiary Kału | Rejestr okresowych badań koproskopowych (ilościowa ocena kokcydiów i jaj nicieni OPG/HPF) | SHOULD | 1.1 | 1,0 |
 
 ---
 
 ### 2. Podsumowanie Nakładu Pracy i Wariantów Wydania
 
 - **Wariant Hybrydowy MVP (Zadania MUST + kluczowe SHOULD z tabeli):**
-  - Zakres: **42–54 dni pracy agenta** (ok. 3–5 tygodni kalendarzowych przy pracy równoległej).
-  - Rezultat: Kompletny cyfrowy notes mistrza, lokalna baza SQLite WAL, generator PDF A4, skaner QR, formuła Vincenty'ego, karta 10 lotek, Apple Watch Companion oraz **infrastruktura Supabase z asynchroniczną replikacją delta, portalem weryfikacji rodowodów online i siecią zgłoszeń Lost & Found**.
+  - Zakres: **52–65 dni pracy agenta** (ok. 4–6 tygodni kalendarzowych przy pracy równoległej).
+  - Rezultat: Kompletny cyfrowy notes mistrza, lokalna baza SQLite WAL, generator PDF A4, skaner QR, formuła Vincenty'ego, **kompletny moduł lęgowy z matrycą cel, owoskopią i oknem obrączkowania, 4-fazowy silnik żywieniowy z rotacją tygodniową wdowców, moduł ciemni Verdunkelung, 12-miesięczny kalendarz weterynaryjny i e-księga PIW z kontrolą karencji**, karta 10 lotek ARI, Apple Watch Companion oraz **infrastruktura Supabase z asynchroniczną replikacją delta, portalem weryfikacji rodowodów online i siecią zgłoszeń Lost & Found**.
 - **Wersja 1.1 (Zaraz po MVP):**
-  - Zakres: Dodatkowe **14–18 dni pracy agenta**.
-  - Rezultat: Supabase Realtime Live Race Broadcasting, Tandem Hodowlany z rolami RLS, wektor znosu wiatru, bilans paszowy Weende, import tras GPS/BTS przez BLE i wektorowe mapy offline.
+  - Zakres: Dodatkowe **16–22 dni pracy agenta**.
+  - Rezultat: Supabase Realtime Live Race Broadcasting, Tandem Hodowlany z rolami RLS, wektor znosu wiatru, zaawansowane badania koproskopowe, bilans paszowy Weende, import tras GPS/BTS przez BLE i wektorowe mapy offline.
+

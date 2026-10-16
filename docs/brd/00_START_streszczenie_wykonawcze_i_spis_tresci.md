@@ -26,9 +26,10 @@ Pakiet specyfikacji wymagań biznesowych dla aplikacji **Pigeon-Fly** został za
 | **`B2_Rodowody_PDF`** | 7.2 | Wymagania drzew genealogicznych, inbredu Wrighta, generatora PDF A4 oraz **kryptograficznego portalu weryfikacji rodowodów online** (**BR-ROD-001 do 034**). |
 | **`B3_Skaner_QR`** | 7.3 | Wymagania mikronaklejek QR, błyskawicznego skanowania w lufce aparatem i precyzyjnego timestampingu (**BR-SKAN-001 do 025**). |
 | **`B4_Loty_Kalkulator`** | 7.4 | Wymagania rejestru lotów, geodezyjnego kalkulatora $m/min$, wektora wiatru, **transmisji przylotów na żywo (Live Race Broadcast)** i prywatnych mini-derbów sekcji (**BR-LOT-001 do 050**). |
-| **`B5_Zdrowie_Pierzenie`** | 7.5 | Wymagania interaktywnej karty 10 lotek skrzydła (wskaźnik ARI), kalendarza profilaktyki PMV-1, kontroli karencji leków i kalkulatora paszowego (**BR-ZDR-001 do 040**). |
+| **`B5_Zdrowie_Pierzenie`** | 7.5 | Wymagania 10 lotek skrzydła (ARI), 12-miesięcznego kalendarza weterynaryjnego (koproskopia, PMV-1, ospa, rzęsistek), systemu ciemni/światła (Verdunkelung/Belichtung), 4-fazowej diety i rotacji wdowiej oraz e-księgi leczenia PIW (**BR-ZDR-001 do 055**). |
 | **`B6_Telemetria_Zegarek`** | 7.6 | Wymagania miniaturowych modułów IoT/BTS, wektorowych map offline, Supabase Edge Functions oraz Apple Watch Companion (**BR-TEL-001 do 038**). |
-| **`C1_Reguly_Dziedzinowe`** | 8 | Zbiór 35 reguł dziedzinowych (**RD-01 do RD-35**) z dowodami matematycznymi, równaniami geodezyjnymi Vincenty'ego i wektorami testowymi. |
+| **`B7_Rozplod_Cele`** | 7.7 | Wymagania cyklu lęgowego, wirtualnej matrycy cel (Nest Box Matrix), podmiany na jajka sztuczne, chronometrażu owoskopii (5. dzień), wylęgu (18. dzień), **krytycznego okna obrączkowania (6.–8. dzień)** i odsadzenia (**BR-ROZP-001 do 045**). |
+| **`C1_Reguly_Dziedzinowe`** | 8 | Zbiór 50 reguł dziedzinowych (**RD-01 do RD-50**) z dowodami matematycznymi, równaniami geodezyjnymi Vincenty'ego, inbredu Wrighta i wektorami testowymi. |
 | **`C2_Zrodla_Badacz`** | 8.P | Rygor 5 szczebli hierarchii źródeł merytorycznych, certyfikacja regulaminów FCI/PZHGP oraz rejestr decyzji badawczych. |
 | **`D1_Wymagania_NFR`** | 9–10 | Wymagania niefunkcjonalne: protokół synchronizacji delta, bezpieczeństwo Row Level Security (RLS), anonimowe logowanie z późniejszym łączeniem z Apple Sign-In, Field Mode i Apple HIG. |
 | **`D2_Architektura_SQLite_Supabase`** | 11–12 | Pełny schemat DDL PostgreSQL dla Supabase z politykami RLS i triggerami, lokalny schemat SQLite WAL oraz protokół synchronizacji dwukierunkowej w Swift. |

@@ -62,9 +62,81 @@
 
 ---
 
-### 3.2. Nowe i Zaktualizowane Scenariusze Życiowe (SYT-01 do SYT-19)
+### 3.2. Kompletny Katalog Scenariuszy Życiowych i Rocznych (SYT-01 do SYT-24)
 
-*(Scenariusze SYT-01 do SYT-15 z wersji 0.1 pozostają w pełni aktualne: zimowy dobór par, owoskopia jaj, obrączkowanie 7-dniowych piskląt, wdowieństwo, trening 40 km, koszowanie, niedzielny poranek i $m/min$, maraton z neutralizacją, regeneracja, ciemnia, wielkie pierzenie 10 lotek, wystawowy PDF A4, szczepienie PMV-1, lokalny backup).*
+#### SYT-01: Zimowy Dobór Par i Symulacja Inbredu Wrighta (Grudzień / Styczeń)
+- **Kontekst:** Stanisław planuje sezon lęgowy. Siedzi wieczorem w domu, analizując karty 40 gołębi rozpłodowych.
+- **Przebieg:** Otwiera w Pigeon-Fly moduł *„Kojarzenie Par”*. Wybiera czołowego samca-rozpłodowca `PL-0123-19-101` i testuje trzy potencjalne samice. Dla każdej pary Pigeon-Fly natychmiast wylicza współczynnik inbredu $F$ wg Wrighta na podstawie 4 pokoleń. Dla pierwszej samicy $F = 25\%$ (ojciec x córka — ostrzeżenie o depresji inbredowej), dla drugiej $F = 3,125\%$ (bezpieczny line-breeding na słynnego dziadka). Stanisław zatwierdza parę i przypisuje ją do celi nr 12. Generuje wstępną kartę planowanego lęgu.
+
+#### SYT-02: Pierwsze Jajo, Podmiana na Gips i Odliczanie +44h (Luty / Marzec)
+- **Kontekst:** W celi nr 12 samica znosi pierwsze jajo w chłodny marcowy wieczór o 17:30.
+- **Przebieg:** Stanisław wchodzi do gołębnika w grubych rękawicach roboczych. Wyjmuje jajo, wkłada do wytłaczarki z nasionami w temperaturze 16°C i wkłada parze sztuczne jajo gipsowe. W Pigeon-Fly włącza *Field Mode*, wybiera Celę 12 i dotyka przycisku *„Jajo 1 Zniesione (Podmieniono na sztuczne)”*. Aplikacja zapisuje timestamp i uruchamia odliczanie biologiczne: prognozowane jajo 2 za 44 godziny ($\pm 2\text{ h}$). Stanisław otrzymuje powiadomienie przypominające w telefonie i na Apple Watch.
+
+#### SYT-03: Zniesienie Drugiego Jaja i Rozpoczęcie Inkubacji
+- **Kontekst:** Po 43 godzinach i 40 minutach samica znosi drugie jajo.
+- **Przebieg:** Stanisław zabiera jajo gipsowe i zwraca parze pierwsze naturalne jajo. W aplikacji klika *„Jajo 2 Zniesione — Rozpoczęto Pełną Inkubację”*. Pigeon-Fly natychmiast generuje 3 kluczowe punkty harmonogramu:
+  1. *Owoskopia (Prześwietlanie)*: za 5 dni (19 marca).
+  2. *Spodziewany Wylęg*: za 18 dni (1 kwietnia).
+  3. *Okno Obrączkowania*: za 24–26 dni (7–9 kwietnia).
+
+#### SYT-04: Owoskopia Dnia 5. — Wykrycie Zbuków i Zarodków
+- **Kontekst:** Mija 5. doba inkubacji w celi 12. Stanisław wchodzi wieczorem po zmroku z owoskopem diodowym.
+- **Przebieg:** Stanisław przykłada latarkę owoskopu do tępego bieguna jaja. W pierwszym widzi wyraźnego „pajączka” — rozgałęzioną sieć naczyń krwionośnych z pulsującym punktem. W aplikacji oznacza: *Jajo 1: Zapłodnione*. Drugie jajo jest całkowicie przezroczyste (zbuk). Aplikacja sugeruje: *„Jajo niezalężone. Zalecane usunięcie lub pozostawienie podkładu, by nie obciążać samicy pustym wysiadywaniem”*. Stanisław usuwa puste jajo, co zapobiega marnotrawieniu energii pary.
+
+#### SYT-05: Zsynchronizowany Wylęg i Karmienie Mleczkiem z Wola (Kwiecień)
+- **Kontekst:** Dokładnie w 18. dobie pisklę nakłuwa skorupę i wykluwa się o 06:15.
+- **Przebieg:** Dzięki wcześniejszej podmianie jaja pisklęta klują się w odstępie zaledwie 2 godzin. Rodzice natychmiast zaczynają karmić je czystym mleczkiem z wola (prolaktynowa papka białkowo-tłuszczowa). Stanisław oznacza w aplikacji: *„Wyklute — Zdrowe”*. Moduł żywieniowy Pigeon-Fly automatycznie aktualizuje plan karmienia dla celi lęgowej: przejście na mieszankę lęgową 18% białka z dodatkiem witaminy A, D3 i fosforanu wapnia.
+
+#### SYT-06: Krytyczne Okno Obrączkowania PZHGP (Doba 6–8)
+- **Kontekst:** Młode pisklę ma 7 dni. Kość stępu osiąga optymalną grubość 7,6 mm.
+- **Przebieg:** Stanisław otrzymuje rano czerwony alert na Apple Watch: *„Cela 12: Dziś optymalny dzień obrączkowania (Doba 7)! Jutro staw stępu może uniemożliwić nałożenie obrączki”*. Stanisław bierze oficjalną obrączkę rodową PZHGP `PL-0123-26-5501` z mikronaklejką QR Pigeon-Fly. Składa 3 przednie palce młodka, nasuwa obrączkę i delikatnie przeciąga palec tylny (hallux). Następnie skanuje kod QR obrączki aparatem iPhone'a. Aplikacja natychmiast łączy numer obrączki z rodowodem rodziców z celi 12 i generuje Cyfrowy Paszport Młodka.
+
+#### SYT-07: Odsadzanie Piskląt i Samodzielność w Wolierze (Doba 24)
+- **Kontekst:** Młode w celi 12 osiągają wiek 24 dni. Zaczynają schodzić z misek na podłogę.
+- **Przebieg:** Stanisław przenosi młódka do sekcji młodych. W Pigeon-Fly oznacza: *„Odsadzony do gołębnika młodych”*. Aplikacja aktywuje protokół buforowania poidła kwasami organicznymi (ocet jabłkowy, pH 4,2), aby zabezpieczyć niedojrzały przewód pokarmowy młodka przed rzęsistkowicą i bakteriami *E. coli*.
+
+#### SYT-08: Wdrożenie Systemu Ciemni (Verdunkelung) dla Młodych (Marzec – Czerwiec)
+- **Kontekst:** Wiosna. Stanisław przygotowuje 50 młodych do jesiennych zawodów.
+- **Przebieg:** W aplikacji włącza moduł *„Fotoperiod: System Ciemni”*. Aplikacja wylicza optymalny harmonogram rolet: zaciemnienie od 18:00 do 08:00 (14 godzin pełnej ciemności, poniżej 0,5 lx). Codziennie o 17:45 i 07:45 aplikacja wysyła przypomnienie o opuszczeniu/podniesieniu rolet. Dzięki temu szyszynka młodych wstrzymuje zrzucanie lotek skrzydła, zrzucając jedynie drobne pióra okrywowe. W sierpniu młode mają pełne skrzydła dorosłych asów.
+
+#### SYT-09: Przejście na Doświetlanie (Belichtung) po Przesileniu Letnim (Czerwiec)
+- **Kontekst:** 22 czerwca, po najdłuższym dniu w roku.
+- **Przebieg:** Pigeon-Fly przełącza profil fotoperiodyczny na *„Doświetlanie (16h światła)”*. Stanisław ustawia zegar sterujący oświetleniem w gołębniku na godziny 05:00–22:00. Zapobiega to gwałtownemu załamaniu formy i zrzuceniu skrzydeł w trakcie sierpniowych konkursów młodych.
+
+#### SYT-10: Tygodniowa Rotacja Żywieniowa Wdowców (Poniedziałek – Niedziela)
+- **Kontekst:** Sezon lotów gołębi dorosłych. Wdowiec przygotowuje się do sobotniego koszowania na lot 520 km.
+- **Przebieg:** Stanisław korzysta z modułu *Żywienie*.
+  - *Poniedziałek:* Dieta depuratywna (oczyszczająca, jęczmień 40%, ostropest plamisty, elektrolity w poidle).
+  - *Wtorek–Środa:* Dieta lekka lotowa (węglowodany, kukurydza cribs, ryż paddy).
+  - *Czwartek–Piątek rano:* Ładowanie lipidowe (orzeszki ziemne 48% tłuszczu, nasiona słonecznika, kardi, L-karnityna w wodzie wg RD-16).
+  - *Piątek po południu:* Czysta woda z magnezem i nasiona drobne (kanar, proso). Ptaki idą do kosza z pełnymi bateriami tłuszczowymi i wolnymi od ciężkostrawnego białka wolami.
+
+#### SYT-11: Kontrola Pierzenia Skrzydła i Wyliczenie Indeksu ARI
+- **Kontekst:** Przed koszowaniem na lot 650 km Stanisław ogląda skrzydło czołowego asa `PL-0123-22-4412`.
+- **Przebieg:** Ptak zrzucił 6. lotkę, a 7. odrasta do połowy. Stanisław klika w kartę ptaka i przesuwa suwak 7. lotki na 50%. Pigeon-Fly natychmiast przelicza wskaźnik ARI (RD-12): $ARI = 0,85$. Aplikacja wyświetla informację: *„Dopuszczony do lotów średniodystansowych kat. B. Ze względu na lukę w strefie nośnej odradza się lot maratoński pow. 700 km”*. Stanisław podejmuje świadomą decyzję o zmianie ptaka na w pełni opierzonego zmiennika.
+
+#### SYT-12: Profilaktyka Przeciw Rzęsistkowi i Zespołowi YPDS (Adeno-Coli)
+- **Kontekst:** U młodych po locie treningowym pojawia się ospałość i wymioty ziarnem.
+- **Przebieg:** Stanisław otwiera moduł *Zdrowie* i uruchamia *„Asystenta Diagnostycznego Objawów”*. Zaznacza: *wymioty ziarnem, zielonkawy kał, wiek: młode*. Aplikacja wskazuje podejrzenie Adeno-Coli (YPDS) i generuje natychmiastowy protokół ratunkowy:
+  1. Głodówka 24h na ziarno twarde (podawać wyłącznie elektrolity i herbatkę z rumianku).
+  2. Zakwaszenie poidła kwasem mrówkowym/octowym do pH 4,0.
+  3. Podanie maślanu sodu i immunoglobulin żółtkowych IgY.
+  4. Kontakt z lekarzem weterynarii przed podaniem antybiotyku.
+  Dzięki szybkiej reakcji stado zostaje uratowane bez strat.
+
+#### SYT-13: Rejestr Szczepień Stada i Karencja Antydopingowa FCI (E-Księga PIW)
+- **Kontekst:** Stanisław szczepi całe stado przeciw Paramyksowirozie (PMV-1) szczepionką skojarzoną z Herpeswirusem.
+- **Przebieg:** W module *Zdrowie* Stanisław wybiera *„Szczepienie Stadne”*. Skanuje kod kreskowy z butelki szczepionki (seria, data ważności). Zaznacza wszystkie 60 ptaków jednym kliknięciem. Aplikacja rejestruje zabieg i generuje gotowy raport PDF zgodny z wymaganiami Powiatowego Lekarza Weterynarii (PIW) do okazania przed sezonem. Dodatkowo aplikacja nanosi 14-dniowy okres karencji na leki i blokuje dodanie ptaka do listy wkładaniowej w przypadku trwającej kuracji antybiotykowej.
+
+#### SYT-14: Koszowanie w Punkcie Wkładania — Lista Związkowa i Kontrola Zgłoszeń
+- **Kontekst:** Piątek wieczór w punkcie wkładania sekcji. Stanisław wkłada 35 wdowców.
+- **Przebieg:** Stanisław generuje z Pigeon-Fly oficjalną listę wkładaniową PDF z kodami obrączek, barwami i typowaniami do serii (np. 5 z 50). Podczas przekazywania ptaków komisji weryfikuje numery w aplikacji offline. Zegary elektroniczne ESK rejestrują czipy, a Stanisław zapisuje stację i planowaną godzinę wypuszczenia.
+
+#### SYT-15: Niedzielny Poranek — Oczekiwanie, Wektor Wiatru i Pomiar m/min
+- **Kontekst:** Niedziela rano, godz. 06:15. SMS z oddziału: *„Wypuszczono z Peine o 06:15, pogoda słoneczna, wiatr SW 15 km/h”*.
+- **Przebieg:** Stanisław wprowadza do Pigeon-Fly godzinę startu `06:15:00`. Aplikacja pobiera z serwisu pogodowego wektor wiatru (RD-06) i wylicza przewidywaną prędkość stada (ok. 1350 m/min) oraz estymowany przylot: 11:22. Stanisław siada przed gołębnikiem z telefonem w lufce. O 11:24:15 pierwszy ptak wpada do wlotu. Kamera skanuje kod QR na obrączce pomocniczej. W ułamku sekundy aplikacja wyświetla:
+  $$\text{Dystans: } 418\,520\text{ m} \quad | \quad \text{Czas: } 309\text{ min } 15\text{ s} \quad | \quad \textbf{Prędkość: } 1353,34\text{ m/min}$$
+  Telefon generuje przyjemny ton 500 Hz i haptykę sukcesu.
 
 #### SYT-16: Live Relacja z Lotu przez Supabase Realtime (Wspólne Emocje w Sekcji)
 - **Kontekst:** Niedzielny lot z Peine (420 km). Marek czeka na gołębnika na swoje ptaki.
@@ -81,3 +153,24 @@
 #### SYT-19: Weryfikacja Autentyczności Rodowodu Online przez Kupca z Tajwanu
 - **Kontekst:** Luc wystawia samicę na sprzedaż. Klient z Tajwanu chce mieć 100% pewności, że rodowód nie został sfałszowany w Photoshopie.
 - **Przebieg:** Luc drukuje rodowód PDF wygenerowany z Pigeon-Fly. Na dole dokumentu znajduje się kod QR i link `pigeonfly.app/pedigree/A9F-2026-BE`. Kupiec w Tajpej skanuje kod QR. Przeglądarka otwiera oficjalny certyfikat kryptograficzny z bazy Supabase z pieczęcią hodowli Luca, kompletnym drzewem przodków i oryginalnymi zdjęciami 4K oka i skrzydła. Kupiec bez wahania finalizuje transakcję.
+
+#### SYT-20: Maraton Dwudniowy i Rygor Neutralizacji Nocnej FCI (Bruksela 950 km)
+- **Kontekst:** Najtrudniejszy lot maratoński sezonu z Belgii. Ptaki nie dolatują w pierwszym dniu przed zmrokiem.
+- **Przebieg:** Stanisław czeka na samicę z linii Jan Aarden. W aplikacji aktywny jest automatyczny zegar neutralizacji nocy (RD-35). Zgodnie z oficjalną tabelą wschodu i zachodu słońca dla współrzędnych gołębnika, czas od godziny 21:42 do 04:18 zostaje zatrzymany. Samica ląduje o 05:12 rano. Pigeon-Fly wylicza oficjalny czas konkursowy po potrąceniu godzin nocnych i plasuje ptaka w czołówce maratonu narodowego.
+
+#### SYT-21: Kąpiel Regeneracyjna i Ziołowa Herbatka z Miodem
+- **Kontekst:** Poniedziałek po maratonie. Zmęczone ptaki potrzebują relaksu mięśniowego.
+- **Przebieg:** Stanisław przygotowuje basen z letnią wodą i solami do kąpieli. W module *Żywienie i Pielęgnacja* odhacza *„Kąpiel regeneracyjna z solą magnezową i octem”*. Do poidła podaje napar z 14 ziół z dodatkiem miodu pszczelego i witaminy B-complex. Aplikacja rejestruje procedurę i oznacza stan stada jako *„W trakcie regeneracji”*.
+
+#### SYT-22: Jesienne Pierzenie Główne — Odbudowa Szaty na Zimą (Wrzesień – Listopad)
+- **Kontekst:** Zakończenie sezonu lotowego. W gołębniku rozpoczyna się wymiana całego upierzenia (lotki, sterówki, pióra puchowe).
+- **Przebieg:** Stanisław przełącza dietę stada na *„Mieszankę Pierzeniową”* o podwyższonej zawartości siarkowych aminokwasów (metionina, cystyna) oraz nasion oleistych (siemię lniane, rzepak). Raz w tygodniu w aplikacji aktualizuje stan zrzucenia lotek 8, 9 i 10 u poszczególnych asów. Monitoruje, by żadna lotka nie wyrosła ze skazą „krwawego pióra” lub przewężeniem stosiny.
+
+#### SYT-23: Selekcja Jesienna i Planowanie Obsady Cel na Nowy Rok
+- **Kontekst:** Listopad. W gołębniku jest 120 ptaków, a miejsc na zimę tylko 80.
+- **Przebieg:** Stanisław otwiera w Pigeon-Fly *„Matrycę Selekcyjną”*. Aplikacja sortuje stado wg sumy konkursów, coeficjentów FCI, punktacji rodowodowej oraz ocen budowy anatomicznej (skrzydło, widełki miednicowe, upierzenie). Stanisław bez emocji i sentymentów eliminuje ptaki nie rokujące nadziei, uzyskując idealną obsadę 40 par na kolejny sezon.
+
+#### SYT-24: Pełna Kopia Zapasowa Przed Zmianą Smartfona na Nowy Model
+- **Kontekst:** Grudzień. Stanisław kupuje nowego iPhone'a na święta.
+- **Przebieg:** Na starym telefonie wchodzi w *Ustawienia $\rightarrow$ Kopia Zapasowa*. Klika *„Eksportuj Pełny Skarbiec Gołębnika (.sqlite + media ZIP)”*. Plik zapisuje się w iCloud Drive oraz w pamięci pendrive'a Lightning. Po uruchomieniu nowego telefonu Stanisław instaluje Pigeon-Fly, loguje się przez Apple ID i w 3 sekundy całe stado, rodowody, zdjęcia i historia lotów z 10 lat są w pełni odtworzone.
+

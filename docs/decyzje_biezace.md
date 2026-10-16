@@ -43,6 +43,16 @@
   * *Rozstrzygnięcie:* SHA-256 + portal `pigeonfly.app/pedigree/[ID]` chroniący przed fałszerstwami.
 * **DEC-37 (Sieć Pomocy Zagubionym): Opcja A (Portal Lost & Found z Push APNs)**
   * *Rozstrzygnięcie:* Znalazca zgłasza ptaka na stronie webowej; właściciel dostaje dyskretny alert push w 3 sekundy.
+* **DEC-51 (Biologiczny Silnik Cyklu Lęgowego): Opcja A (Automatyczny Chronometraż Lęgów)**
+  * *Rozstrzygnięcie:* Automatyczne wyliczanie dat biologicznych: 1. jajo (+9 dni), 2. jajo (+44h / 2 dni), owoskopia na 5. dzień, wylęg na 18. dzień, krytyczny alarm obrączkowania w oknie 6.–8. dnia życia piskląt oraz odsadzenie na 24. dzień. Wsparcie procedury podmiany na jajka gipsowe.
+* **DEC-52 (4-Fazowy Silnik Żywieniowy): Opcja A (Tygodniowy Kalendarz Poidła i Karmnika)**
+  * *Rozstrzygnięcie:* 4 fazy roczne (spoczynek zimowy, lęgi/odchów, sezon lotowy wdowi, wielkie pierzenie jesienne) z precyzyjną 7-dniową rotacją karmy (oczyszczająca $\to$ sportowa $\to$ ładowanie tłuszczem) oraz dedykowanymi suplementami do poidła (woda) i karmnika (zwilżanie karmy).
+* **DEC-53 (Fotoperiod — Zaciemnianie i Doświetlanie): Opcja A (Moduł Verdunkelung & Belichtung)**
+  * *Rozstrzygnięcie:* System automatycznie wylicza reżim fotoperiodyczny dla młodych gołębi: 14h ciemności (18:00–08:00) od 15 marca do 21 czerwca (blokada zrzucania 10 lotek) oraz doświetlanie do 16h (od 05:00 i do 22:30) od 22 czerwca do września (utrzymanie formy).
+* **DEC-54 (12-Miesięczny Kalendarz Weterynaryjny i E-Księga Leczenia): Opcja A (Urzędowy Rejestr PIW)**
+  * *Rozstrzygnięcie:* Całoroczny terminarz badań parazytologicznych kału (koproskopia), szczepień (PMV-1, ospa), kuracji przedlęgowych (rzęsistek) oraz urzędowa księga leków z automatycznym kalkulatorem karencji i eksportem do PDF dla Inspekcji Weterynaryjnej.
+* **DEC-55 (Wirtualna Matryca Cel Lęgowych): Opcja A (Nest Box Matrix)**
+  * *Rozstrzygnięcie:* Graficzna mapa przedziału rozpłodowego z kolorystycznymi statusami cel (pusta, para, wysiadywanie, owoskopia, alarm obrączkowania, odchów).
 
 ---
 
