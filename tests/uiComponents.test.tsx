@@ -676,6 +676,41 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('Do\u015bwietlanie (Belichtung)');
     expect(tree).toContain('24-GODZINNY CYKL');
   });
+
+  test('CompartmentsModal renders loft sections, density summary, and stocking capacity', () => {
+    const { CompartmentsModal } = require('../src/components/CompartmentsModal');
+    const onClose = jest.fn();
+    const demoPigeons: Pigeon[] = [
+      {
+        id: 'p-01',
+        loftId: 'l-01',
+        ringNumber: 'PL-0284-23-1402',
+        countryCode: 'PL',
+        year: 2023,
+        sex: 'cock',
+        plumageColor: 'Niebieski',
+        status: 'racing',
+        qrCodeUuid: 'uuid-1',
+        isDeleted: false,
+        createdAt: '',
+        updatedAt: '',
+      },
+    ];
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <CompartmentsModal visible={true} onClose={onClose} pigeons={demoPigeons} />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('ZARZĄDZANIE PRZESTRZENIĄ GOŁĘBNIKA');
+    expect(tree).toContain('PRZEDZIAŁY I SEKCJE STADA');
+    expect(tree).toContain('SEKTORY FIZYCZNE GOŁĘBNIKA');
+    expect(tree).toContain('Wdowców');
+    expect(tree).toContain('OPTYMALNE');
+  });
 });
 
 

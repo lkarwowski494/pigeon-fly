@@ -20,6 +20,7 @@ import { FieldButton } from '../../src/components/FieldButton';
 import { PaywallModal } from '../../src/components/PaywallModal';
 import { PigeonDetailModal } from '../../src/components/PigeonDetailModal';
 import { LostPigeonReportModal } from '../../src/components/LostPigeonReportModal';
+import { CompartmentsModal } from '../../src/components/CompartmentsModal';
 import { PdfService } from '../../src/services/pdfService';
 
 // Initial demo pigeons for immediate offline usability
@@ -80,6 +81,7 @@ export default function FlockScreen() {
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [isProUser, setIsProUser] = useState(false);
   const [isSosModalOpen, setIsSosModalOpen] = useState(false);
+  const [isCompartmentsModalOpen, setIsCompartmentsModalOpen] = useState(false);
 
   const handlePigeonPress = (pigeon: Pigeon) => {
     setSelectedPigeon(pigeon);
@@ -210,16 +212,25 @@ export default function FlockScreen() {
         {/* Secondary Utility Actions */}
         <View style={styles.utilityRow}>
           <FieldButton
-            title="🏷️ Drukuj Naklejki QR A4"
+            title="🏠 Przedziały"
+            variant="secondary"
+            onPress={() => setIsCompartmentsModalOpen(true)}
+            style={styles.utilityBtn}
+            textStyle={{ fontSize: 13 }}
+            testID="btn-compartments-modal"
+          />
+          <View style={{ width: 6 }} />
+          <FieldButton
+            title="🏷️ Naklejki A4"
             variant="secondary"
             onPress={exportStickerSheet}
             style={styles.utilityBtn}
             textStyle={{ fontSize: 13 }}
             testID="btn-export-stickers"
           />
-          <View style={{ width: 8 }} />
+          <View style={{ width: 6 }} />
           <FieldButton
-            title="🚨 Zgłoszenia SOS"
+            title="🚨 SOS"
             variant="danger"
             onPress={() => setIsSosModalOpen(true)}
             style={styles.utilityBtn}
@@ -311,6 +322,13 @@ export default function FlockScreen() {
       <LostPigeonReportModal
         visible={isSosModalOpen}
         onClose={() => setIsSosModalOpen(false)}
+      />
+
+      {/* Loft Compartments Management Modal */}
+      <CompartmentsModal
+        visible={isCompartmentsModalOpen}
+        onClose={() => setIsCompartmentsModalOpen(false)}
+        pigeons={pigeons}
       />
     </SafeAreaView>
   );

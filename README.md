@@ -122,6 +122,7 @@ pigeon-fly/
 │   │   ├── appraisal.ts        # Ocena fenotypowa, znak oka, widełki i Standard FCI
 │   │   ├── basketing.ts        # Koszowanie, walidacja obrączek i seria typowana (T)
 │   │   ├── breeding.ts         # Biologia lęgu i harmonogram jaj/obrączkowania
+│   │   ├── compartments.ts     # Sektory i przedziały gołębnika (Wdowce, Wdówki, Młode, Rozpłód, Izolatka) i normy FCI (BR-STADO-005)
 │   │   ├── concourse.ts        # Baza konkursowa (20%), FCI Coeff i punkty GMP Asów
 │   │   ├── costCalculator.ts   # Kalkulator budżetu stada, ziarna i weterynarii
 │   │   ├── derby.ts            # Mini-Derby Sekcji, wielogołębnikowe live standings i feed
@@ -163,6 +164,7 @@ pigeon-fly/
 │   │   ├── ClockArrivalModal.tsx  # Odbicie przylotu z live kalkulacją m/min
 │   │   ├── ClutchCard.tsx      # Karta lęgu z kamieniami milowymi
 │   │   ├── ClutchLifecycleModal.tsx # Cykl lęgowy: jaja, owoskopia, obrączkowanie
+│   │   ├── CompartmentsModal.tsx # Zarządzanie fizycznymi przedziałami gołębnika i normami FCI (BR-STADO-005)
 │   │   ├── FeatherGauge.tsx    # Wizualny wskaźnik 10 lotek skrzydła
 │   │   ├── FeedCalculatorModal.tsx # Laboratorium paszowe 20 ziaren i ocena biologiczna
 │   │   ├── FieldButton.tsx     # Przycisk dotykowy >=56pt z wibracją haptyczną
@@ -186,7 +188,7 @@ pigeon-fly/
 │   └── lib/                    # Współdzielone moduły pomocnicze
 │       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
 ├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
-├── tests/                      # 29 zestawów testowych (180 testów jednostkowych i fast-check)
+├── tests/                      # 30 zestawów testowych (188 testów jednostkowych i fast-check)
 ├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
 └── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
     └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)
