@@ -1,66 +1,183 @@
-# PIGEON-FLY (Cyfrowy Notes Mistrza)
+# Pigeon-Fly 🕊️⏱️
 
-> **Kategoria:** Sport i Hodowla / Hobby / Narzędzia Offline-First & Cloud Collaboration  
-> **Platforma docelowa:** iOS 18+ (SwiftUI / SQLite / Supabase), watchOS 11+  
-> **Architektura:** Hybrydowa Offline-First (Lokalna baza SQLite WAL z asynchroniczną synchronizacją dwukierunkową Supabase PostgreSQL 16)  
-> **Chmura i Usługi:** Supabase (Auth, Row Level Security, Realtime WebSockets, Storage CDN, Edge Functions)  
-> **Lokalizacja:** 35 języków od wersji 1.0 (z branżowym żargonem hodowlanym PZHGP / FCI / KBDB)
+> **„Cyfrowy notes mistrza — prosto, niezawodnie i w 100% offline w każdych warunkach gołębnika.”**
 
----
+Aplikacja mobilna na system iOS dedykowana pasjonatom i zawodowym hodowcom gołębi pocztowych, stworzona w architekturze **100% Offline-First** jako nowoczesny, cyfrowy odpowiednik tradycyjnego zeszytu w kratkę. Łączy polową niezawodność w trudnych warunkach gołębnika (kurz, pióra, brak zasięgu) z precyzyjnym kalkulatorem prędkości lotu w $m/\text{min}$, drzewem genealogicznym, skanerem QR na obrączkach, rejestrem lęgów i suplementacji oraz synchronizacją chmurową Supabase.
 
-## 🕊️ O Projekcie
-
-**Pigeon-Fly** to wyspecjalizowany, cyfrowy notes mistrza hodowli gołębi pocztowych, zaprojektowany jako bezpośredni, niezawodny następca tradycyjnego zeszytu w kratkę, rozszerzony o potęgę chmurowej bazy danych **Supabase**. Tworzony z myślą o doświadczonych hodowcach, pasjonatach, spółkach hodowlanych (tandemach) i mistrzach sportu gołębiarskiego.
-
-Aplikacja łączy polową niezawodność z przełomowymi możliwościami chmurowymi:
-1. **Prawdziwy Tryb Polowy (100% Offline-First w Gołębniku):** Brak zasięgu w gołębniku nie blokuje żadnej akcji. Wszystkie wpisy trafiają natychmiast do lokalnej bazy SQLite.
-2. **Automatyczna Synchronizacja Chmurowa (Supabase PostgreSQL):** Po powrocie do domu lub złapaniu sieci dane stada, lęgów i czasów przylotu bezkonfliktowo replikują się do chmury.
-3. **Tandem Hodowlany & Multi-Device Sync:** Współdzielenie gołębnika między wspólnikami (np. ojciec i syn, spółki hodowlane). Jednoczesna praca na iPhone, iPad i Mac z uprawnieniami RLS (Row Level Security).
-4. **Relacje z Lotów na Żywo (Supabase Realtime):** Transmisja przylotów z zawodów na żywo dla rodziny, przyjaciół i członków sekcji przez bezpieczny link lub kod QR.
-5. **Zweryfikowany Cyfrowy Paszport Rodowodu:** Ochrona przed fałszowaniem rodowodów. Każdy wygenerowany PDF A4 posiada unikalny link i kod QR weryfikowany w bazie Supabase (`pigeonfly.app/pedigree/[ID]`).
-6. **Globalna Sieć Pomocy Zagubionym Gołębiom (Lost & Found):** Znalazca wycieńczonego gołębia skanuje mikronaklejkę QR lub wpisuje numer obrączki na publicznym portalu – właściciel otrzymuje natychmiastowe, bezpieczne powiadomienie Push z kontaktem do znalazcy.
-7. **Kompletny Cykl Lęgowy i Wirtualna Matryca Cel:** Parowanie, symulator inbredu Wrighta, odliczanie zniesienia drugiego jaja (+44h podmiana na gips), owoskopia Dnia 5 („pajączek”), strażnik okna obrączkowania (Doba 6–8) i wylęg zsynchronizowany.
-8. **Żywienie 4-Fazowe i Rotacja Tygodniowa Wdowców:** Depuracja $\rightarrow$ lotowa $\rightarrow$ ładowanie lipidowe (orzeszki, kardi) z L-karnityną i buforowaniem poidła kwasami organicznymi (pH 4,0–4,5).
-9. **Zdrowie, Profilaktyka i Monitor 10 Lotek:** Interaktywna karta skrzydła ze Wskaźnikiem Gotowości Aerodynamicznej (ARI), kalendarz szczepień PMV-1, cyfrowa księga leczenia PIW oraz kontrola okresów karencji leków (antydoping FCI).
-10. **System Ciemni (Verdunkelung) i Doświetlania (Belichtung):** Neuroendokrynologiczne sterowanie fotoperiodem młodych (14h ciemności/10h światła w marcu–czerwcu, 16h światła od przesilenia letniego).
-11. **Błyskawiczne Skanowanie QR w Lufce:** Natychmiastowa identyfikacja ptaka i precyzyjny timestamp przylotu (dokładność ms) za pomocą aparatu i Apple Vision Framework.
-12. **Automatyczny Kalkulator Prędkości ($m/min$):** Geodezyjne formuły ortodromy Vincenty'ego i Haversine'a, analiza wektora wiatru i neutralizacja nocna w maratonach.
-13. **Apple Watch Companion:** 1-tap rejestracja przylotów z nadgarstka („Spadł ptak!”) z wibracją haptyczną i parowaniem w telefonie.
+**Status projektu:** Wersja deweloperska gotowa do testów TestFlight (16.10.2026).  
+**Stos technologiczny:** Expo SDK 57, React Native, TypeScript, SQLite (`expo-sqlite`, czysty SQL, transakcje WAL), Supabase.
 
 ---
 
-## 📚 Dokumentacja Biznesowa i Architektoniczna (BRD)
+## 🌟 Główne Zasady Produktowe & Architektura
 
-Kompletna specyfikacja wymagań biznesowych (BRD), architektury bazy danych SQLite/Supabase i reguł dziedzinowych znajduje się w katalogu [`docs/brd/`](docs/brd/):
-
-- [`docs/brd/00_START_streszczenie_wykonawcze_i_spis_tresci.md`](docs/brd/00_START_streszczenie_wykonawcze_i_spis_tresci.md) — Streszczenie wykonawcze, persony, nowe możliwości chmurowe Supabase, model Freemium/Pro/Lifetime i spis treści.
-- [`docs/brd/00b_Jedna_lista_decyzji_projektowych_DEC.md`](docs/brd/00b_Jedna_lista_decyzji_projektowych_DEC.md) — Rejestr 55 decyzji projektowych z uwzględnieniem architektury lęgowej, żywienia i chmury Supabase.
-- [`docs/brd/00c_Sprzecznosci_i_errata.md`](docs/brd/00c_Sprzecznosci_i_errata.md) — Rozstrzygnięcia sprzeczności offline vs chmura, polityki prywatności i konfliktów synchronizacji.
-- [`docs/brd/A1_rozdz_1_3_Tozsamosc_Persony_Scenariusze_Roczne.md`](docs/brd/A1_rozdz_1_3_Tozsamosc_Persony_Scenariusze_Roczne.md) — Wizja, 18 Zasad Produktu, 10 person (w tym Tandem i Znalazca) oraz 24 szczegółowe scenariusze roczne.
-- [`docs/brd/A2_rozdz_4_6_1_Rynek_Konkurencja_Model_Przychodu.md`](docs/brd/A2_rozdz_4_6_1_Rynek_Konkurencja_Model_Przychodu.md) — Analiza rynku, cennik, ekonomia Supabase (darmowy tier vs Pro) i unit economics.
-- [`docs/brd/A3_rozdz_6_2_Tabela_Zakresu_Z_i_Etapy.md`](docs/brd/A3_rozdz_6_2_Tabela_Zakresu_Z_i_Etapy.md) — Tabela zakresu funkcjonalnego (Z-001 do Z-315) z pełnymi modułami hodowli, lęgów, żywienia i chmury.
-- [`docs/brd/A4_rozdz_13_15_KPI_Marketing_ASO.md`](docs/brd/A4_rozdz_13_15_KPI_Marketing_ASO.md) — Metryki sukcesu, ochrona prywatności i ASO w 35 językach.
-- [`docs/brd/B1_rozdz_7_Cyfrowy_Notes_Stada_i_Karty_Ptaka.md`](docs/brd/B1_rozdz_7_Cyfrowy_Notes_Stada_i_Karty_Ptaka.md) — Kartoteka stada, multi-device sync i globalna baza rodowodów.
-- [`docs/brd/B2_rozdz_7_Rodowody_Inbred_i_Generator_PDF.md`](docs/brd/B2_rozdz_7_Rodowody_Inbred_i_Generator_PDF.md) — Genealogia, inbred Wrighta, generator PDF i weryfikacja cyfrowa online.
-- [`docs/brd/B3_rozdz_7_Skaner_QR_i_Szybka_Identyfikacja.md`](docs/brd/B3_rozdz_7_Skaner_QR_i_Szybka_Identyfikacja.md) — Znakowanie QR, detekcja Vision 60 fps i timestamping.
-- [`docs/brd/B4_rozdz_7_Treningi_Loty_i_Kalkulator_Predkosci.md`](docs/brd/B4_rozdz_7_Treningi_Loty_i_Kalkulator_Predkosci.md) — Loty, $m/min$, znos wiatru, Supabase Realtime Live Leaderboard i mini-derby.
-- [`docs/brd/B5_rozdz_7_Zdrowie_Pierzenie_Dieta_i_Profilaktyka.md`](docs/brd/B5_rozdz_7_Zdrowie_Pierzenie_Dieta_i_Profilaktyka.md) — Monitor 10 lotek skrzydła (ARI), 12-miesięczny kalendarz weterynaryjny, e-książka PIW, karencje leków i matryca poidła.
-- [`docs/brd/B6_rozdz_7_Telemetria_IoT_Mapy_Offline_i_Apple_Watch.md`](docs/brd/B6_rozdz_7_Telemetria_IoT_Mapy_Offline_i_Apple_Watch.md) — Śledzenie IoT/BTS przez Edge Functions, wektorowe mapy offline i watchOS.
-- [`docs/brd/B7_rozdz_7_Rozplod_Cykl_Legowy_Owoskopia_i_Cele.md`](docs/brd/B7_rozdz_7_Rozplod_Cykl_Legowy_Owoskopia_i_Cele.md) — Kompletny cykl lęgowy, biologia jaj, podkładanie gipsu, owoskopia Dnia 5., okno obrączkowania Doba 6–8 i wirtualna matryca cel.
-- [`docs/brd/C1_rozdz_8_Reguly_Dziedzinowe_i_Fizyka_Lotu.md`](docs/brd/C1_rozdz_8_Reguly_Dziedzinowe_i_Fizyka_Lotu.md) — 50 reguł dziedzinowych (RD-01 do RD-50) z rygorem matematycznym i biologicznym.
-- [`docs/brd/C2_rozdz_8P_Weryfikacja_Merytoryczna_i_Zrodla.md`](docs/brd/C2_rozdz_8P_Weryfikacja_Merytoryczna_i_Zrodla.md) — 5 szczebli hierarchii źródeł merytorycznych i decyzje badacza.
-- [`docs/brd/D1_rozdz_9_10_Wymagania_Niefunkcjonalne_NFR_i_Apple.md`](docs/brd/D1_rozdz_9_10_Wymagania_Niefunkcjonalne_NFR_i_Apple.md) — Protokół synchronizacji delta, bezpieczeństwo RLS, ergonomia Field Mode i Apple HIG.
-- [`docs/brd/D2_rozdz_11_12_Architektura_Systemu_Model_SQLite_i_Kopie.md`](docs/brd/D2_rozdz_11_12_Architektura_Systemu_Model_SQLite_i_Kopie.md) — Schemat DDL PostgreSQL dla Supabase z politykami RLS oraz lokalny schemat SQLite z protokołem synchronizacji.
-- [`docs/brd/D3_rozdz_14_16_Rejestr_Ryzyk_i_Plan_Mitygacji.md`](docs/brd/D3_rozdz_14_16_Rejestr_Ryzyk_i_Plan_Mitygacji.md) — Rejestr 40 ryzyk z mitygacją dla chmury i sieci polowej.
-- [`docs/brd/D4_rozdz_17_Wielowarstwowa_Strategia_Testow.md`](docs/brd/D4_rozdz_17_Wielowarstwowa_Strategia_Testow.md) — 9 warstw rygoru jakości, testy RLS `pgTAP`, testy współbieżności i Maestro E2E.
+- **100% Offline-First (SQLite + pending_sync):** Wszystkie ekrany i operacje w gołębniku czytają i piszą wyłącznie do lokalnej bazy SQLite (`/Library/SQLite/pigeon_fly.db`). Brak zasięgu komórkowego w gołębniku nie blokuje żadnej akcji — rejestracja przylotu ptaka, parowanie w celi czy wpis szczepienia zapisują się natychmiastowo w lokalnej transakcji bazodanowej.
+- **Ergofizyka i Tryb Polowy (Field Mode):** Interfejs zaprojektowany do obsługi jedną ręką w warunkach polowych. Duże, kontrastowe elementy dotykowe (min. 56 pt dla głównych akcji, komponent `FieldButton`), zredukowana do minimum liczba kliknięć, natychmiastowa odpowiedź haptyczna (`expo-haptics`) oraz zapobieganie wygaszaniu ekranu (`isIdleTimerDisabled` / `expo-keep-awake`) podczas oczekiwania na przylot stada.
+- **Precyzja Sportowa i Standardy FCI / PZHGP ($m/\text{min}$):** Precyzyjny silnik obliczeniowy prędkości lotu w metrach na minutę ($m/\text{min}$) oraz jardach na minutę ($\text{ypm}$) bazujący na geodezyjnej odległości gołębnika, z uwzględnieniem sekundowego timestampingu, neutralizacji nocy w lotach dalekodystansowych i maratonach oraz korekty stref czasowych.
+- **Cyfrowe Drzewo Genealogiczne i Anty-fałszerstwo (QR):** Algorytm rekurencyjnej rekonstrukcji 4-pokoleniowego rodowodu z kalkulacją współczynnika inbredu Wrighta ($F$). Generator profesjonalnych dokumentów A4 PDF (`expo-print`, `expo-sharing`) z unikalnym kryptograficznym kodem QR umożliwiającym natychmiastową weryfikację autentyczności ptaka w bazie Supabase.
+- **Pełny 12-Miesięczny Cykl Biologiczny Stada:** Kompleksowe wsparcie hodowcy przez cały rok: wirtualna matryca cel i cykl lęgowy (owoskopia Dnia 5, okno obrączkowania Doba 6–8), 4-fazowe żywienie i tygodniowa rotacja wdowieństwa, monitor pierzenia 10 lotek (Wskaźnik ARI), kalendarz szczepień PMV-1 oraz urzędowa E-Księga Leczenia Zwierząt PIW z automatyczną kontrolą okresów karencji leków.
+- **Pojedyncze Źródło Prawdy & Spójność Apps4Brew Studio:** Zgodność ze standardem portfolio: 10-plikowa rotacyjna kopia zapasowa JSON z sumą kontrolną tabel (`backupService.ts`), podwójny system metryczno-imperialny (`units.ts`), kalkulator ekonomiki i budżetu karmy (`costCalculator.ts`), dyskretne wsparcie Apple Watch (`appleWatchService.ts`) oraz model monetyzacji Freemium/Pro z paywallem Apple HIG.
 
 ---
 
-## 🛠️ Weryfikacja Jakościowa
+## 📱 Moduły i Ekrany
 
-Projekt posiada zintegrowany mechanizm weryfikacji jakości kodu i tłumaczeń:
+1. **🕊️ Cyfrowy Notes Gołębnika (Stado & Karta Ptaka — `app/(tabs)/index.tsx`):**
+   - Ewidencja stada z błyskawicznym wyszukiwaniem po numerze obrączki, roczniku, maści i statusie (lotowy, rozpłód, wycofany).
+   - Generowanie i bezpośredni wydruk 4-pokoleniowych rodowodów A4 PDF z poziomu karty ptaka.
+   - Wbudowana ochrona limitu darmowego stada (Free Tier: do 10 ptaków) zintegrowana z Paywall Modalem.
+2. **🥚 Rozpłód, Cele & Kalkulator Inbredu Wrighta (`app/(tabs)/rozplod.tsx`):**
+   - Wirtualna matryca cel gniazdowych z rejestrem skojarzonych par (`PairingModal.tsx`).
+   - Obliczanie współczynnika inbredu Sewalla Wrighta ($F$) dla planowanego potomstwa w głąb rodowodu.
+   - Automatyczny harmonogram biologiczny lęgu: data owoskopii (Dzień 5), okno zakładania obrączek rodowych (Doba 6–8) i termin odsadzenia młodych.
+3. **⏱️ Loty, Treningi & Tablica Przylotów Live (`app/(tabs)/loty.tsx`):**
+   - Panel aktywnego lotu konkursowego lub treningu z podglądem współrzędnych i dystansu.
+   - Dynamiczny ranking przylotów stada na żywo z prędkościami w $m/\text{min}$ sortowanymi w czasie rzeczywistym.
+   - Generowanie i wydruk Oficjalnej Listy Wkładaniowej do Kosza (FCI/PZHGP) z oznaczaniem serii typowanych ptaków (T).
+4. **📷 Błyskawiczny Skaner Kodów QR w Lufce (`app/modal/scan.tsx`):**
+   - Błyskawiczne rejestrowanie wlotu ptaka za pomocą kamery urządzenia (`expo-camera`).
+   - Odczyt mikronaklejek QR z obrączek pomocniczych z rejestracją znacznika czasu (dokładność ms) i automatycznym przeliczeniem prędkości.
+5. **💉 Zdrowie, E-Księga PIW & Kontrola Pierzenia (`app/(tabs)/zdrowie.tsx`):**
+   - Interaktywny wskaźnik skrzydła (`FeatherGauge.tsx`) monitorujący zrzucanie 10 lotek pierwszego rzędu i wyliczający Wskaźnik Regeneracji Skrzydła (ARI).
+   - Status szczepienia przeciwko paramyksowirozie (PMV-1) i roczny kalendarz profilaktyki stada.
+   - Generowanie urzędowej E-Książki Leczenia Zwierząt PIW (PDF A4) z kontrolą okresów karencji i numerów partii leków.
+6. **🥣 Żywienie, Rotacja Wdowców & Bilans Karmy (`app/(tabs)/zywienie.tsx`):**
+   - Tygodniowy harmonogram żywienia dla 4 faz rocznych (loty wdowieństwo, lęgi, wielkie pierzenie, zimowanie).
+   - Podział na karmnik poranny/wieczorny, profil makroskładników (białko, tłuszcz, węglowodany, włókno) oraz dodatki do poidła.
+   - Interaktywny kalkulator bilansu ziarna i budżetu karmy (`calculateLoftCosts`) przeliczający zużycie dzienne, miesięczne i roczne w workach 25 kg.
+7. **🧮 Precyzyjny Kalkulator Prędkości ($m/\text{min}$) (`app/(tabs)/kalkulator.tsx`):**
+   - Samodzielne narzędzie kalkulacji prędkości dla dowolnego dystansu i czasu wypuszczenia/przylotu.
+   - Automatyczne przeliczanie pomiędzy systemem metrycznym ($m/\text{min}$, $\text{km/h}$) a imperialnym ($\text{ypm}$, $\text{mph}$).
+8. **⌚ Wsparcie Apple Watch & 1-Tap Odbicia (`appleWatchService.ts`):**
+   - Rejestracja przylotu jednym dotknięciem na nadgarstku w gołębniku („Spadł ptak!”).
+   - Kolejka synchronizacji offline i bezproblemowe parowanie przylotów z numerami obrączek po wejściu do domu.
+9. **⚙️ Ustawienia, Bezpieczny Backup & Pigeon-Fly Pro (`app/(tabs)/ustawienia.tsx`):**
+   - Monitor statusu subskrypcji Pro Pass (Miesięczny, Roczny, Dożywotni) z natychmiastowym przywracaniem zakupów.
+   - 10-plikowa rotacyjna kopia zapasowa SQLite/JSON do prywatnych Plików / iCloud Drive z weryfikacją sum kontrolnych.
+   - Przełącznik jednostek metrycznych/imperialnych oraz status synchronizacji Supabase.
+
+---
+
+## 🧪 9 Warstw Weryfikacji Jakości (Testing Rigor)
+
+Projekt realizowany jest zgodnie z rygorystyczną definicją ukończenia (DoD):
+- **100% Pokrycia Logiki Domenowej:** Bezwzględny wymóg pełnego pokrycia testami dla logiki biznesowej (`src/domain`, `src/services`, `src/db`).
+- **Testy Własnościowe (Property-Based):** Weryfikacja niezmienników matematycznych (formuła prędkości lotu, czas trwania, współczynnik inbredu Wrighta $F \in [0, 1]$) z użyciem biblioteki `fast-check`.
+- **Precyzja Matematyczna i Geodezyjna:** Rygorystyczne testy neutralizacji nocnej w maratonach, konwersji jednostek metryczno-imperialnych oraz kalkulatora zapotrzebowania na ziarno.
+- **Bezpieczeństwo i Integralność Bazy SQLite:** Testy atomiczności transakcji (`withTransactionAsync`), izolacji ścieżki pliku bazy w katalogu `/Library/SQLite` (SEC-09) oraz walidacji nagłówka i sum kontrolnych kopii zapasowych.
+- **Walidacja Zgodności i18n:** Automatyczny skrypt CI (`scripts/check-i18n.mjs`) weryfikujący stuprocentową zgodność kluczy pomiędzy kodem aplikacji a słownikami językowymi (PL / EN).
+- **Testy Usług Druku i Generowania PDF:** Walidacja szablonów HTML/CSS rodowodu 4-pokoleniowego, listy wkładaniowej FCI oraz e-książki PIW z mockami `expo-print` i `expo-sharing`.
+
+---
+
+## 🛠️ Uruchomienie i Weryfikacja
+
+Wymagane środowisko: Node.js 20+ oraz npm.
+
 ```bash
-npm run verify
-```
-Komenda ta sprawdza poprawność statyczną TypeScript (`tsc --noEmit`), spójność kluczy i2ś (`node scripts/check-i18n.mjs`) oraz uruchamia pełną suite testów jednostkowych i integracyjnych (`jest`).
+# Instalacja zależności
+npm install
 
+# Pełna weryfikacja projektu (typecheck + check-i18n + testy Jest)
+npm run verify
+
+# Uruchomienie wszystkich testów jednostkowych i integracyjnych Jest
+npm test
+
+# Uruchomienie testów z generowaniem raportu pokrycia kodu
+npm run test:coverage
+
+# Sprawdzenie poprawności typów TypeScript (zero tolerancji dla błędów)
+npm run typecheck
+
+# Sprawdzenie kompletności tłumaczeń językowych i18n
+npm run check:i18n
+
+# Uruchomienie serwera deweloperskiego Expo
+npm run start
+```
+
+---
+
+## 📂 Architektura Kodu
+
+```text
+pigeon-fly/
+├── app/                        # Expo Router (Ekrany i nawigacja w standardzie Field Mode)
+│   ├── (tabs)/                 # Główne zakładki dolnego paska nawigacji
+│   │   ├── index.tsx           # Stado: cyfrowy notes mistrza i karty ptaków
+│   │   ├── rozplod.tsx         # Rozpłód: wirtualne cele, kojarzenia i inbred
+│   │   ├── loty.tsx            # Loty: tablica przylotów na żywo i lista wkładaniowa
+│   │   ├── zdrowie.tsx         # Zdrowie: wskaźnik 10 lotek (ARI) i e-księga PIW
+│   │   ├── zywienie.tsx        # Żywienie: rotacja 4-fazowa i bilans karmy
+│   │   ├── kalkulator.tsx      # Szybki kalkulator prędkości w m/min
+│   │   └── ustawienia.tsx      # Ustawienia, kopie zapasowe, jednostki i Pro Pass
+│   ├── modal/                  # Formularze modalne
+│   │   ├── new-pigeon.tsx      # Dodawanie nowego ptaka z walidacją limitu stada
+│   │   └── scan.tsx            # Błyskawiczny skaner kodów QR aparatem (Vision)
+│   └── _layout.tsx             # Główny kontener nawigacyjny aplikacji
+├── src/
+│   ├── domain/                 # Czysta logika biznesowa i reguły hodowlane (zero UI)
+│   │   ├── access.ts           # Silnik uprawnień Freemium / Pro / Lifetime
+│   │   ├── breeding.ts         # Biologia lęgu i harmonogram jaj/obrączkowania
+│   │   ├── costCalculator.ts   # Kalkulator budżetu stada, ziarna i weterynarii
+│   │   ├── genetics.ts         # Matematyczny algorytm inbredu Wrighta (F)
+│   │   ├── health.ts           # Profilaktyka, szczepienia PMV-1 i karencje leków
+│   │   ├── moult.ts            # Regeneracja 10 lotek skrzydła i fotoperiod
+│   │   ├── nutrition.ts        # 4-fazowe protokoły żywieniowe i bilans makro
+│   │   ├── pdfExport.ts        # Generatory HTML A4 dla rodowodów, kosza i PIW
+│   │   ├── qr.ts               # Bezpieczne identyfikatory i weryfikacja rodowodów
+│   │   ├── racing.ts           # Fizyka lotu, m/min, ypm i neutralizacja nocy
+│   │   ├── types.ts            # Wspólne interfejsy domenowe TypeScript
+│   │   └── units.ts            # Konwerter jednostek metrycznych i imperialnych
+│   ├── db/                     # Baza lokalna SQLite (expo-sqlite, czysty SQL)
+│   │   ├── database.ts         # Połączenie z bazą, transakcje i migracje schematu
+│   │   ├── dbPath.ts           # Ścieżka bazodanowa chroniona standardem SEC-09
+│   │   ├── schema.ts           # Schemat tabel DDL i indeksy relacyjne
+│   │   ├── pigeonRepository.ts # CRUD stada i zapytań rodowodowych
+│   │   ├── breedingRepository.ts # Zapytania cel gniazdowych i kojarzeń
+│   │   └── raceRepository.ts   # Zapytania lotów i rankingu przylotów
+│   ├── services/               # Usługi systemowe i integracje
+│   │   ├── appleWatchService.ts # Komunikacja i odbijanie przylotów na Apple Watch
+│   │   ├── backupService.ts    # 10-plikowa rotacyjna kopia zapasowa JSON/SQLite
+│   │   └── pdfService.ts       # Natywny wydruk (expo-print) i udostępnianie (expo-sharing)
+│   ├── components/             # Ergonomiczne komponenty interfejsu (Field Mode)
+│   │   ├── ArrivalCard.tsx     # Karta przylotu z wyróżnieniem prędkości
+│   │   ├── ClutchCard.tsx      # Karta lęgu z kamieniami milowymi
+│   │   ├── FeatherGauge.tsx    # Wizualny wskaźnik 10 lotek skrzydła
+│   │   ├── FieldButton.tsx     # Przycisk dotykowy >=56pt z wibracją haptyczną
+│   │   ├── PairingModal.tsx    # Zarządzanie parowaniem w celkach z inbredem
+│   │   ├── PaywallModal.tsx    # Cennik i zakup Pigeon-Fly Pro (Apple HIG)
+│   │   ├── PigeonCard.tsx      # Karta ptaka z oznaczeniem płci i rocznika
+│   │   └── QrCodeSvg.tsx       # Czysty wektorowy kod QR SVG do naklejek
+│   ├── sync/                   # Klient synchronizacji chmurowej Supabase
+│   │   └── syncEngine.ts       # Dwukierunkowa replikacja delta i obsługa offline
+│   └── lib/                    # Współdzielone moduły pomocnicze
+│       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
+├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
+├── tests/                      # 16 zestawów testowych (87 testów jednostkowych i fast-check)
+├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
+└── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
+    └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)
+```
+
+---
+
+## 📖 Dokumentacja i Rejestr Decyzji
+
+- **Kompletna Dokumentacja BRD:** [`docs/brd/00_START_streszczenie_wykonawcze_i_spis_tresci.md`](docs/brd/00_START_streszczenie_wykonawcze_i_spis_tresci.md)
+- **Rejestr 55 Decyzji Projektowych (DEC):** [`docs/brd/00b_Jedna_lista_decyzji_projektowych_DEC.md`](docs/brd/00b_Jedna_lista_decyzji_projektowych_DEC.md)
+- **50 Ścisłych Reguł Dziedzinowych (RD-01 do RD-50):** [`docs/brd/C1_rozdz_8_Reguly_Dziedzinowe_i_Fizyka_Lotu.md`](docs/brd/C1_rozdz_8_Reguly_Dziedzinowe_i_Fizyka_Lotu.md)
+- **Tabela Zakresu Funkcjonalnego (Z-001 do Z-315):** [`docs/brd/A3_rozdz_6_2_Tabela_Zakresu_Z_i_Etapy.md`](docs/brd/A3_rozdz_6_2_Tabela_Zakresu_Z_i_Etapy.md)
+- **Architektura Bazy Danych i Schemat DDL:** [`docs/brd/D2_rozdz_11_12_Architektura_Systemu_Model_SQLite_i_Kopie.md`](docs/brd/D2_rozdz_11_12_Architektura_Systemu_Model_SQLite_i_Kopie.md)
+
+---
+
+## 📄 Status & Dystrybucja
+
+- **Model Biznesowy (Freemium):**
+  - **Darmowy Rdzeń (Free Tier):** Zarządzanie do 10 ptakami w stadzie, podstawowy notes, ręczne wpisywanie przylotów.
+  - **Subskrypcja Miesięczna:** 1,99 EUR / 8,99 PLN (dla hodowców aktywnych sezonowo).
+  - **Subskrypcja Roczna:** 6,99 EUR / 29,99 PLN z 3-dniowym darmowym okresem próbnym (rekomendowana na pełny 12-miesięczny sezon).
+  - **Zakup Dożywotni (Lifetime):** 19,99 EUR / 89,99 PLN jednorazowo (preferowany przez tradycyjnych mistrzów).
+- **Zasady Interfejsu & Dostępność:** Zgodność z Apple Human Interface Guidelines, wysoki kontrast WCAG AA/AAA, wsparcie dynamicznego tekstu oraz dotykowy standard Field Mode przystosowany do brudnych dłoni i pracy w pyle gołębnika.
