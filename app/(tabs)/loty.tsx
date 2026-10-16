@@ -16,6 +16,8 @@ import { ArrivalCard } from '../../src/components/ArrivalCard';
 import { FieldButton } from '../../src/components/FieldButton';
 import { ClockArrivalModal } from '../../src/components/ClockArrivalModal';
 import { NewRaceModal } from '../../src/components/NewRaceModal';
+import { TelemetryTrackModal } from '../../src/components/TelemetryTrackModal';
+import { RaceWeatherModal } from '../../src/components/RaceWeatherModal';
 import { PdfService } from '../../src/services/pdfService';
 import { Alert } from 'react-native';
 import { calculateFciCoefficient, calculateConcourseLimit } from '../../src/domain/concourse';
@@ -69,6 +71,8 @@ export default function RacesScreen() {
   );
   const [isTraining, setIsTraining] = useState(false);
   const [basketedCount] = useState(120);
+  const [isTelemetryModalVisible, setIsTelemetryModalVisible] = useState(false);
+  const [isWeatherModalVisible, setIsWeatherModalVisible] = useState(false);
 
   const handleSaveNewRace = (data: {
     name: string;
@@ -223,6 +227,22 @@ export default function RacesScreen() {
             testID="btn-clock-arrival"
             style={{ marginBottom: 10 }}
           />
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 10 }}>
+            <FieldButton
+              title="🛰️ Trasa GPS"
+              onPress={() => setIsTelemetryModalVisible(true)}
+              testID="btn-open-telemetry"
+              variant="secondary"
+              style={{ flex: 1 }}
+            />
+            <FieldButton
+              title="💨 Wiatr i Pogoda"
+              onPress={() => setIsWeatherModalVisible(true)}
+              testID="btn-open-weather"
+              variant="secondary"
+              style={{ flex: 1 }}
+            />
+          </View>
           <FieldButton
             title="🏁 + Nowy Lot / Trening"
             onPress={() => setIsNewRaceModalVisible(true)}
@@ -271,6 +291,19 @@ export default function RacesScreen() {
         visible={isNewRaceModalVisible}
         onClose={() => setIsNewRaceModalVisible(false)}
         onSaveRace={handleSaveNewRace}
+      />
+
+      {/* Telemetry Track Modal */}
+      <TelemetryTrackModal
+        visible={isTelemetryModalVisible}
+        onClose={() => setIsTelemetryModalVisible(false)}
+      />
+
+      {/* Race Weather Aerodynamics Modal */}
+      <RaceWeatherModal
+        visible={isWeatherModalVisible}
+        onClose={() => setIsWeatherModalVisible(false)}
+        distanceMeters={raceDistanceMeters}
       />
     </SafeAreaView>
   );

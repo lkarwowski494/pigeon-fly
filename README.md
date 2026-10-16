@@ -131,7 +131,8 @@ pigeon-fly/
 │   │   ├── racing.ts           # Fizyka lotu, m/min, ypm i neutralizacja nocy
 │   │   ├── telemetry.ts        # Moduł 5: IoT/GPS tracking, krzywizna i efektywność trasy
 │   │   ├── types.ts            # Wspólne interfejsy domenowe TypeScript
-│   │   └── units.ts            # Konwerter jednostek metrycznych i imperialnych
+│   │   ├── units.ts            # Konwerter jednostek metrycznych i imperialnych
+│   │   └── weather.ts          # Wektory wiatru (headwind/tailwind) i aerodynamika stada
 │   ├── db/                     # Baza lokalna SQLite (expo-sqlite, czysty SQL)
 │   │   ├── database.ts         # Połączenie z bazą, transakcje i migracje schematu
 │   │   ├── dbPath.ts           # Ścieżka bazodanowa chroniona standardem SEC-09
@@ -160,13 +161,15 @@ pigeon-fly/
 │   │   ├── PedigreeTreeModal.tsx  # Interaktywne drzewo rodowodowe 3-4 pokoleń
 │   │   ├── PigeonCard.tsx      # Karta ptaka z oznaczeniem płci i rocznika
 │   │   ├── PigeonDetailModal.tsx # Karta ptaka, mikronaklejka QR i rodowód PDF
-│   │   └── QrCodeSvg.tsx       # Czysty wektorowy kod QR SVG do naklejek
+│   │   ├── QrCodeSvg.tsx       # Czysty wektorowy kod QR SVG do naklejek
+│   │   ├── RaceWeatherModal.tsx# Prognoza prędkości i aerodynamika wiatru
+│   │   └── TelemetryTrackModal.tsx # Analiza krzywizny trasy GPS/IoT z obrączek
 │   ├── sync/                   # Klient synchronizacji chmurowej Supabase
 │   │   └── syncEngine.ts       # Dwukierunkowa replikacja delta i obsługa offline
 │   └── lib/                    # Współdzielone moduły pomocnicze
 │       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
 ├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
-├── tests/                      # 20 zestawów testowych (118 testów jednostkowych i fast-check)
+├── tests/                      # 21 zestawów testowych (125 testów jednostkowych i fast-check)
 ├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
 └── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
     └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)

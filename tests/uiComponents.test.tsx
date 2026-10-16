@@ -402,7 +402,40 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('MATKA');
     expect(tree).toContain('DZIADEK OJCOWSKI');
   });
+
+  test('TelemetryTrackModal renders track efficiency and points', () => {
+    const { TelemetryTrackModal } = require('../src/components/TelemetryTrackModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(<TelemetryTrackModal visible={true} onClose={onClose} />);
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('TELEMETRIA');
+    expect(tree).toContain('EFEKTYWNO\u015aCI');
+    expect(tree).toContain('DANE Z LOGERA');
+  });
+
+  test('RaceWeatherModal renders aerodynamics, bearing, and wind presets', () => {
+    const { RaceWeatherModal } = require('../src/components/RaceWeatherModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <RaceWeatherModal visible={true} onClose={onClose} distanceMeters={300000} />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('AERODYNAMIKA I WIATR');
+    expect(tree).toContain('KIERUNEK WIATRU');
+    expect(tree).toContain('Zach\u00f3d (W)');
+  });
 });
+
 
 
 
