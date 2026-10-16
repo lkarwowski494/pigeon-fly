@@ -14,6 +14,7 @@ import {
 import { ArrivalWithPigeon } from '../../src/db/raceRepository';
 import { ArrivalCard } from '../../src/components/ArrivalCard';
 import { FieldButton } from '../../src/components/FieldButton';
+import { ClockArrivalModal } from '../../src/components/ClockArrivalModal';
 import { PdfService } from '../../src/services/pdfService';
 import { Alert } from 'react-native';
 
@@ -55,7 +56,10 @@ const DEMO_ARRIVALS: ArrivalWithPigeon[] = [
 ];
 
 export default function RacesScreen() {
-  const [arrivals] = useState<ArrivalWithPigeon[]>(DEMO_ARRIVALS);
+  const [arrivals, setArrivals] = useState<ArrivalWithPigeon[]>(DEMO_ARRIVALS);
+  const [isClockModalVisible, setIsClockModalVisible] = useState(false);
+  const raceDistanceMeters = 345200;
+  const releaseTimeIso = new Date(Date.now() - 1000 * 60 * 240).toISOString(); // 4 hours ago
 
   const handleExportBasketingList = () => {
     Alert.alert(
@@ -121,6 +125,40 @@ export default function RacesScreen() {
     );
   };
 
+  const handleClockArrival = (data: {
+    ringNumber: string;
+    arrivalTimeIso: string;
+    velocityMPerMin: number;
+  }) => {
+    const newArrival: ArrivalWithPigeon = {
+      id: `arr-${Date.now()}`,
+      raceId: 'race-01',
+      pigeonId: `p-${Date.now()}`,
+      arrivalTime: data.arrivalTimeIso,
+      distanceMeters: raceDistanceMeters,
+      velocityMPerMin: data.velocityMPerMin,
+      scanType: 'manual',
+      isManualOverride: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      ringNumber: data.ringNumber,
+      countryCode: data.ringNumber.split('-')[0] || 'PL',
+      year: new Date().getFullYear(),
+      sex: 'cock',
+      plumageColor: 'Niebieski',
+    };
+
+    setArrivals((prev) => {
+      const updated = [newArrival, ...prev];
+      return updated.sort((a, b) => b.velocityMPerMin - a.velocityMPerMin);
+    });
+
+    Alert.alert(
+      'Odbito Przylot!',
+      `Ptak: ${data.ringNumber}\nPrędkość: ${data.velocityMPerMin.toFixed(2)} m/min\nCzas: ${new Date(data.arrivalTimeIso).toLocaleTimeString('pl-PL')}`
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -141,9 +179,7 @@ export default function RacesScreen() {
         <View style={styles.actionRow}>
           <FieldButton
             title="⏱️ Odbij Przylot Ptaka"
-            onPress={() => {
-              // Open quick clocking modal or scanner
-            }}
+            onPress={() => setIsClockModalVisible(true)}
             testID="btn-clock-arrival"
             style={{ marginBottom: 10 }}
           />
@@ -172,6 +208,15 @@ export default function RacesScreen() {
           contentContainerStyle={styles.listContent}
         />
       </View>
+
+      {/* Quick Clocking Modal */}
+      <ClockArrivalModal
+        visible={isClockModalVisible}
+        onClose={() => setIsClockModalVisible(false)}
+        raceDistanceMeters={raceDistanceMeters}
+        releaseTimeIso={releaseTimeIso}
+        onClockArrival={handleClockArrival}
+      />
     </SafeAreaView>
   );
 }

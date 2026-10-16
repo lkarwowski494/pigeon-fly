@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { FeatherStatus } from '../domain/types';
 
 export interface FeatherGaugeProps {
@@ -13,10 +13,15 @@ export interface FeatherGaugeProps {
     status: FeatherStatus;
     lengthPct: number;
   }[];
+  onPressFeather?: (featherNumber: number) => void;
   testID?: string;
 }
 
-export const FeatherGauge: React.FC<FeatherGaugeProps> = ({ feathers, testID }) => {
+export const FeatherGauge: React.FC<FeatherGaugeProps> = ({
+  feathers,
+  onPressFeather,
+  testID,
+}) => {
   return (
     <View testID={testID} style={styles.container}>
       <Text style={styles.title}>10 Lotek Pierwszorzędowych (Skrzydło)</Text>
@@ -31,7 +36,13 @@ export const FeatherGauge: React.FC<FeatherGaugeProps> = ({ feathers, testID }) 
             : '#43A047'; // Green if intact/full
 
           return (
-            <View key={f.featherNumber} style={styles.featherCol}>
+            <TouchableOpacity
+              key={f.featherNumber}
+              style={styles.featherCol}
+              activeOpacity={onPressFeather ? 0.7 : 1}
+              onPress={() => onPressFeather?.(f.featherNumber)}
+              disabled={!onPressFeather}
+            >
               <View style={styles.barTrack}>
                 <View
                   style={[
@@ -44,7 +55,7 @@ export const FeatherGauge: React.FC<FeatherGaugeProps> = ({ feathers, testID }) 
                 />
               </View>
               <Text style={styles.featherNumber}>{f.featherNumber}</Text>
-            </View>
+            </TouchableOpacity>
           );
         })}
       </View>

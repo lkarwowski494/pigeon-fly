@@ -179,3 +179,87 @@ describe('UI Components — ClutchCard', () => {
     expect(tree).toContain('Zalężone');
   });
 });
+
+describe('UI Components — Interactive Modals', () => {
+  const { AddTreatmentModal } = require('../src/components/AddTreatmentModal');
+  const { ClockArrivalModal } = require('../src/components/ClockArrivalModal');
+  const { AddFeedingLogModal } = require('../src/components/AddFeedingLogModal');
+
+  test('FeatherGauge triggers onPressFeather on feather tap', () => {
+    const onPressFeather = jest.fn();
+    const feathers = [{ featherNumber: 1, status: 'full' as const, lengthPct: 100 }];
+    let component: any;
+
+    act(() => {
+      component = renderer.create(
+        <FeatherGauge feathers={feathers} onPressFeather={onPressFeather} testID="gauge-test" />
+      );
+    });
+
+    const root = component.root;
+    const touchable = root.findByType(TouchableOpacity);
+    act(() => {
+      touchable.props.onPress();
+    });
+
+    expect(onPressFeather).toHaveBeenCalledWith(1);
+  });
+
+  test('AddTreatmentModal renders title and handles close', () => {
+    const onClose = jest.fn();
+    let component: any;
+
+    act(() => {
+      component = renderer.create(
+        <AddTreatmentModal visible={true} onClose={onClose} onSave={jest.fn()} />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('NOWY ZABIEG / LEK');
+    expect(tree).toContain('Szczepienie');
+  });
+
+  test('ClockArrivalModal renders title, speed calculation, and handles close', () => {
+    const onClose = jest.fn();
+    let component: any;
+
+    act(() => {
+      component = renderer.create(
+        <ClockArrivalModal
+          visible={true}
+          onClose={onClose}
+          raceDistanceMeters={300000}
+          releaseTimeIso="2026-06-01T06:00:00Z"
+          onClockArrival={jest.fn()}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('ODBICIE PRZYLOTU GOŁĘBIA');
+    expect(tree).toContain('PRĘDKOŚĆ');
+    expect(tree).toContain('300.0');
+    expect(tree).toContain('km');
+
+    act(() => {
+      component.unmount();
+    });
+  });
+
+  test('AddFeedingLogModal renders title and phase chips', () => {
+    const onClose = jest.fn();
+    let component: any;
+
+    act(() => {
+      component = renderer.create(
+        <AddFeedingLogModal visible={true} onClose={onClose} onSave={jest.fn()} />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('DZIENNIK ŻYWIENIA I SUPLEMENTACJI');
+    expect(tree).toContain('Loty (Wdowieństwo)');
+  });
+});
+

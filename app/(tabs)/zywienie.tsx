@@ -11,16 +11,26 @@ import {
   ScrollView,
   SafeAreaView,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { AnnualLoftPhase, getFeedingProtocol } from '../../src/domain/nutrition';
 import { calculateLoftCosts } from '../../src/domain/costCalculator';
 import { FieldButton } from '../../src/components/FieldButton';
+import { AddFeedingLogModal } from '../../src/components/AddFeedingLogModal';
 
 export default function NutritionScreen() {
   const [selectedPhase, setSelectedPhase] = useState<AnnualLoftPhase>('racing_widowhood');
   const [selectedDay, setSelectedDay] = useState<'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'>('tue');
   const [flockSize, setFlockSize] = useState<number>(60);
   const [bagPrice, setBagPrice] = useState<number>(85);
+  const [isFeedingModalVisible, setIsFeedingModalVisible] = useState(false);
+  const [customLogs, setCustomLogs] = useState<{
+    date: string;
+    phase: string;
+    mixName: string;
+    waterSupplements?: string;
+    feedSupplements?: string;
+  }[]>([]);
 
   const protocol = getFeedingProtocol(selectedPhase);
   const dayPlan = protocol.weeklySchedule[selectedDay];
@@ -212,13 +222,55 @@ export default function NutritionScreen() {
           );
         })()}
 
+        {/* Custom Logged Feedings Card */}
+        {customLogs.length > 0 && (
+          <View style={styles.customLogsCard}>
+            <Text style={styles.customLogsTitle}>ZAPISANE WPISY W DZIENNIKU GOŁĘBNIKA</Text>
+            {customLogs.map((log, index) => (
+              <View key={index} style={styles.customLogItem}>
+                <View style={styles.customLogHeader}>
+                  <Text style={styles.customLogDate}>{log.date}</Text>
+                  <Text style={styles.customLogPhase}>{log.phase}</Text>
+                </View>
+                <Text style={styles.customLogMix}>🥣 {log.mixName}</Text>
+                {log.waterSupplements && (
+                  <Text style={styles.customLogWater}>💧 Poidło: {log.waterSupplements}</Text>
+                )}
+                {log.feedSupplements && (
+                  <Text style={styles.customLogFeed}>🌿 Dodatki: {log.feedSupplements}</Text>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
+
         {/* Action Button */}
         <FieldButton
           title="+ Zapisz Własny Dziennik Karmienia"
-          onPress={() => {}}
+          onPress={() => setIsFeedingModalVisible(true)}
           style={{ marginTop: 14 }}
         />
       </ScrollView>
+
+      {/* Add Feeding Log Modal */}
+      <AddFeedingLogModal
+        visible={isFeedingModalVisible}
+        onClose={() => setIsFeedingModalVisible(false)}
+        defaultPhase={selectedPhase}
+        onSave={async (newLog) => {
+          setCustomLogs((prev) => [
+            {
+              date: newLog.date,
+              phase: newLog.phase,
+              mixName: newLog.mixName,
+              waterSupplements: newLog.waterSupplements,
+              feedSupplements: newLog.feedSupplements,
+            },
+            ...prev,
+          ]);
+          Alert.alert('Zapisano!', `Mieszanka "${newLog.mixName}" została dodana do dziennika żywienia.`);
+        }}
+      />
     </SafeAreaView>
   );
 }
@@ -488,5 +540,61 @@ const styles = StyleSheet.create({
     color: '#8E94A0',
     marginTop: 4,
     lineHeight: 14,
+  },
+  customLogsCard: {
+    backgroundColor: '#1E2127',
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#2F343F',
+    marginTop: 14,
+  },
+  customLogsTitle: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#E5A93C',
+    letterSpacing: 0.5,
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#262930',
+    paddingBottom: 8,
+  },
+  customLogItem: {
+    backgroundColor: '#15171B',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#262930',
+  },
+  customLogHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  customLogDate: {
+    fontSize: 11,
+    color: '#8E94A0',
+    fontFamily: 'monospace',
+  },
+  customLogPhase: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#E5A93C',
+  },
+  customLogMix: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  customLogWater: {
+    fontSize: 12,
+    color: '#64B5F6',
+    marginBottom: 2,
+  },
+  customLogFeed: {
+    fontSize: 12,
+    color: '#81C784',
   },
 });

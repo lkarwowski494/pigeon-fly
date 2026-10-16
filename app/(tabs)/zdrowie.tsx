@@ -14,56 +14,89 @@ import {
 } from 'react-native';
 import { FeatherGauge } from '../../src/components/FeatherGauge';
 import { FieldButton } from '../../src/components/FieldButton';
+import { AddTreatmentModal } from '../../src/components/AddTreatmentModal';
 import { analyzeWingMoult, getPhotoperiodStatus } from '../../src/domain/moult';
 import { PdfService } from '../../src/services/pdfService';
+import { FeatherStatus, MoultLog } from '../../src/domain/types';
+import { TreatmentRecordItem } from '../../src/domain/pdfExport';
+
+const INITIAL_MOULT_LOGS: MoultLog[] = [
+  { id: 'm-1', pigeonId: 'p-01', checkDate: '2026-09-15', primaryFeatherNumber: 1, status: 'full', lengthPct: 100, createdAt: '', updatedAt: '' },
+  { id: 'm-2', pigeonId: 'p-01', checkDate: '2026-09-15', primaryFeatherNumber: 2, status: 'full', lengthPct: 100, createdAt: '', updatedAt: '' },
+  { id: 'm-3', pigeonId: 'p-01', checkDate: '2026-10-01', primaryFeatherNumber: 3, status: 'regrowing', lengthPct: 65, createdAt: '', updatedAt: '' },
+  { id: 'm-4', pigeonId: 'p-01', checkDate: '2026-10-10', primaryFeatherNumber: 4, status: 'dropped', lengthPct: 0, createdAt: '', updatedAt: '' },
+];
+
+const INITIAL_TREATMENTS: TreatmentRecordItem[] = [
+  {
+    date: '2026-02-15',
+    eventType: 'Szczepienie PMV-1',
+    productName: 'Pharmavac Columbi 2',
+    batchNumber: 'LOT-2026-09A',
+    targetPigeon: 'Całe stado (60 szt.)',
+    withdrawalDays: 0,
+    notes: 'Szczepienie podskórne w kark przed sezonem lęgowym',
+  },
+  {
+    date: '2026-03-01',
+    eventType: 'Odrobaczanie',
+    productName: 'Levamisole 10%',
+    batchNumber: 'LEV-551',
+    targetPigeon: 'Całe stado',
+    withdrawalDays: 7,
+    notes: 'Podanie do wody pitnej po badaniu kału',
+  },
+];
 
 export default function HealthScreen() {
   const [selectedPigeonRing] = useState('PL-0284-23-1402');
-  const photoperiod = getPhotoperiodStatus(new Date());
+  const [isTreatmentModalVisible, setIsTreatmentModalVisible] = useState(false);
+  const [treatments, setTreatments] = useState<TreatmentRecordItem[]>(INITIAL_TREATMENTS);
+  const [moultLogs, setMoultLogs] = useState<MoultLog[]>(INITIAL_MOULT_LOGS);
 
-  // Simulated moult logs for the selected bird
-  const demoMoult = analyzeWingMoult('p-01', [
-    {
-      id: 'm-1',
-      pigeonId: 'p-01',
-      checkDate: '2026-09-15',
-      primaryFeatherNumber: 1,
-      status: 'full',
-      lengthPct: 100,
-      createdAt: '',
-      updatedAt: '',
-    },
-    {
-      id: 'm-2',
-      pigeonId: 'p-01',
-      checkDate: '2026-09-15',
-      primaryFeatherNumber: 2,
-      status: 'full',
-      lengthPct: 100,
-      createdAt: '',
-      updatedAt: '',
-    },
-    {
-      id: 'm-3',
-      pigeonId: 'p-01',
-      checkDate: '2026-10-01',
-      primaryFeatherNumber: 3,
-      status: 'regrowing',
-      lengthPct: 65,
-      createdAt: '',
-      updatedAt: '',
-    },
-    {
-      id: 'm-4',
-      pigeonId: 'p-01',
-      checkDate: '2026-10-10',
-      primaryFeatherNumber: 4,
-      status: 'dropped',
-      lengthPct: 0,
-      createdAt: '',
-      updatedAt: '',
-    },
-  ]);
+  const photoperiod = getPhotoperiodStatus(new Date());
+  const wingAnalysis = analyzeWingMoult('p-01', moultLogs);
+
+  const handleFeatherPress = (featherNumber: number) => {
+    Alert.alert(
+      `Lotka #${featherNumber} (Skrzydło)`,
+      'Wybierz aktualny stan zrzucenia lotki podczas przeglądu w ręku:',
+      [
+        {
+          text: '🟩 Pełna / Odrośnięta (100%)',
+          onPress: () => updateFeather(featherNumber, 'full', 100),
+        },
+        {
+          text: '🟧 Wzrost / Odrost (50%)',
+          onPress: () => updateFeather(featherNumber, 'regrowing', 50),
+        },
+        {
+          text: '🟥 Zrzucona / Brak (0%)',
+          onPress: () => updateFeather(featherNumber, 'dropped', 0),
+        },
+        { text: 'Anuluj', style: 'cancel' },
+      ]
+    );
+  };
+
+  const updateFeather = (featherNumber: number, status: FeatherStatus, lengthPct: number) => {
+    setMoultLogs((prev) => {
+      const filtered = prev.filter((m) => m.primaryFeatherNumber !== featherNumber);
+      return [
+        ...filtered,
+        {
+          id: `m-${featherNumber}-${Date.now()}`,
+          pigeonId: 'p-01',
+          checkDate: new Date().toISOString().slice(0, 10),
+          primaryFeatherNumber: featherNumber,
+          status,
+          lengthPct,
+          createdAt: '',
+          updatedAt: '',
+        },
+      ];
+    });
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -138,29 +171,65 @@ export default function HealthScreen() {
         {/* Selected Bird Wing Moult Analysis */}
         <View style={styles.moultSection}>
           <Text style={styles.moultSectionTitle}>PRZEGLĄD SKRZYDŁA: {selectedPigeonRing}</Text>
-          <FeatherGauge feathers={demoMoult.feathers} />
+          <Text style={styles.moultHint}>Dotknij lotkę, aby zaktualizować jej stan podczas przeglądu w ręku</Text>
+          <FeatherGauge
+            feathers={wingAnalysis.feathers}
+            onPressFeather={handleFeatherPress}
+          />
 
           <View style={styles.moultStatsCard}>
             <Text style={styles.moultStatLabel}>
               Wskaźnik Regeneracji Skrzydła (ARI):{' '}
-              <Text style={styles.moultStatValue}>{demoMoult.annualRegenerationIndex}%</Text>
+              <Text style={styles.moultStatValue}>{wingAnalysis.annualRegenerationIndex}%</Text>
             </Text>
             <Text style={styles.moultStatLabel}>
               Status lotowy:{' '}
-              <Text style={{ color: demoMoult.isFitForRacing ? '#4CAF50' : '#E53935', fontWeight: '800' }}>
-                {demoMoult.isFitForRacing ? 'ZDOLNY DO LOTU' : 'NIEZALECANY NA CIĘŻKI LOT'}
+              <Text style={{ color: wingAnalysis.isFitForRacing ? '#4CAF50' : '#E53935', fontWeight: '800' }}>
+                {wingAnalysis.isFitForRacing ? 'ZDOLNY DO LOTU' : 'NIEZALECANY NA CIĘŻKI LOT'}
               </Text>
             </Text>
-            {demoMoult.unfitnessReason && (
-              <Text style={styles.unfitnessText}>{demoMoult.unfitnessReason}</Text>
+            {wingAnalysis.unfitnessReason && (
+              <Text style={styles.unfitnessText}>{wingAnalysis.unfitnessReason}</Text>
             )}
           </View>
+        </View>
+
+        {/* Recent Treatments & PIW Withdrawal Warning Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>OSTATNIE ZABIEGI I KARENCJE (PIW)</Text>
+          {treatments.map((t, idx) => {
+            const hasWithdrawal = t.withdrawalDays > 0;
+            return (
+              <View key={idx} style={styles.treatmentRow}>
+                <View style={styles.treatmentMeta}>
+                  <Text style={styles.treatmentDate}>{t.date}</Text>
+                  <Text style={styles.treatmentName}>{t.productName}</Text>
+                  <Text style={styles.treatmentTarget}>{t.targetPigeon}</Text>
+                </View>
+                <View
+                  style={[
+                    styles.withdrawalBadge,
+                    hasWithdrawal ? styles.withdrawalActive : styles.withdrawalClear,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.withdrawalText,
+                      hasWithdrawal ? styles.withdrawalActiveText : styles.withdrawalClearText,
+                    ]}
+                  >
+                    {hasWithdrawal ? `⚠️ Karencja: ${t.withdrawalDays}d` : '✓ Brak karencji'}
+                  </Text>
+                </View>
+              </View>
+            );
+          })}
         </View>
 
         {/* Action Buttons */}
         <FieldButton
           title="+ Zapisz Zabieg Weterynaryjny / Lek"
-          onPress={() => {}}
+          onPress={() => setIsTreatmentModalVisible(true)}
           style={{ marginTop: 8, marginBottom: 10 }}
         />
         <FieldButton
@@ -179,26 +248,7 @@ export default function HealthScreen() {
                           loftName: 'Gołębnik Mistrza',
                           breederName: 'Hodowca Pigeon-Fly',
                           veterinarianName: 'Lek. wet. Janusz Ptasiński',
-                          records: [
-                            {
-                              date: '2026-02-15',
-                              eventType: 'Szczepienie PMV-1',
-                              productName: 'Pharmavac Columbi 2',
-                              batchNumber: 'LOT-2026-09A',
-                              targetPigeon: 'Całe stado (60 szt.)',
-                              withdrawalDays: 0,
-                              notes: 'Szczepienie podskórne w kark przed sezonem lęgowym',
-                            },
-                            {
-                              date: '2026-03-01',
-                              eventType: 'Odrobaczanie',
-                              productName: 'Levamisole 10%',
-                              batchNumber: 'LEV-551',
-                              targetPigeon: 'Całe stado',
-                              withdrawalDays: 7,
-                              notes: 'Podanie do wody pitnej po badaniu kału',
-                            },
-                          ],
+                          records: treatments,
                         },
                         'print'
                       );
@@ -216,26 +266,7 @@ export default function HealthScreen() {
                           loftName: 'Gołębnik Mistrza',
                           breederName: 'Hodowca Pigeon-Fly',
                           veterinarianName: 'Lek. wet. Janusz Ptasiński',
-                          records: [
-                            {
-                              date: '2026-02-15',
-                              eventType: 'Szczepienie PMV-1',
-                              productName: 'Pharmavac Columbi 2',
-                              batchNumber: 'LOT-2026-09A',
-                              targetPigeon: 'Całe stado (60 szt.)',
-                              withdrawalDays: 0,
-                              notes: 'Szczepienie podskórne w kark przed sezonem lęgowym',
-                            },
-                            {
-                              date: '2026-03-01',
-                              eventType: 'Odrobaczanie',
-                              productName: 'Levamisole 10%',
-                              batchNumber: 'LEV-551',
-                              targetPigeon: 'Całe stado',
-                              withdrawalDays: 7,
-                              notes: 'Podanie do wody pitnej po badaniu kału',
-                            },
-                          ],
+                          records: treatments,
                         },
                         'share'
                       );
@@ -251,6 +282,28 @@ export default function HealthScreen() {
           variant="secondary"
         />
       </ScrollView>
+
+      {/* Add Treatment Modal */}
+      <AddTreatmentModal
+        visible={isTreatmentModalVisible}
+        onClose={() => setIsTreatmentModalVisible(false)}
+        defaultRingNumber={selectedPigeonRing}
+        onSave={async (newLog) => {
+          setTreatments((prev) => [
+            {
+              date: newLog.date,
+              eventType: newLog.eventType,
+              productName: newLog.productName,
+              batchNumber: newLog.batchNumber,
+              targetPigeon: newLog.pigeonId ? `Ptak: ${newLog.pigeonId}` : 'Całe stado',
+              withdrawalDays: newLog.withdrawalDays,
+              notes: newLog.notes,
+            },
+            ...prev,
+          ]);
+          Alert.alert('Zapisano', `Zabieg ${newLog.productName} został zapisany w E-Księdze PIW.`);
+        }}
+      />
     </SafeAreaView>
   );
 }
@@ -379,5 +432,63 @@ const styles = StyleSheet.create({
     color: '#FF8A80',
     marginTop: 6,
     lineHeight: 18,
+  },
+  moultHint: {
+    fontSize: 11,
+    color: '#E5A93C',
+    fontStyle: 'italic',
+    marginBottom: 4,
+  },
+  treatmentRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#262930',
+  },
+  treatmentMeta: {
+    flex: 1,
+  },
+  treatmentDate: {
+    fontSize: 11,
+    color: '#8E94A0',
+    fontFamily: 'monospace',
+  },
+  treatmentName: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    marginTop: 2,
+  },
+  treatmentTarget: {
+    fontSize: 12,
+    color: '#A0A6B2',
+    marginTop: 1,
+  },
+  withdrawalBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  withdrawalActive: {
+    backgroundColor: '#381E1E',
+    borderWidth: 1,
+    borderColor: '#E53935',
+  },
+  withdrawalClear: {
+    backgroundColor: '#1E3824',
+    borderWidth: 1,
+    borderColor: '#43A047',
+  },
+  withdrawalText: {
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  withdrawalActiveText: {
+    color: '#FF8A80',
+  },
+  withdrawalClearText: {
+    color: '#81C784',
   },
 });

@@ -55,16 +55,17 @@ export default function QRScannerModal() {
     const parsed = parseQRPayload(data);
     if (parsed.isValid) {
       const ringText = parsed.ringNumber ? ` (${parsed.ringNumber})` : '';
+      const now = new Date();
       Alert.alert(
-        'Odbito Gołębia!',
-        `Zeskanowano kod ptaka${ringText}.\nIdentyfikator: ${parsed.qrCodeUuid}`,
+        'Odbito Gołębia w Lufce! 🕊️',
+        `Zeskanowano kod ptaka${ringText}.\nCzas przylotu: ${now.toLocaleTimeString('pl-PL')}\nID weryfikacji: ${parsed.qrCodeUuid.slice(0, 16)}...`,
         [
           {
-            text: 'Zarejestruj Przylot',
+            text: 'Zapisz Przylot w Locie',
             onPress: () => router.back(),
           },
           {
-            text: 'Skanuj kolejnego',
+            text: 'Skanuj kolejnego ptaka',
             onPress: () => setScannedResult(null),
           },
         ]

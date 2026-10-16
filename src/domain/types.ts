@@ -141,6 +141,17 @@ export interface MoultLog {
   updatedAt: string;
 }
 
+export interface FeedingLog {
+  id: string;
+  loftId: string;
+  date: string; // YYYY-MM-DD
+  phase: string;
+  mixName: string;
+  waterSupplements?: string;
+  feedSupplements?: string;
+  createdAt: string;
+}
+
 export interface LostPigeonReport {
   id: string;
   qrCodeUuid: string;
