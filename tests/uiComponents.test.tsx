@@ -711,6 +711,24 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('Wdowców');
     expect(tree).toContain('OPTYMALNE');
   });
+
+  test('DrinkerLabModal renders pH buffering, isotonic rehydration osmolarity, and Carbo-Lipid shift', () => {
+    const { DrinkerLabModal } = require('../src/components/DrinkerLabModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <DrinkerLabModal visible={true} onClose={onClose} />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('LABORATORIUM BIOCHEMICZNE');
+    expect(tree).toContain('POIDŁO, pH I REHYDRATACJA');
+    expect(tree).toContain('WYNIKOWE pH POIDŁA');
+    expect(tree).toContain('Ocet Jabłkowy');
+  });
 });
 
 

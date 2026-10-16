@@ -18,6 +18,7 @@ import { calculateLoftCosts } from '../../src/domain/costCalculator';
 import { FieldButton } from '../../src/components/FieldButton';
 import { AddFeedingLogModal } from '../../src/components/AddFeedingLogModal';
 import { FeedCalculatorModal } from '../../src/components/FeedCalculatorModal';
+import { DrinkerLabModal } from '../../src/components/DrinkerLabModal';
 
 export default function NutritionScreen() {
   const [selectedPhase, setSelectedPhase] = useState<AnnualLoftPhase>('racing_widowhood');
@@ -26,6 +27,7 @@ export default function NutritionScreen() {
   const [bagPrice, setBagPrice] = useState<number>(85);
   const [isFeedingModalVisible, setIsFeedingModalVisible] = useState(false);
   const [isFeedCalcOpen, setIsFeedCalcOpen] = useState(false);
+  const [isDrinkerLabOpen, setIsDrinkerLabOpen] = useState(false);
   const [customLogs, setCustomLogs] = useState<{
     date: string;
     phase: string;
@@ -259,6 +261,13 @@ export default function NutritionScreen() {
           style={{ marginTop: 10 }}
           testID="btn-open-feed-calc"
         />
+        <FieldButton
+          title="💧 Laboratorium Poidła i Elektrolitów (RD-17/18)"
+          onPress={() => setIsDrinkerLabOpen(true)}
+          variant="secondary"
+          style={{ marginTop: 10 }}
+          testID="btn-open-drinker-lab"
+        />
       </ScrollView>
 
       {/* Add Feeding Log Modal */}
@@ -285,6 +294,12 @@ export default function NutritionScreen() {
       <FeedCalculatorModal
         visible={isFeedCalcOpen}
         onClose={() => setIsFeedCalcOpen(false)}
+      />
+
+      {/* Drinker pH & Rehydration Osmolarity Lab Modal */}
+      <DrinkerLabModal
+        visible={isDrinkerLabOpen}
+        onClose={() => setIsDrinkerLabOpen(false)}
       />
     </SafeAreaView>
   );
