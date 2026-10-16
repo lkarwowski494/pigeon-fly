@@ -21,6 +21,7 @@ import {
 } from 'react-native';
 import { FieldButton } from '../../src/components/FieldButton';
 import { PaywallModal } from '../../src/components/PaywallModal';
+import { TandemModal } from '../../src/components/TandemModal';
 import {
   PlanType,
   activatePlan,
@@ -37,6 +38,7 @@ export default function SettingsScreen() {
   const [activePlan, setActivePlan] = useState<PlanType>('trial');
   const [unitSystem, setUnitSystem] = useState<UnitSystem>('metric');
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [isTandemOpen, setIsTandemOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [pendingQueueCount, setPendingQueueCount] = useState(0);
 
@@ -92,6 +94,30 @@ export default function SettingsScreen() {
             <Text style={styles.statLabel}>Kraj i Federacja:</Text>
             <Text style={styles.statValue}>Polska (PZHGP / FCI)</Text>
           </View>
+        </View>
+
+        {/* Tandem & Współdzielenie Gołębnika (Z-057, BR-STADO-009) */}
+        <View style={styles.card}>
+          <View style={styles.syncHeaderRow}>
+            <Text style={styles.cardHeader}>TANDEM I WSPÓŁDZIELENIE (Z-057)</Text>
+            <View style={styles.onlineBadge}>
+              <Text style={styles.onlineText}>2 HODOWCÓW</Text>
+            </View>
+          </View>
+          <Text style={styles.syncDesc}>
+            Wspólne prowadzenie gołębnika z podziałem ról (Główny Hodowca, Wspólnik, Asystent, Weterynarz) oraz szyfrowanymi tokenami zaproszeń i dziennikiem audytu.
+          </Text>
+          <View style={styles.statRow}>
+            <Text style={styles.statLabel}>Skład zespołu:</Text>
+            <Text style={styles.statValue}>Janusz (Główny) & Marek (Wspólnik)</Text>
+          </View>
+          <FieldButton
+            title="👥 Zarządzaj Tandemem i Zaproszeniami"
+            variant="secondary"
+            onPress={() => setIsTandemOpen(true)}
+            style={{ marginTop: 10 }}
+            testID="btn-open-tandem"
+          />
         </View>
 
         {/* Pigeon-Fly Pro & Monetyzacja */}
@@ -253,6 +279,12 @@ export default function SettingsScreen() {
           Alert.alert('Przywracanie', 'Sprawdzono zakupy w App Store. Stan licencji zaktualizowany.');
         }}
         currentPigeonsCount={12}
+      />
+
+      {/* Tandem & Multi-Breeder Sharing Modal (Z-057) */}
+      <TandemModal
+        visible={isTandemOpen}
+        onClose={() => setIsTandemOpen(false)}
       />
     </SafeAreaView>
   );

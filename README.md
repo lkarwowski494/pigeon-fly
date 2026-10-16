@@ -110,8 +110,8 @@ pigeon-fly/
 │   │   ├── loty.tsx            # Loty: tablica przylotów na żywo i lista wkładaniowa
 │   │   ├── zdrowie.tsx         # Zdrowie: wskaźnik 10 lotek (ARI) i e-księga PIW
 │   │   ├── zywienie.tsx        # Żywienie: rotacja 4-fazowa i bilans karmy
-│   │   ├── kalkulator.tsx      # Szybki kalkulator prędkości w m/min
-│   │   └── ustawienia.tsx      # Ustawienia, kopie zapasowe, jednostki i Pro Pass
+│   │   ├── kalkulator.tsx      # Szybki kalkulator prędkości w m/min, wektor wiatru 3D i predyktor Coeff FCI
+│   │   └── ustawienia.tsx      # Ustawienia, tandem, kopie zapasowe, jednostki i Pro Pass
 │   ├── modal/                  # Formularze modalne
 │   │   ├── new-pigeon.tsx      # Dodawanie nowego ptaka z walidacją limitu stada
 │   │   └── scan.tsx            # Błyskawiczny skaner kodów QR aparatem (Vision)
@@ -139,6 +139,7 @@ pigeon-fly/
 │   │   ├── photoperiod.ts      # Chronobiologia stada, systemy Verdunkelung / Belichtung (RD-13/14) i alerty rolet
 │   │   ├── qr.ts               # Bezpieczne identyfikatory i weryfikacja rodowodów
 │   │   ├── racing.ts           # Fizyka lotu, m/min, ypm i neutralizacja nocy
+│   │   ├── tandem.ts           # Silnik współdzielenia gołębnika (Tandem), role RBAC, zaproszenia i audyt (BR-STADO-009, Z-057)
 │   │   ├── telemetry.ts        # Moduł 5: IoT/GPS tracking, krzywizna i efektywność trasy
 │   │   ├── types.ts            # Wspólne interfejsy domenowe TypeScript
 │   │   ├── units.ts            # Konwerter jednostek metrycznych i imperialnych
@@ -185,13 +186,14 @@ pigeon-fly/
 │   │   ├── PigeonPhotoGalleryModal.tsx # 3-kątowa galeria makro (Sylwetka/Oko/Skrzydło)
 │   │   ├── QrCodeSvg.tsx       # Czysty wektorowy kod QR SVG do naklejek
 │   │   ├── RaceWeatherModal.tsx# Prognoza prędkości i aerodynamika wiatru
+│   │   ├── TandemModal.tsx     # Zarządzanie tandemem hodowców, zaproszenia z tokenami i dziennik audytu (Z-057)
 │   │   └── TelemetryTrackModal.tsx # Analiza krzywizny trasy GPS/IoT z obrączek
 │   ├── sync/                   # Klient synchronizacji chmurowej Supabase
 │   │   └── syncEngine.ts       # Dwukierunkowa replikacja delta i obsługa offline
 │   └── lib/                    # Współdzielone moduły pomocnicze
 │       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
 ├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
-├── tests/                      # 31 zestawów testowych (200 testów jednostkowych i fast-check)
+├── tests/                      # 32 zestawy testowe (215 testów jednostkowych i fast-check)
 ├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
 └── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
     └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)

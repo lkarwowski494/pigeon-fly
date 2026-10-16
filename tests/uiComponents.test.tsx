@@ -775,7 +775,33 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('PL-0284-23-1402');
     expect(tree).toContain('KONKURS');
   });
+
+  test('TandemModal renders loft sharing, members list, invite tab, and audit log', () => {
+    const { TandemModal } = require('../src/components/TandemModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <TandemModal
+          visible={true}
+          onClose={onClose}
+          loftName="Gołębnik Mistrza"
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Tandem & Współdzielenie');
+    expect(tree).toContain('Gołębnik Mistrza');
+    expect(tree).toContain('Główny Hodowca');
+    expect(tree).toContain('Wspólnik / Partner');
+    expect(tree).toContain('Janusz Hodowca');
+    expect(tree).toContain('Marek Partner');
+    expect(tree).toContain('Zaproś Wspólnika');
+  });
 });
+
 
 
 
