@@ -20,6 +20,7 @@ import { TelemetryTrackModal } from '../../src/components/TelemetryTrackModal';
 import { RaceWeatherModal } from '../../src/components/RaceWeatherModal';
 import { BasketingSessionModal } from '../../src/components/BasketingSessionModal';
 import { LiveDerbyModal } from '../../src/components/LiveDerbyModal';
+import { ConcourseSheetModal } from '../../src/components/ConcourseSheetModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { Alert } from 'react-native';
@@ -78,6 +79,7 @@ export default function RacesScreen() {
   const [isWeatherModalVisible, setIsWeatherModalVisible] = useState(false);
   const [isBasketingModalVisible, setIsBasketingModalVisible] = useState(false);
   const [isDerbyModalVisible, setIsDerbyModalVisible] = useState(false);
+  const [isConcourseModalVisible, setIsConcourseModalVisible] = useState(false);
 
   const handleSaveBasketing = (entries: BasketEntry[]) => {
     setBasketedCount(entries.length > 0 ? entries.length : 120);
@@ -274,6 +276,13 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="📊 Oficjalna Lista Konkursowa i GMP"
+            onPress={() => setIsConcourseModalVisible(true)}
+            testID="btn-open-concourse-sheet"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -341,6 +350,17 @@ export default function RacesScreen() {
       <LiveDerbyModal
         visible={isDerbyModalVisible}
         onClose={() => setIsDerbyModalVisible(false)}
+      />
+
+      {/* Official Concourse Sheet & Olympic Categories Modal */}
+      <ConcourseSheetModal
+        visible={isConcourseModalVisible}
+        onClose={() => setIsConcourseModalVisible(false)}
+        raceName={raceName}
+        releaseLocation={releaseLocation}
+        distanceKm={raceDistanceMeters / 1000}
+        totalBasketed={basketedCount}
+        arrivals={arrivals}
       />
     </SafeAreaView>
   );

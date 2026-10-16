@@ -166,6 +166,7 @@ pigeon-fly/
 │   │   ├── ClutchCard.tsx      # Karta lęgu z kamieniami milowymi
 │   │   ├── ClutchLifecycleModal.tsx # Cykl lęgowy: jaja, owoskopia, obrączkowanie
 │   │   ├── CompartmentsModal.tsx # Zarządzanie fizycznymi przedziałami gołębnika i normami FCI (BR-STADO-005)
+│   │   ├── ConcourseSheetModal.tsx # Oficjalna lista konkursowa FCI, baza 20%/25%/33%, GMP 5 z 50 i kategorie olimpijskie
 │   │   ├── DrinkerLabModal.tsx # Laboratorium poidła, buforowanie pH, izotonik i ładowanie tłuszczowe (RD-15..18)
 │   │   ├── FeatherGauge.tsx    # Wizualny wskaźnik 10 lotek skrzydła
 │   │   ├── FeedCalculatorModal.tsx # Laboratorium paszowe 20 ziaren i ocena biologiczna
@@ -190,7 +191,7 @@ pigeon-fly/
 │   └── lib/                    # Współdzielone moduły pomocnicze
 │       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
 ├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
-├── tests/                      # 31 zestawów testowych (196 testów jednostkowych i fast-check)
+├── tests/                      # 31 zestawów testowych (200 testów jednostkowych i fast-check)
 ├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
 └── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
     └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)

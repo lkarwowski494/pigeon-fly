@@ -126,3 +126,51 @@ describe('Concourse Engine — Individual Evaluation & Ace Pigeon', () => {
     expect(summary.totalGmpPoints).toBeGreaterThan(60);
   });
 });
+
+describe('Concourse Engine — Olympic / FCI Sport Categories', () => {
+  const { evaluateOlympicQualification, calculateTeamSeriesScore } = require('../src/domain/concourse');
+
+  test('qualifies pigeon for Category A (Sprint) when requirements met (5 prizes, >=1000 kkm)', () => {
+    const races = [
+      { position: 2, totalBasketed: 2000, distanceKm: 220 }, // coeff: 1.000
+      { position: 5, totalBasketed: 2000, distanceKm: 180 }, // coeff: 2.500
+      { position: 8, totalBasketed: 2000, distanceKm: 250 }, // coeff: 4.000
+      { position: 10, totalBasketed: 2000, distanceKm: 310 }, // coeff: 5.000
+      { position: 15, totalBasketed: 2000, distanceKm: 240 }, // coeff: 7.500
+    ];
+
+    const result = evaluateOlympicQualification('A', races);
+    expect(result.isQualified).toBe(true);
+    expect(result.qualifiedPrizesCount).toBe(5);
+    expect(result.totalConcourseKm).toBe(1200); // >= 1000 kkm
+    expect(result.totalFciCoeff).toBe(20.0); // 1.0 + 2.5 + 4.0 + 5.0 + 7.5
+  });
+
+  test('fails qualification when not enough prizes', () => {
+    const races = [
+      { position: 2, totalBasketed: 2000, distanceKm: 220 },
+      { position: 5, totalBasketed: 2000, distanceKm: 180 },
+    ];
+
+    const result = evaluateOlympicQualification('A', races);
+    expect(result.isQualified).toBe(false);
+    expect(result.reason).toContain('Brakuje 3 konkursów');
+  });
+
+  test('calculateTeamSeriesScore computes top 5 from 50 series score', () => {
+    const arrivals = [
+      { isTip: true, isPrize: true, gmpPoints: 39.5, ringNumber: 'PL-1' },
+      { isTip: true, isPrize: true, gmpPoints: 38.0, ringNumber: 'PL-2' },
+      { isTip: false, isPrize: true, gmpPoints: 40.0, ringNumber: 'PL-3' }, // not tipped!
+      { isTip: true, isPrize: true, gmpPoints: 35.0, ringNumber: 'PL-4' },
+      { isTip: true, isPrize: true, gmpPoints: 33.0, ringNumber: 'PL-5' },
+      { isTip: true, isPrize: true, gmpPoints: 30.0, ringNumber: 'PL-6' },
+      { isTip: true, isPrize: false, gmpPoints: 0, ringNumber: 'PL-7' }, // outside prize base
+    ];
+
+    const teamScore = calculateTeamSeriesScore('5_from_50', arrivals);
+    // Should count top 5 tipped: 39.5 + 38.0 + 35.0 + 33.0 + 30.0 = 175.5
+    expect(teamScore.countingPigeonsCount).toBe(5);
+    expect(teamScore.totalSeriesPoints).toBe(175.5);
+  });
+});

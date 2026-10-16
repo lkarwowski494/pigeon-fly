@@ -729,6 +729,52 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('WYNIKOWE pH POIDŁA');
     expect(tree).toContain('Ocet Jabłkowy');
   });
+
+  test('ConcourseSheetModal renders official concourse list, 20% limit, and Olympic categories', () => {
+    const { ConcourseSheetModal } = require('../src/components/ConcourseSheetModal');
+    const onClose = jest.fn();
+    const demoArrivals = [
+      {
+        id: 'arr-1',
+        raceId: 'race-01',
+        pigeonId: 'p-01',
+        arrivalTime: '2026-06-01T12:00:00Z',
+        distanceMeters: 345000,
+        velocityMPerMin: 1340.5,
+        scanType: 'qr' as const,
+        isManualOverride: false,
+        createdAt: '',
+        updatedAt: '',
+        ringNumber: 'PL-0284-23-1402',
+        countryCode: 'PL',
+        year: 2023,
+        sex: 'cock' as const,
+        plumageColor: 'Niebieski',
+      },
+    ];
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <ConcourseSheetModal
+          visible={true}
+          onClose={onClose}
+          raceName="Lot Magdeburg"
+          releaseLocation="Magdeburg"
+          distanceKm={345}
+          totalBasketed={100}
+          arrivals={demoArrivals}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('OFICJALNA LISTA KONKURSOWA FCI');
+    expect(tree).toContain('Magdeburg');
+    expect(tree).toContain('Baza Konkursowa');
+    expect(tree).toContain('PL-0284-23-1402');
+    expect(tree).toContain('KONKURS');
+  });
 });
 
 
