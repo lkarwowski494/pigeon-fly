@@ -141,3 +141,41 @@ describe('UI Components — FeatherGauge', () => {
     }
   });
 });
+
+describe('UI Components — ClutchCard', () => {
+  const { ClutchCard } = require('../src/components/ClutchCard');
+
+  test('renders nest box, parents, and egg badges', () => {
+    const clutch = {
+      id: 'c-01',
+      loftId: 'l-01',
+      roundNumber: 1,
+      nestBox: 'Cela A-04',
+      cockId: 'p-01',
+      henId: 'p-02',
+      pairedDate: '2026-03-01',
+      egg1Date: '2026-03-10',
+      egg2Date: '2026-03-12',
+      egg1Status: 'fertile',
+      egg2Status: 'fertile',
+      chick1Banded: false,
+      chick2Banded: false,
+      createdAt: '',
+      updatedAt: '',
+      cockRingNumber: 'PL-0284-23-1402',
+      henRingNumber: 'PL-0284-22-9854',
+    };
+
+    let component: any;
+    act(() => {
+      component = renderer.create(<ClutchCard clutch={clutch} onPress={jest.fn()} testID="clutch-card" />);
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Cela A-04');
+    expect(tree).toContain('LĘG');
+    expect(tree).toContain('PL-0284-23-1402');
+    expect(tree).toContain('PL-0284-22-9854');
+    expect(tree).toContain('Zalężone');
+  });
+});

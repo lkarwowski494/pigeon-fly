@@ -156,7 +156,52 @@ export const SQLITE_SCHEMA_V1 = `
     FOREIGN KEY (pigeon_id) REFERENCES pigeons(id) ON DELETE CASCADE
   );
 
-  -- 8. Offline Mutation Sync Queue (Delta Sync z Supabase)
+  -- 8. Clutches (Lęgi, Jaja i Odchów Piskląt)
+  CREATE TABLE IF NOT EXISTS clutches (
+    id TEXT PRIMARY KEY,
+    loft_id TEXT NOT NULL,
+    round_number INTEGER NOT NULL,
+    nest_box TEXT NOT NULL,
+    cock_id TEXT NOT NULL,
+    hen_id TEXT NOT NULL,
+    paired_date TEXT NOT NULL,
+    egg1_date TEXT,
+    egg2_date TEXT,
+    egg1_status TEXT NOT NULL DEFAULT 'laid',
+    egg2_status TEXT NOT NULL DEFAULT 'laid',
+    hatch_date TEXT,
+    chick1_ring_number TEXT,
+    chick2_ring_number TEXT,
+    chick1_banded INTEGER NOT NULL DEFAULT 0,
+    chick2_banded INTEGER NOT NULL DEFAULT 0,
+    weaned_date TEXT,
+    notes TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY (loft_id) REFERENCES lofts(id) ON DELETE CASCADE,
+    FOREIGN KEY (cock_id) REFERENCES pigeons(id) ON DELETE CASCADE,
+    FOREIGN KEY (hen_id) REFERENCES pigeons(id) ON DELETE CASCADE
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_clutches_loft ON clutches(loft_id);
+  CREATE INDEX IF NOT EXISTS idx_clutches_parents ON clutches(cock_id, hen_id);
+
+  -- 9. Feeding Logs (Dziennik Karmy i Suplementów)
+  CREATE TABLE IF NOT EXISTS feeding_logs (
+    id TEXT PRIMARY KEY,
+    loft_id TEXT NOT NULL,
+    date TEXT NOT NULL,
+    phase TEXT NOT NULL,
+    mix_name TEXT NOT NULL,
+    water_supplements TEXT,
+    feed_supplements TEXT,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (loft_id) REFERENCES lofts(id) ON DELETE CASCADE
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_feeding_loft_date ON feeding_logs(loft_id, date);
+
+  -- 10. Offline Mutation Sync Queue (Delta Sync z Supabase)
   CREATE TABLE IF NOT EXISTS sync_queue (
     id TEXT PRIMARY KEY,
     client_mutation_id TEXT NOT NULL UNIQUE,

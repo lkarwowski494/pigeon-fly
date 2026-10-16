@@ -1,6 +1,6 @@
 /**
- * PIGEON-FLY — Zdrowie i Pierzenie (Health & Moult Screen)
- * Paramyxo PMV-1 vaccination compliance, medication withdrawal warnings, and 10 flight feather inspection.
+ * PIGEON-FLY — Zdrowie, Profilaktyka i Pierzenie (Full Loft Health & Moult Screen)
+ * Paramyxo PMV-1 compliance, 12-month flock medical calendar, Photoperiod Darkness (Verdunkelung), and 10 flight feather inspection.
  */
 
 import React, { useState } from 'react';
@@ -13,10 +13,11 @@ import {
 } from 'react-native';
 import { FeatherGauge } from '../../src/components/FeatherGauge';
 import { FieldButton } from '../../src/components/FieldButton';
-import { analyzeWingMoult } from '../../src/domain/moult';
+import { analyzeWingMoult, getPhotoperiodStatus } from '../../src/domain/moult';
 
 export default function HealthScreen() {
   const [selectedPigeonRing] = useState('PL-0284-23-1402');
+  const photoperiod = getPhotoperiodStatus(new Date());
 
   // Simulated moult logs for the selected bird
   const demoMoult = analyzeWingMoult('p-01', [
@@ -74,32 +75,67 @@ export default function HealthScreen() {
             </View>
           </View>
           <Text style={styles.cardDesc}>
-            Ostatnie szczepienie stadne wykonano: <Text style={styles.highlightText}>15.02.2026</Text>
+            Ostatnie szczepienie stada: <Text style={styles.highlightText}>15.02.2026</Text> (Pharmavac Columbi 2)
           </Text>
           <Text style={styles.cardSub}>
-            Ważność odporności: do 15.02.2027 (Pozostało 122 dni). Zgodność z wymogami PZHGP/FCI: 100%.
+            Ważność odporności do 15.02.2027. Zgodność z wymogami PZHGP / FCI: 100%.
           </Text>
         </View>
 
-        {/* Medication Withdrawal Alert Card */}
-        <View style={[styles.card, styles.withdrawalCard]}>
-          <View style={styles.cardHeader}>
-            <Text style={[styles.cardTitle, { color: '#4CAF50' }]}>STATUS KARENCJI LEKÓW</Text>
-            <View style={[styles.statusBadgeValid, { backgroundColor: '#1B3B22' }]}>
-              <Text style={[styles.statusBadgeText, { color: '#81C784' }]}>CZYSTO</Text>
+        {/* 12-Month Veterinary & Prevention Calendar */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>ROCZNY KALENDARZ PROFILAKTYKI STADA</Text>
+          <View style={styles.calendarTimeline}>
+            <View style={styles.timelineItem}>
+              <Text style={styles.monthBadge}>STY / LUT</Text>
+              <View style={styles.timelineContent}>
+                <Text style={styles.timelineTitle}>Koproskopia & Szczepienie PMV-1 + Ospa</Text>
+                <Text style={styles.timelineDesc}>Badanie kału pod mikroskopem na kokcydia i robaki; szczepienie stada.</Text>
+              </View>
+            </View>
+            <View style={styles.timelineItem}>
+              <Text style={styles.monthBadge}>LUT / MAR</Text>
+              <View style={styles.timelineContent}>
+                <Text style={styles.timelineTitle}>Kuracja przed parowaniem (Rzęsistek)</Text>
+                <Text style={styles.timelineDesc}>Dezynfekcja wola (trichomonadoza / żółty guzek) przed złożeniem jaj.</Text>
+              </View>
+            </View>
+            <View style={styles.timelineItem}>
+              <Text style={styles.monthBadge}>MAJ / CZE</Text>
+              <View style={styles.timelineContent}>
+                <Text style={styles.timelineTitle}>Ochrona Młodzieży (Adeno-Coli / YPDS)</Text>
+                <Text style={styles.timelineDesc}>Wzmacnianie odporności jelitowej (probiotyki, maślan sodu, przeciwciała).</Text>
+              </View>
+            </View>
+            <View style={styles.timelineItem}>
+              <Text style={styles.monthBadge}>WRZ / PAŹ</Text>
+              <View style={styles.timelineContent}>
+                <Text style={styles.timelineTitle}>Salmonelloza (Paratyfus) & Pierzenie</Text>
+                <Text style={styles.timelineDesc}>Kontrola nosicielstwa salmonelli przed zimą; podaż metioniny na pióra.</Text>
+              </View>
             </View>
           </View>
-          <Text style={styles.cardDesc}>
-            Brak aktywnych okresów karencji farmakologicznej w stadzie. Ptaki gotowe do koszowania.
-          </Text>
+        </View>
+
+        {/* Photoperiod / Darkness System (Verdunkelung) Card */}
+        <View style={[styles.card, photoperiod.isActive && styles.activePhotoperiodCard]}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardTitle}>
+              {photoperiod.systemType === 'darkness' ? '🌙 SYSTEM ZACIEMNIANIA (VERDUNKELUNG)' : '☀️ SYSTEM DOŚWIETLANIA (BELICHTUNG)'}
+            </Text>
+            <View style={[styles.statusBadgeValid, { backgroundColor: photoperiod.isActive ? '#E5A93C' : '#2A2E38' }]}>
+              <Text style={[styles.statusBadgeText, { color: photoperiod.isActive ? '#121417' : '#8E94A0' }]}>
+                {photoperiod.isActive ? 'AKTYWNY' : 'NATURALNY'}
+              </Text>
+            </View>
+          </View>
+          <Text style={styles.cardDesc}>{photoperiod.scheduleDescription}</Text>
+          <Text style={styles.cardSub}>Cel biologiczny: {photoperiod.biologicalGoal}</Text>
         </View>
 
         {/* Selected Bird Wing Moult Analysis */}
         <View style={styles.moultSection}>
-          <View style={styles.moultHeader}>
-            <Text style={styles.moultSectionTitle}>PRZEGLĄD SKRZYDŁA: {selectedPigeonRing}</Text>
-          </View>
-
+          <Text style={styles.moultSectionTitle}>PRZEGLĄD SKRZYDŁA: {selectedPigeonRing}</Text>
           <FeatherGauge feathers={demoMoult.feathers} />
 
           <View style={styles.moultStatsCard}>
@@ -121,7 +157,7 @@ export default function HealthScreen() {
 
         {/* Action Button */}
         <FieldButton
-          title="+ Zapisz Przegląd Pierzenia / Lek"
+          title="+ Zapisz Zabieg Weterynaryjny / Lek"
           onPress={() => {}}
           style={{ marginTop: 8 }}
         />
@@ -146,8 +182,8 @@ const styles = StyleSheet.create({
     borderColor: '#2F343F',
     marginBottom: 14,
   },
-  withdrawalCard: {
-    borderColor: '#2E7D32',
+  activePhotoperiodCard: {
+    borderColor: '#E5A93C',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -156,7 +192,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   cardTitle: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '800',
     color: '#E5A93C',
     letterSpacing: 0.5,
@@ -181,22 +217,56 @@ const styles = StyleSheet.create({
   cardSub: {
     fontSize: 13,
     color: '#8E94A0',
+    lineHeight: 18,
   },
   highlightText: {
     color: '#E5A93C',
     fontWeight: '700',
   },
+  calendarTimeline: {
+    marginTop: 10,
+  },
+  timelineItem: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    alignItems: 'flex-start',
+  },
+  monthBadge: {
+    width: 65,
+    backgroundColor: '#15171B',
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+    borderRadius: 6,
+    color: '#E5A93C',
+    fontWeight: '800',
+    fontSize: 11,
+    textAlign: 'center',
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: '#2F343F',
+  },
+  timelineContent: {
+    flex: 1,
+  },
+  timelineTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  timelineDesc: {
+    fontSize: 12,
+    color: '#8E94A0',
+    marginTop: 1,
+  },
   moultSection: {
     marginBottom: 14,
-  },
-  moultHeader: {
-    marginBottom: 4,
   },
   moultSectionTitle: {
     fontSize: 15,
     fontWeight: '800',
     color: '#FFFFFF',
     fontFamily: 'monospace',
+    marginBottom: 4,
   },
   moultStatsCard: {
     backgroundColor: '#1E2127',

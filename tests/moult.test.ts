@@ -54,3 +54,28 @@ describe('Moult Engine — 10 Primary Flight Feathers', () => {
     expect(analysis.annualRegenerationIndex).toBe(100.0);
   });
 });
+
+describe('Photoperiod Engine — Darkness (Verdunkelung) & Lighting', () => {
+  const { getPhotoperiodStatus } = require('../src/domain/moult');
+
+  test('activates Darkness System in April (14h dark / 10h light)', () => {
+    const status = getPhotoperiodStatus(new Date('2026-04-15'));
+    expect(status.systemType).toBe('darkness');
+    expect(status.isActive).toBe(true);
+    expect(status.darkHoursPerDay).toBe(14);
+    expect(status.scheduleDescription).toContain('14h');
+  });
+
+  test('activates Lighting System in July (16h light)', () => {
+    const status = getPhotoperiodStatus(new Date('2026-07-15'));
+    expect(status.systemType).toBe('lighting');
+    expect(status.isActive).toBe(true);
+    expect(status.lightHoursPerDay).toBe(16);
+  });
+
+  test('returns natural photoperiod in December during winter rest', () => {
+    const status = getPhotoperiodStatus(new Date('2026-12-15'));
+    expect(status.systemType).toBe('natural');
+    expect(status.isActive).toBe(false);
+  });
+});
