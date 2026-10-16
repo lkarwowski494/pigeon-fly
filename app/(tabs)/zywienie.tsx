@@ -13,11 +13,14 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { AnnualLoftPhase, getFeedingProtocol } from '../../src/domain/nutrition';
+import { calculateLoftCosts } from '../../src/domain/costCalculator';
 import { FieldButton } from '../../src/components/FieldButton';
 
 export default function NutritionScreen() {
   const [selectedPhase, setSelectedPhase] = useState<AnnualLoftPhase>('racing_widowhood');
   const [selectedDay, setSelectedDay] = useState<'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'>('tue');
+  const [flockSize, setFlockSize] = useState<number>(60);
+  const [bagPrice, setBagPrice] = useState<number>(85);
 
   const protocol = getFeedingProtocol(selectedPhase);
   const dayPlan = protocol.weeklySchedule[selectedDay];
@@ -154,6 +157,60 @@ export default function NutritionScreen() {
             )}
           </View>
         )}
+
+        {/* Loft Feeding Budget & Grain Demand Card */}
+        {(() => {
+          const loftCosts = calculateLoftCosts({
+            flockSize,
+            feedBagPrice: bagPrice,
+            dailyGramsPerBird: dayPlan?.profile.recommendedGramsPerBird || 32,
+            monthlySupplementsCost: 120,
+            annualVeterinaryCost: 600,
+          });
+
+          return (
+            <View style={styles.budgetCard}>
+              <View style={styles.budgetHeader}>
+                <Text style={styles.budgetTitle}>BILANS ZIARNA I KOSZTÓW STADA</Text>
+                <View style={styles.stepperContainer}>
+                  <Text style={styles.stepperLabel}>Stado: </Text>
+                  <TouchableOpacity
+                    style={styles.stepperBtn}
+                    onPress={() => setFlockSize((s) => Math.max(5, s - 5))}
+                  >
+                    <Text style={styles.stepperBtnText}>-</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.flockCountText}>{flockSize} szt.</Text>
+                  <TouchableOpacity
+                    style={styles.stepperBtn}
+                    onPress={() => setFlockSize((s) => s + 5)}
+                  >
+                    <Text style={styles.stepperBtnText}>+</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.budgetGrid}>
+                <View style={styles.budgetItem}>
+                  <Text style={styles.budgetNum}>{loftCosts.dailyFlockGrainKg} kg</Text>
+                  <Text style={styles.budgetSub}>Dziennie ({dayPlan?.profile.recommendedGramsPerBird || 32}g/ptak)</Text>
+                </View>
+                <View style={styles.budgetItem}>
+                  <Text style={styles.budgetNum}>{loftCosts.monthlyFlockGrainKg} kg</Text>
+                  <Text style={styles.budgetSub}>Miesięcznie (~{loftCosts.monthlyFeedBags} worków 25kg)</Text>
+                </View>
+                <View style={styles.budgetItem}>
+                  <Text style={[styles.budgetNum, { color: '#E5A93C' }]}>{loftCosts.monthlyFeedCost} zł</Text>
+                  <Text style={styles.budgetSub}>Koszt karmy / msc (worek {bagPrice} zł)</Text>
+                </View>
+                <View style={styles.budgetItem}>
+                  <Text style={[styles.budgetNum, { color: '#81C784' }]}>{loftCosts.costPerBirdPerMonth} zł</Text>
+                  <Text style={styles.budgetSub}>Utrzymanie 1 ptaka / msc</Text>
+                </View>
+              </View>
+            </View>
+          );
+        })()}
 
         {/* Action Button */}
         <FieldButton
@@ -353,5 +410,83 @@ const styles = StyleSheet.create({
     color: '#FFE082',
     fontSize: 12,
     fontWeight: '700',
+  },
+  budgetCard: {
+    backgroundColor: '#1E2127',
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#2F343F',
+    marginTop: 14,
+  },
+  budgetHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#262930',
+    paddingBottom: 10,
+    marginBottom: 12,
+  },
+  budgetTitle: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#E5A93C',
+    letterSpacing: 0.5,
+  },
+  stepperContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  stepperLabel: {
+    fontSize: 12,
+    color: '#8E94A0',
+    fontWeight: '600',
+  },
+  stepperBtn: {
+    backgroundColor: '#2A2E38',
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepperBtnText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  flockCountText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '800',
+    marginHorizontal: 8,
+    fontFamily: 'monospace',
+  },
+  budgetGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  budgetItem: {
+    width: '48%',
+    backgroundColor: '#15171B',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#262930',
+  },
+  budgetNum: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#F0F2F5',
+    fontFamily: 'monospace',
+  },
+  budgetSub: {
+    fontSize: 11,
+    color: '#8E94A0',
+    marginTop: 4,
+    lineHeight: 14,
   },
 });

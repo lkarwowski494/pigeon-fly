@@ -17,6 +17,11 @@ export function getLanguage(): Language {
   return currentLanguage;
 }
 
+export function useLang(): Language {
+  return currentLanguage;
+}
+
+
 /**
  * Translates a key with parameter interpolation (e.g. {ringNumber}).
  */

@@ -15,8 +15,11 @@ import {
 import { ClutchWithParents } from '../../src/db/breedingRepository';
 import { ClutchCard } from '../../src/components/ClutchCard';
 import { FieldButton } from '../../src/components/FieldButton';
+import { PairingModal } from '../../src/components/PairingModal';
+import { calculateClutchMilestones } from '../../src/domain/breeding';
 
-const DEMO_CLUTCHES: ClutchWithParents[] = [
+
+const INITIAL_CLUTCHES: ClutchWithParents[] = [
   {
     id: 'c-01',
     loftId: 'loft-01',
@@ -63,7 +66,61 @@ const DEMO_CLUTCHES: ClutchWithParents[] = [
 ];
 
 export default function BreedingScreen() {
-  const [clutches] = useState<ClutchWithParents[]>(DEMO_CLUTCHES);
+  const [clutches, setClutches] = useState<ClutchWithParents[]>(INITIAL_CLUTCHES);
+  const [isPairingOpen, setIsPairingOpen] = useState(false);
+
+  const handlePairSaved = (pairing: {
+    cockId: string;
+    cockRing: string;
+    henId: string;
+    henRing: string;
+    nestBox: string;
+    pairedDate: string;
+    inbreedingF: number;
+  }) => {
+    const newClutch: ClutchWithParents = {
+      id: `c-${Date.now()}`,
+      loftId: 'loft-01',
+      roundNumber: 1,
+      nestBox: pairing.nestBox,
+      cockId: pairing.cockId,
+      henId: pairing.henId,
+      pairedDate: pairing.pairedDate,
+      egg1Date: undefined,
+      egg2Date: undefined,
+      egg1Status: 'laid',
+      egg2Status: 'laid',
+      chick1Banded: false,
+      chick2Banded: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      cockRingNumber: pairing.cockRing,
+      henRingNumber: pairing.henRing,
+    };
+    setClutches([newClutch, ...clutches]);
+  };
+
+  const handleClutchPress = (item: ClutchWithParents) => {
+    if (item.egg1Date) {
+      const milestones = calculateClutchMilestones({ pairDate: item.pairedDate, egg1Date: item.egg1Date });
+      Alert.alert(
+        `${item.nestBox} — Kalendarium Lęgu`,
+        `Para: ${item.cockRingNumber} × ${item.henRingNumber}\n` +
+          `Jajo 1: ${item.egg1Date} (${item.egg1Status})\n` +
+          `Jajo 2: ${item.egg2Date || 'oczekiwane (+44h)'} (${item.egg2Status})\n` +
+          `Owoskopia (Dzień 5): ${milestones.candlingDate}\n` +
+          `Spodziewany wylęg: ${milestones.expectedHatchDate}\n` +
+          `Okno obrączkowania (6-8 dni): ${milestones.bandingStartDate} do ${milestones.bandingEndDate}\n` +
+          `Odsadzenie młodków: ${milestones.weaningDate}`
+      );
+    } else {
+
+      Alert.alert(
+        `${item.nestBox} — Nowa Para`,
+        `Para: ${item.cockRingNumber} × ${item.henRingNumber}\nData parowania: ${item.pairedDate}\n\nOczekiwanie na pierwsze jajo (ok. 8-10 dni od sparowania).`
+      );
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -72,9 +129,7 @@ export default function BreedingScreen() {
         <View style={styles.actionsRow}>
           <FieldButton
             title="+ Zestaw Nową Parę"
-            onPress={() => {
-              Alert.alert('Dobór Pary', 'Wybierz samca i samicę z notesu stada. Aplikacja automatycznie przeliczy współczynnik inbredu Wrighta (F).');
-            }}
+            onPress={() => setIsPairingOpen(true)}
             style={{ flex: 1 }}
             testID="btn-new-pair"
           />
@@ -85,11 +140,13 @@ export default function BreedingScreen() {
           <Text style={styles.summaryTitle}>SEZON LĘGOWY 2026 (LĘG I)</Text>
           <View style={styles.summaryStatsRow}>
             <View style={styles.statCol}>
-              <Text style={styles.statVal}>12</Text>
+              <Text style={styles.statVal}>{clutches.length}</Text>
               <Text style={styles.statLbl}>Par w celach</Text>
             </View>
             <View style={styles.statCol}>
-              <Text style={styles.statVal}>22</Text>
+              <Text style={styles.statVal}>
+                {clutches.filter((c) => c.egg1Date).length * 2}
+              </Text>
               <Text style={styles.statLbl}>Jaj zniesionych</Text>
             </View>
             <View style={styles.statCol}>
@@ -97,7 +154,9 @@ export default function BreedingScreen() {
               <Text style={styles.statLbl}>Zalężenie</Text>
             </View>
             <View style={styles.statCol}>
-              <Text style={styles.statVal}>8</Text>
+              <Text style={styles.statVal}>
+                {clutches.filter((c) => c.chick1Banded).length}
+              </Text>
               <Text style={styles.statLbl}>Obrączkowanych</Text>
             </View>
           </View>
@@ -112,17 +171,18 @@ export default function BreedingScreen() {
           renderItem={({ item }) => (
             <ClutchCard
               clutch={item}
-              onPress={() => {
-                Alert.alert(
-                  `${item.nestBox} — Szczegóły Lęgu`,
-                  `Para: ${item.cockRingNumber} × ${item.henRingNumber}\nData parowania: ${item.pairedDate}\nJajko 1: ${item.egg1Status}\nJajko 2: ${item.egg2Status}`
-                );
-              }}
+              onPress={() => handleClutchPress(item)}
             />
           )}
           contentContainerStyle={{ paddingBottom: 24 }}
         />
       </View>
+
+      <PairingModal
+        visible={isPairingOpen}
+        onClose={() => setIsPairingOpen(false)}
+        onPairSaved={handlePairSaved}
+      />
     </SafeAreaView>
   );
 }
@@ -153,7 +213,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#E5A93C',
     letterSpacing: 0.8,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   summaryStatsRow: {
     flexDirection: 'row',
@@ -164,9 +224,8 @@ const styles = StyleSheet.create({
   },
   statVal: {
     fontSize: 20,
-    fontWeight: '900',
+    fontWeight: '800',
     color: '#FFFFFF',
-    fontFamily: 'monospace',
   },
   statLbl: {
     fontSize: 11,
@@ -175,7 +234,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 15,
-    fontWeight: '800',
+    fontWeight: '700',
     color: '#D4D8E0',
     marginBottom: 10,
     textTransform: 'uppercase',

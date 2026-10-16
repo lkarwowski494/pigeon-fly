@@ -275,3 +275,184 @@ export function generatePedigreeHtml(
 </html>
   `.trim();
 }
+
+export interface BasketPigeonItem {
+  index: number;
+  ringNumber: string;
+  color: string;
+  sex: string;
+  isTip?: boolean; // typowany do serii np. 5/50
+  auxiliaryRing?: string;
+}
+
+export interface BasketingListPdfOptions {
+  loftName: string;
+  breederName: string;
+  clubBranch: string;
+  raceName: string;
+  releaseLocation: string;
+  basketingDate: string;
+  pigeons: BasketPigeonItem[];
+}
+
+export function generateRaceBasketingListHtml(options: BasketingListPdfOptions): string {
+  const rows = options.pigeons
+    .map(
+      (p) => `
+    <tr>
+      <td style="text-align: center; font-weight: bold;">${p.index}</td>
+      <td style="font-family: monospace; font-size: 13px; font-weight: bold;">${p.ringNumber}</td>
+      <td>${p.color}</td>
+      <td style="text-align: center;">${p.sex === 'cock' ? '1.0 ♂' : '0.1 ♀'}</td>
+      <td style="text-align: center; font-family: monospace;">${p.auxiliaryRing || '—'}</td>
+      <td style="text-align: center; font-weight: bold; color: ${p.isTip ? '#B45309' : '#94A3B8'};">
+        ${p.isTip ? '★ SERIA (T)' : '—'}
+      </td>
+      <td style="border-bottom: 1px dotted #CBD5E1; min-width: 60px;"></td>
+    </tr>
+  `
+    )
+    .join('');
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Lista Wkładaniowa — ${options.raceName}</title>
+  <style>
+    @page { size: A4 portrait; margin: 12mm; }
+    body { font-family: -apple-system, sans-serif; color: #0F172A; font-size: 11px; margin: 0; }
+    .header { border-bottom: 2px solid #0F172A; padding-bottom: 8px; margin-bottom: 12px; }
+    .title { font-size: 18px; font-weight: 900; text-transform: uppercase; }
+    .meta-row { display: flex; justify-content: space-between; margin-top: 6px; font-size: 12px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th { background: #F1F5F9; border: 1px solid #CBD5E1; padding: 6px; font-size: 11px; text-transform: uppercase; }
+    td { border: 1px solid #E2E8F0; padding: 5px 6px; }
+    .footer { margin-top: 24px; display: flex; justify-content: space-between; font-size: 11px; }
+    .sign-box { border-top: 1px solid #0F172A; width: 180px; text-align: center; padding-top: 4px; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">Oficjalna Lista Wkładaniowa Gołębi do Kosza</div>
+    <div class="meta-row">
+      <div><strong>Hodowca:</strong> ${options.breederName} (${options.loftName})</div>
+      <div><strong>Oddział / Sekcja:</strong> ${options.clubBranch}</div>
+    </div>
+    <div class="meta-row">
+      <div><strong>Lot:</strong> ${options.raceName} (${options.releaseLocation})</div>
+      <div><strong>Data Koszowania:</strong> ${options.basketingDate} • <strong>Sztuk:</strong> ${options.pigeons.length}</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 35px;">Lp.</th>
+        <th>Numer Obrączki Rodowej</th>
+        <th>Barwa</th>
+        <th style="width: 55px;">Płeć</th>
+        <th>Obrączka Pomocnicza / Czip</th>
+        <th style="width: 80px;">Typowanie</th>
+        <th>Podpis Komisji</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows}
+    </tbody>
+  </table>
+
+  <div class="footer">
+    <div class="sign-box">Podpis Hodowcy</div>
+    <div class="sign-box">Komisja Wkładaniowa (1)</div>
+    <div class="sign-box">Komisja Wkładaniowa (2)</div>
+  </div>
+</body>
+</html>
+  `.trim();
+}
+
+export interface TreatmentRecordItem {
+  date: string;
+  eventType: string;
+  productName: string;
+  batchNumber?: string;
+  targetPigeon: string;
+  withdrawalDays: number;
+  expiryOrDue?: string;
+  notes?: string;
+}
+
+export function generateVeterinaryTreatmentBookHtml(options: {
+  loftName: string;
+  breederName: string;
+  veterinarianName?: string;
+  records: TreatmentRecordItem[];
+}): string {
+  const rows = options.records
+    .map(
+      (r, i) => `
+    <tr>
+      <td style="text-align: center;">${i + 1}</td>
+      <td style="font-weight: bold;">${r.date}</td>
+      <td><span style="font-weight: 700; text-transform: uppercase;">${r.eventType}</span></td>
+      <td><strong>${r.productName}</strong> ${r.batchNumber ? `<br><small style="color: #64748B;">Seria: ${r.batchNumber}</small>` : ''}</td>
+      <td>${r.targetPigeon}</td>
+      <td style="text-align: center; font-weight: bold; color: ${r.withdrawalDays > 0 ? '#DC2626' : '#16A34A'};">
+        ${r.withdrawalDays} dni
+      </td>
+      <td>${r.notes || '—'}</td>
+    </tr>
+  `
+    )
+    .join('');
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>E-Księga Leczenia Zwierząt PIW — ${options.loftName}</title>
+  <style>
+    @page { size: A4 landscape; margin: 10mm; }
+    body { font-family: -apple-system, sans-serif; color: #0F172A; font-size: 11px; margin: 0; }
+    .header { border-bottom: 2px solid #0F172A; padding-bottom: 8px; margin-bottom: 12px; }
+    .title { font-size: 16px; font-weight: 900; text-transform: uppercase; }
+    .subtitle { font-size: 11px; color: #475569; margin-top: 2px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th { background: #F1F5F9; border: 1px solid #CBD5E1; padding: 6px; font-size: 10px; text-transform: uppercase; }
+    td { border: 1px solid #E2E8F0; padding: 6px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">E-Książka Leczenia Zwierząt i Zabiegów Weterynaryjnych</div>
+    <div class="subtitle">Zgodna z wymaganiami Powiatowego Lekarza Weterynarii (PIW) i przepisami antydopingowymi FCI</div>
+    <div style="margin-top: 6px; display: flex; justify-content: space-between;">
+      <div><strong>Hodowla:</strong> ${options.loftName} (${options.breederName})</div>
+      <div><strong>Lekarz Weterynarii Prowadzący:</strong> ${options.veterinarianName || 'Lek. wet. stada'}</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 30px;">Lp.</th>
+        <th style="width: 75px;">Data</th>
+        <th style="width: 100px;">Zabieg</th>
+        <th>Preparat / Nr Serii</th>
+        <th>Grupa Ptaków / Nr Obrączki</th>
+        <th style="width: 70px;">Karencja</th>
+        <th>Uwagi / Dawka</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows}
+    </tbody>
+  </table>
+</body>
+</html>
+  `.trim();
+}
+

@@ -216,4 +216,16 @@ export const SQLITE_SCHEMA_V1 = `
   );
 
   CREATE INDEX IF NOT EXISTS idx_sync_queue_created ON sync_queue(created_at);
+
+  -- 11. App Entitlements (Monetyzacja Impulsowa, Trial i Licencje Pro)
+  CREATE TABLE IF NOT EXISTS app_entitlements (
+    id TEXT PRIMARY KEY,
+    plan_type TEXT NOT NULL, -- 'trial', 'monthly', 'annual', 'lifetime'
+    status TEXT NOT NULL, -- 'active', 'expired'
+    trial_started_at TEXT NOT NULL,
+    purchased_at TEXT,
+    expires_at TEXT,
+    updated_at TEXT NOT NULL
+  );
 `;
+

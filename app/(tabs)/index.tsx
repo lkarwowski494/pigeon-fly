@@ -11,11 +11,14 @@ import {
   FlatList,
   TextInput,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Pigeon } from '../../src/domain/types';
 import { PigeonCard } from '../../src/components/PigeonCard';
 import { FieldButton } from '../../src/components/FieldButton';
+import { PaywallModal } from '../../src/components/PaywallModal';
+import { PdfService } from '../../src/services/pdfService';
 
 // Initial demo pigeons for immediate offline usability
 const INITIAL_DEMO_PIGEONS: Pigeon[] = [
@@ -70,6 +73,51 @@ export default function FlockScreen() {
   const [pigeons] = useState<Pigeon[]>(INITIAL_DEMO_PIGEONS);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'racing' | 'breeding'>('all');
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [isProUser, setIsProUser] = useState(false);
+
+  const handlePigeonPress = (pigeon: Pigeon) => {
+    Alert.alert(
+      `${pigeon.countryCode}-${pigeon.ringNumber}`,
+      `Wybierz działanie dla gołębia (${pigeon.plumageColor}, ${pigeon.year}):`,
+      [
+        {
+          text: '📜 Drukuj Rodowód PDF (A4)',
+          onPress: () => exportPigeonPedigree(pigeon, 'print'),
+        },
+        {
+          text: '📤 Udostępnij Rodowód PDF',
+          onPress: () => exportPigeonPedigree(pigeon, 'share'),
+        },
+        { text: 'Anuluj', style: 'cancel' },
+      ]
+    );
+  };
+
+  const exportPigeonPedigree = async (pigeon: Pigeon, mode: 'print' | 'share') => {
+    if (!isProUser) {
+      setIsPaywallOpen(true);
+      return;
+    }
+
+    try {
+      await PdfService.exportPedigree(
+        {
+          pigeon,
+          generation: 0,
+        },
+        {
+          loftName: 'Gołębnik Mistrza',
+          breederName: 'Hodowca Pigeon-Fly',
+          breederPhone: '+48 600 000 000',
+          inbreedingF: 0.0,
+        },
+        mode
+      );
+    } catch (e: any) {
+      Alert.alert('Błąd', e?.message || 'Nie udało się wygenerować rodowodu');
+    }
+  };
 
   const filteredPigeons = pigeons.filter((p) => {
     const matchesSearch =
@@ -138,9 +186,7 @@ export default function FlockScreen() {
           renderItem={({ item }) => (
             <PigeonCard
               pigeon={item}
-              onPress={() => {
-                // Navigate to pigeon details / pedigree
-              }}
+              onPress={() => handlePigeonPress(item)}
             />
           )}
           contentContainerStyle={styles.listContent}
@@ -151,6 +197,23 @@ export default function FlockScreen() {
           }
         />
       </View>
+
+      {/* Paywall Pro Upgrade Modal */}
+      <PaywallModal
+        visible={isPaywallOpen}
+        onClose={() => setIsPaywallOpen(false)}
+        onSelectPlan={async () => {
+          setIsProUser(true);
+          setIsPaywallOpen(false);
+          Alert.alert('Sukces!', 'Plan Pigeon-Fly Pro aktywowany. Dostęp do generowania profesjonalnych rodowodów PDF został odblokowany!');
+        }}
+        onRestore={async () => {
+          setIsProUser(true);
+          setIsPaywallOpen(false);
+          Alert.alert('Przywrócono', 'Przywrócono uprawnienia Pigeon-Fly Pro.');
+        }}
+        currentPigeonsCount={pigeons.length}
+      />
     </SafeAreaView>
   );
 }

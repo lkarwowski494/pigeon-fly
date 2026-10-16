@@ -14,6 +14,8 @@ import {
 import { ArrivalWithPigeon } from '../../src/db/raceRepository';
 import { ArrivalCard } from '../../src/components/ArrivalCard';
 import { FieldButton } from '../../src/components/FieldButton';
+import { PdfService } from '../../src/services/pdfService';
+import { Alert } from 'react-native';
 
 const DEMO_ARRIVALS: ArrivalWithPigeon[] = [
   {
@@ -55,6 +57,70 @@ const DEMO_ARRIVALS: ArrivalWithPigeon[] = [
 export default function RacesScreen() {
   const [arrivals] = useState<ArrivalWithPigeon[]>(DEMO_ARRIVALS);
 
+  const handleExportBasketingList = () => {
+    Alert.alert(
+      'Lista Wkładaniowa (Kosz)',
+      'Wybierz akcję dla oficjalnej listy wkładaniowej FCI / PZHGP:',
+      [
+        {
+          text: '🖨️ Drukuj',
+          onPress: async () => {
+            try {
+              await PdfService.exportBasketingList(
+                {
+                  loftName: 'Gołębnik Mistrza',
+                  breederName: 'Hodowca Pigeon-Fly',
+                  clubBranch: 'Oddział 0284 Gostyń',
+                  raceName: 'Magdeburg (Niemcy)',
+                  releaseLocation: 'Magdeburg',
+                  basketingDate: new Date().toISOString().slice(0, 10),
+                  pigeons: arrivals.map((a, idx) => ({
+                    index: idx + 1,
+                    ringNumber: a.ringNumber,
+                    color: a.plumageColor,
+                    sex: a.sex,
+                    isTip: idx < 5,
+                  })),
+                },
+                'print'
+              );
+            } catch (e: any) {
+              Alert.alert('Błąd', e?.message || 'Nie udało się wydrukować listy');
+            }
+          },
+        },
+        {
+          text: '📤 Udostępnij PDF',
+          onPress: async () => {
+            try {
+              await PdfService.exportBasketingList(
+                {
+                  loftName: 'Gołębnik Mistrza',
+                  breederName: 'Hodowca Pigeon-Fly',
+                  clubBranch: 'Oddział 0284 Gostyń',
+                  raceName: 'Magdeburg (Niemcy)',
+                  releaseLocation: 'Magdeburg',
+                  basketingDate: new Date().toISOString().slice(0, 10),
+                  pigeons: arrivals.map((a, idx) => ({
+                    index: idx + 1,
+                    ringNumber: a.ringNumber,
+                    color: a.plumageColor,
+                    sex: a.sex,
+                    isTip: idx < 5,
+                  })),
+                },
+                'share'
+              );
+            } catch (e: any) {
+              Alert.alert('Błąd', e?.message || 'Nie udało się wyeksportować PDF');
+            }
+          },
+        },
+        { text: 'Anuluj', style: 'cancel' },
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -71,7 +137,7 @@ export default function RacesScreen() {
           </View>
         </View>
 
-        {/* Action Button */}
+        {/* Action Buttons */}
         <View style={styles.actionRow}>
           <FieldButton
             title="⏱️ Odbij Przylot Ptaka"
@@ -79,6 +145,13 @@ export default function RacesScreen() {
               // Open quick clocking modal or scanner
             }}
             testID="btn-clock-arrival"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
+            title="📄 Drukuj Listę Wkładaniową (Kosz)"
+            onPress={handleExportBasketingList}
+            testID="btn-export-basketing"
+            variant="secondary"
           />
         </View>
 

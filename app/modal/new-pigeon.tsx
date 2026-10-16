@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FieldButton } from '../../src/components/FieldButton';
+import { PaywallModal } from '../../src/components/PaywallModal';
 import { Sex, PigeonStatus } from '../../src/domain/types';
 
 export default function NewPigeonModal() {
@@ -25,6 +26,9 @@ export default function NewPigeonModal() {
   const [sex, setSex] = useState<Sex>('cock');
   const [plumageColor, setPlumageColor] = useState('Niebieski');
   const [status, setStatus] = useState<PigeonStatus>('racing');
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [currentFlockCount] = useState(10); // Demonstracja limitu darmowego stada
+  const [isProUser, setIsProUser] = useState(false);
 
   const handleSave = () => {
     if (!ringNumber.trim()) {
@@ -32,10 +36,16 @@ export default function NewPigeonModal() {
       return;
     }
 
+    if (!isProUser && currentFlockCount >= 10) {
+      setIsPaywallOpen(true);
+      return;
+    }
+
     Alert.alert('Sukces', `Ptak ${countryCode}-${ringNumber} został zapisany w notesie stada.`, [
       { text: 'OK', onPress: () => router.back() },
     ]);
   };
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -142,9 +152,24 @@ export default function NewPigeonModal() {
           />
         </View>
       </ScrollView>
+
+      <PaywallModal
+        visible={isPaywallOpen}
+        onClose={() => setIsPaywallOpen(false)}
+        onSelectPlan={async () => {
+          setIsProUser(true);
+          Alert.alert('Sukces!', 'Plan Pigeon-Fly Pro aktywowany. Możesz dodać kolejnego ptaka do stada!');
+        }}
+        onRestore={async () => {
+          setIsProUser(true);
+          Alert.alert('Przywrócono', 'Przywrócono uprawnienia Pigeon-Fly Pro.');
+        }}
+        currentPigeonsCount={currentFlockCount}
+      />
     </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   safeArea: {

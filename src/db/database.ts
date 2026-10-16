@@ -5,6 +5,9 @@
 
 import * as SQLite from 'expo-sqlite';
 import { SQLITE_INIT_PRAGMAS, SQLITE_SCHEMA_V1 } from './schema';
+import { resolveDatabaseDirectory } from './dbPath';
+
+export type Database = SQLite.SQLiteDatabase;
 
 export interface DatabaseConnection {
   execAsync(sql: string): Promise<void>;
@@ -15,6 +18,7 @@ export interface DatabaseConnection {
 }
 
 let dbInstance: SQLite.SQLiteDatabase | null = null;
+
 
 export async function getDatabase(dbName = 'pigeon_fly.db'): Promise<SQLite.SQLiteDatabase> {
   if (dbInstance) {

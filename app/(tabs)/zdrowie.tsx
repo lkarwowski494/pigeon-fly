@@ -10,10 +10,12 @@ import {
   StyleSheet,
   ScrollView,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { FeatherGauge } from '../../src/components/FeatherGauge';
 import { FieldButton } from '../../src/components/FieldButton';
 import { analyzeWingMoult, getPhotoperiodStatus } from '../../src/domain/moult';
+import { PdfService } from '../../src/services/pdfService';
 
 export default function HealthScreen() {
   const [selectedPigeonRing] = useState('PL-0284-23-1402');
@@ -155,11 +157,98 @@ export default function HealthScreen() {
           </View>
         </View>
 
-        {/* Action Button */}
+        {/* Action Buttons */}
         <FieldButton
           title="+ Zapisz Zabieg Weterynaryjny / Lek"
           onPress={() => {}}
-          style={{ marginTop: 8 }}
+          style={{ marginTop: 8, marginBottom: 10 }}
+        />
+        <FieldButton
+          title="📄 Drukuj E-Książkę Leczenia (PIW)"
+          onPress={() => {
+            Alert.alert(
+              'E-Księga Leczenia Zwierząt (PIW)',
+              'Wybierz akcję dla urzędowej E-Księgi Zabiegów Weterynaryjnych:',
+              [
+                {
+                  text: '🖨️ Drukuj',
+                  onPress: async () => {
+                    try {
+                      await PdfService.exportVeterinaryTreatmentBook(
+                        {
+                          loftName: 'Gołębnik Mistrza',
+                          breederName: 'Hodowca Pigeon-Fly',
+                          veterinarianName: 'Lek. wet. Janusz Ptasiński',
+                          records: [
+                            {
+                              date: '2026-02-15',
+                              eventType: 'Szczepienie PMV-1',
+                              productName: 'Pharmavac Columbi 2',
+                              batchNumber: 'LOT-2026-09A',
+                              targetPigeon: 'Całe stado (60 szt.)',
+                              withdrawalDays: 0,
+                              notes: 'Szczepienie podskórne w kark przed sezonem lęgowym',
+                            },
+                            {
+                              date: '2026-03-01',
+                              eventType: 'Odrobaczanie',
+                              productName: 'Levamisole 10%',
+                              batchNumber: 'LEV-551',
+                              targetPigeon: 'Całe stado',
+                              withdrawalDays: 7,
+                              notes: 'Podanie do wody pitnej po badaniu kału',
+                            },
+                          ],
+                        },
+                        'print'
+                      );
+                    } catch (e: any) {
+                      Alert.alert('Błąd', e?.message || 'Nie udało się wydrukować księgi');
+                    }
+                  },
+                },
+                {
+                  text: '📤 Udostępnij PDF',
+                  onPress: async () => {
+                    try {
+                      await PdfService.exportVeterinaryTreatmentBook(
+                        {
+                          loftName: 'Gołębnik Mistrza',
+                          breederName: 'Hodowca Pigeon-Fly',
+                          veterinarianName: 'Lek. wet. Janusz Ptasiński',
+                          records: [
+                            {
+                              date: '2026-02-15',
+                              eventType: 'Szczepienie PMV-1',
+                              productName: 'Pharmavac Columbi 2',
+                              batchNumber: 'LOT-2026-09A',
+                              targetPigeon: 'Całe stado (60 szt.)',
+                              withdrawalDays: 0,
+                              notes: 'Szczepienie podskórne w kark przed sezonem lęgowym',
+                            },
+                            {
+                              date: '2026-03-01',
+                              eventType: 'Odrobaczanie',
+                              productName: 'Levamisole 10%',
+                              batchNumber: 'LEV-551',
+                              targetPigeon: 'Całe stado',
+                              withdrawalDays: 7,
+                              notes: 'Podanie do wody pitnej po badaniu kału',
+                            },
+                          ],
+                        },
+                        'share'
+                      );
+                    } catch (e: any) {
+                      Alert.alert('Błąd', e?.message || 'Nie udało się wyeksportować PDF');
+                    }
+                  },
+                },
+                { text: 'Anuluj', style: 'cancel' },
+              ]
+            );
+          }}
+          variant="secondary"
         />
       </ScrollView>
     </SafeAreaView>
