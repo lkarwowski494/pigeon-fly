@@ -603,6 +603,42 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('GUM-42');
     expect(tree).toContain('📷');
   });
+
+  test('NestBoxMatrixModal renders 2D breeding loft grid and summary stats', () => {
+    const { NestBoxMatrixModal } = require('../src/components/NestBoxMatrixModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <NestBoxMatrixModal visible={true} onClose={onClose} />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('WIRTUALNY ZARZ\u0104DCA CEL');
+    expect(tree).toContain('SCHEMAT KLATKOWY');
+    expect(tree).toContain('Zaj\u0119te cele');
+  });
+
+  test('FeedCalculatorModal renders 20-grain mixer, macro gauges, and suitability verdict', () => {
+    const { FeedCalculatorModal } = require('../src/components/FeedCalculatorModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <FeedCalculatorModal visible={true} onClose={onClose} />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('LABORATORIUM PASZOWE');
+    expect(tree).toContain('BILANS BIOCHEMICZNY');
+    expect(tree).toContain('Bia\u0142ko');
+    expect(tree).toContain('T\u0142uszcz');
+    expect(tree).toContain('SZABLONY MISTRZOWSKICH');
+  });
 });
 
 

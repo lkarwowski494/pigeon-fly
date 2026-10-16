@@ -17,6 +17,7 @@ import { AnnualLoftPhase, getFeedingProtocol } from '../../src/domain/nutrition'
 import { calculateLoftCosts } from '../../src/domain/costCalculator';
 import { FieldButton } from '../../src/components/FieldButton';
 import { AddFeedingLogModal } from '../../src/components/AddFeedingLogModal';
+import { FeedCalculatorModal } from '../../src/components/FeedCalculatorModal';
 
 export default function NutritionScreen() {
   const [selectedPhase, setSelectedPhase] = useState<AnnualLoftPhase>('racing_widowhood');
@@ -24,6 +25,7 @@ export default function NutritionScreen() {
   const [flockSize, setFlockSize] = useState<number>(60);
   const [bagPrice, setBagPrice] = useState<number>(85);
   const [isFeedingModalVisible, setIsFeedingModalVisible] = useState(false);
+  const [isFeedCalcOpen, setIsFeedCalcOpen] = useState(false);
   const [customLogs, setCustomLogs] = useState<{
     date: string;
     phase: string;
@@ -250,6 +252,13 @@ export default function NutritionScreen() {
           onPress={() => setIsFeedingModalVisible(true)}
           style={{ marginTop: 14 }}
         />
+        <FieldButton
+          title="🔬 Laboratorium Paszowe 20 Ziaren"
+          onPress={() => setIsFeedCalcOpen(true)}
+          variant="secondary"
+          style={{ marginTop: 10 }}
+          testID="btn-open-feed-calc"
+        />
       </ScrollView>
 
       {/* Add Feeding Log Modal */}
@@ -270,6 +279,12 @@ export default function NutritionScreen() {
           ]);
           Alert.alert('Zapisano!', `Mieszanka "${newLog.mixName}" została dodana do dziennika żywienia.`);
         }}
+      />
+
+      {/* 20-Grain Feed Calculator Modal */}
+      <FeedCalculatorModal
+        visible={isFeedCalcOpen}
+        onClose={() => setIsFeedCalcOpen(false)}
       />
     </SafeAreaView>
   );

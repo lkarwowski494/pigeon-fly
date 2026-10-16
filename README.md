@@ -125,9 +125,11 @@ pigeon-fly/
 │   │   ├── concourse.ts        # Baza konkursowa (20%), FCI Coeff i punkty GMP Asów
 │   │   ├── costCalculator.ts   # Kalkulator budżetu stada, ziarna i weterynarii
 │   │   ├── derby.ts            # Mini-Derby Sekcji, wielogołębnikowe live standings i feed
+│   │   ├── feedCompounder.ts   # Laboratorium paszowe 20 ziaren, bilans makro i energia MJ/kg
 │   │   ├── genetics.ts         # Matematyczny algorytm inbredu Wrighta (F)
 │   │   ├── health.ts           # Profilaktyka, szczepienia PMV-1 i karencje leków
 │   │   ├── moult.ts            # Regeneracja 10 lotek skrzydła i fotoperiod
+│   │   ├── nestBoxMatrix.ts    # Wirtualna siatka cel lęgowych, jajka gipsowe i alarmy 6-8 dni
 │   │   ├── nutrition.ts        # 4-fazowe protokoły żywieniowe i bilans makro
 │   │   ├── pdfExport.ts        # Generatory HTML A4 dla rodowodów, kosza i PIW
 │   │   ├── performance.ts      # Silnik formy sportowej, dynamika prędkości m/min i taktyka
@@ -160,8 +162,10 @@ pigeon-fly/
 │   │   ├── ClutchCard.tsx      # Karta lęgu z kamieniami milowymi
 │   │   ├── ClutchLifecycleModal.tsx # Cykl lęgowy: jaja, owoskopia, obrączkowanie
 │   │   ├── FeatherGauge.tsx    # Wizualny wskaźnik 10 lotek skrzydła
+│   │   ├── FeedCalculatorModal.tsx # Laboratorium paszowe 20 ziaren i ocena biologiczna
 │   │   ├── FieldButton.tsx     # Przycisk dotykowy >=56pt z wibracją haptyczną
 │   │   ├── LiveDerbyModal.tsx  # Klubowe Mini-Derby i live feed przylotów sekcji
+│   │   ├── NestBoxMatrixModal.tsx # Wirtualna siatka cel lęgowych (2D Matrix)
 │   │   ├── NewRaceModal.tsx    # Konfiguracja nowego lotu i treningu
 │   │   ├── PairingModal.tsx    # Zarządzanie parowaniem w celkach z inbredem
 │   │   ├── PaywallModal.tsx    # Cennik i zakup Pigeon-Fly Pro (Apple HIG)
@@ -178,7 +182,7 @@ pigeon-fly/
 │   └── lib/                    # Współdzielone moduły pomocnicze
 │       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
 ├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
-├── tests/                      # 25 zestawów testowych (149 testów jednostkowych i fast-check)
+├── tests/                      # 27 zestawów testowych (163 testy jednostkowe i fast-check)
 ├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
 └── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
     └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)

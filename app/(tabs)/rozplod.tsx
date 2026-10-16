@@ -17,6 +17,7 @@ import { ClutchCard } from '../../src/components/ClutchCard';
 import { FieldButton } from '../../src/components/FieldButton';
 import { PairingModal } from '../../src/components/PairingModal';
 import { ClutchLifecycleModal } from '../../src/components/ClutchLifecycleModal';
+import { NestBoxMatrixModal } from '../../src/components/NestBoxMatrixModal';
 import { calculateClutchMilestones } from '../../src/domain/breeding';
 
 
@@ -71,6 +72,7 @@ export default function BreedingScreen() {
   const [isPairingOpen, setIsPairingOpen] = useState(false);
   const [selectedClutch, setSelectedClutch] = useState<ClutchWithParents | null>(null);
   const [isLifecycleModalOpen, setIsLifecycleModalOpen] = useState(false);
+  const [isMatrixOpen, setIsMatrixOpen] = useState(false);
 
   const handlePairSaved = (pairing: {
     cockId: string;
@@ -126,10 +128,17 @@ export default function BreedingScreen() {
         {/* Action Bar */}
         <View style={styles.actionsRow}>
           <FieldButton
-            title="+ Zestaw Nową Parę"
+            title="+ Nowa Para"
             onPress={() => setIsPairingOpen(true)}
-            style={{ flex: 1 }}
+            style={{ flex: 1, marginRight: 8 }}
             testID="btn-new-pair"
+          />
+          <FieldButton
+            title="🏢 Siatka Cel"
+            variant="secondary"
+            onPress={() => setIsMatrixOpen(true)}
+            style={{ flex: 1 }}
+            testID="btn-open-matrix"
           />
         </View>
 
@@ -190,6 +199,11 @@ export default function BreedingScreen() {
           setSelectedClutch(null);
         }}
         onSave={handleSaveClutchLifecycle}
+      />
+
+      <NestBoxMatrixModal
+        visible={isMatrixOpen}
+        onClose={() => setIsMatrixOpen(false)}
       />
     </SafeAreaView>
   );
