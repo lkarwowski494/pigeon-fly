@@ -434,7 +434,64 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('KIERUNEK WIATRU');
     expect(tree).toContain('Zach\u00f3d (W)');
   });
+
+  test('AppraisalModal renders conformation criteria and FCI standard score', () => {
+    const { AppraisalModal } = require('../src/components/AppraisalModal');
+    const onClose = jest.fn();
+
+    const pigeon = {
+      id: 'p-01',
+      loftId: 'l-01',
+      ringNumber: 'PL-0284-23-1402',
+      countryCode: 'PL',
+      year: 2023,
+      sex: 'cock' as const,
+      plumageColor: 'Niebieski',
+      status: 'racing' as const,
+      qrCodeUuid: 'uuid-1',
+      isDeleted: false,
+      createdAt: '',
+      updatedAt: '',
+    };
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <AppraisalModal visible={true} pigeon={pigeon} onClose={onClose} />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('OCENA BUDOWY');
+    expect(tree).toContain('PUNKTY STANDARD FCI');
+    expect(tree).toContain('WIDE\u0141KI MIEDNICOWE');
+    expect(tree).toContain('ZNAK OKA');
+  });
+
+  test('BasketingSessionModal renders basket pool and series designation', () => {
+    const { BasketingSessionModal } = require('../src/components/BasketingSessionModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <BasketingSessionModal
+          visible={true}
+          onClose={onClose}
+          raceName="Magdeburg"
+          onSaveBasket={jest.fn()}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('KOSZOWANIE');
+    expect(tree).toContain('W koszu');
+    expect(tree).toContain('PL-0284-23-1402');
+    expect(tree).toContain('Seria (T)');
+  });
 });
+
 
 
 

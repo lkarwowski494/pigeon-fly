@@ -119,6 +119,8 @@ pigeon-fly/
 ├── src/
 │   ├── domain/                 # Czysta logika biznesowa i reguły hodowlane (zero UI)
 │   │   ├── access.ts           # Silnik uprawnień Freemium / Pro / Lifetime
+│   │   ├── appraisal.ts        # Ocena fenotypowa, znak oka, widełki i Standard FCI
+│   │   ├── basketing.ts        # Koszowanie, walidacja obrączek i seria typowana (T)
 │   │   ├── breeding.ts         # Biologia lęgu i harmonogram jaj/obrączkowania
 │   │   ├── concourse.ts        # Baza konkursowa (20%), FCI Coeff i punkty GMP Asów
 │   │   ├── costCalculator.ts   # Kalkulator budżetu stada, ziarna i weterynarii
@@ -149,7 +151,9 @@ pigeon-fly/
 │   ├── components/             # Ergonomiczne komponenty interfejsu (Field Mode)
 │   │   ├── AddFeedingLogModal.tsx # Formularz dziennika karmy i suplementacji
 │   │   ├── AddTreatmentModal.tsx  # Formularz szczepień PMV-1 i leczenia PIW
+│   │   ├── AppraisalModal.tsx     # Ocena fenotypowa, znaku oka i skrzydeł (FCI)
 │   │   ├── ArrivalCard.tsx     # Karta przylotu z wyróżnieniem prędkości
+│   │   ├── BasketingSessionModal.tsx # Sesja koszowania i typowania serii (T)
 │   │   ├── ClockArrivalModal.tsx  # Odbicie przylotu z live kalkulacją m/min
 │   │   ├── ClutchCard.tsx      # Karta lęgu z kamieniami milowymi
 │   │   ├── ClutchLifecycleModal.tsx # Cykl lęgowy: jaja, owoskopia, obrączkowanie
@@ -169,7 +173,7 @@ pigeon-fly/
 │   └── lib/                    # Współdzielone moduły pomocnicze
 │       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
 ├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
-├── tests/                      # 21 zestawów testowych (125 testów jednostkowych i fast-check)
+├── tests/                      # 23 zestawy testowe (136 testów jednostkowych i fast-check)
 ├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
 └── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
     └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)

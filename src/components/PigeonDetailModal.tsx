@@ -21,6 +21,7 @@ import { generateQRPayload } from '../domain/qr';
 import { QrCodeSvg } from './QrCodeSvg';
 import { FieldButton } from './FieldButton';
 import { PedigreeTreeModal } from './PedigreeTreeModal';
+import { AppraisalModal } from './AppraisalModal';
 
 export interface PigeonDetailModalProps {
   visible: boolean;
@@ -41,6 +42,7 @@ export function PigeonDetailModal({
 
   const [currentStatus, setCurrentStatus] = useState<PigeonStatus>(pigeon.status);
   const [isPedigreeTreeOpen, setIsPedigreeTreeOpen] = useState(false);
+  const [isAppraisalOpen, setIsAppraisalOpen] = useState(false);
 
   useEffect(() => {
     if (pigeon) {
@@ -151,6 +153,13 @@ export function PigeonDetailModal({
                   style={{ marginBottom: 10 }}
                 />
                 <FieldButton
+                  title="🔍 Ocena Budowy & Znak Oka (FCI)"
+                  onPress={() => setIsAppraisalOpen(true)}
+                  variant="secondary"
+                  testID="btn-open-appraisal"
+                  style={{ marginBottom: 10 }}
+                />
+                <FieldButton
                   title="📜 Drukuj Rodowód A4 PDF"
                   onPress={() => onPrintPedigree(pigeon, 'print')}
                   testID="btn-print-pedigree-modal"
@@ -174,6 +183,13 @@ export function PigeonDetailModal({
         pigeon={pigeon}
         onClose={() => setIsPedigreeTreeOpen(false)}
         onPrintPdf={(p) => onPrintPedigree(p, 'print')}
+      />
+
+      {/* Conformation, Eye Sign & Wing Appraisal Modal */}
+      <AppraisalModal
+        visible={isAppraisalOpen}
+        pigeon={pigeon}
+        onClose={() => setIsAppraisalOpen(false)}
       />
     </Modal>
   );

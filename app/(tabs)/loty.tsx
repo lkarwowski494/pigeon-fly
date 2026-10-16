@@ -18,6 +18,8 @@ import { ClockArrivalModal } from '../../src/components/ClockArrivalModal';
 import { NewRaceModal } from '../../src/components/NewRaceModal';
 import { TelemetryTrackModal } from '../../src/components/TelemetryTrackModal';
 import { RaceWeatherModal } from '../../src/components/RaceWeatherModal';
+import { BasketingSessionModal } from '../../src/components/BasketingSessionModal';
+import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { Alert } from 'react-native';
 import { calculateFciCoefficient, calculateConcourseLimit } from '../../src/domain/concourse';
@@ -70,9 +72,14 @@ export default function RacesScreen() {
     new Date(Date.now() - 1000 * 60 * 240).toISOString() // 4 hours ago
   );
   const [isTraining, setIsTraining] = useState(false);
-  const [basketedCount] = useState(120);
+  const [basketedCount, setBasketedCount] = useState(120);
   const [isTelemetryModalVisible, setIsTelemetryModalVisible] = useState(false);
   const [isWeatherModalVisible, setIsWeatherModalVisible] = useState(false);
+  const [isBasketingModalVisible, setIsBasketingModalVisible] = useState(false);
+
+  const handleSaveBasketing = (entries: BasketEntry[]) => {
+    setBasketedCount(entries.length > 0 ? entries.length : 120);
+  };
 
   const handleSaveNewRace = (data: {
     name: string;
@@ -251,7 +258,14 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
-            title="📄 Drukuj Listę Wkładaniową (Kosz)"
+            title="📦 Sesja Koszowania (Kosz)"
+            onPress={() => setIsBasketingModalVisible(true)}
+            testID="btn-open-basketing-session"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
+            title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
             variant="secondary"
@@ -304,6 +318,14 @@ export default function RacesScreen() {
         visible={isWeatherModalVisible}
         onClose={() => setIsWeatherModalVisible(false)}
         distanceMeters={raceDistanceMeters}
+      />
+
+      {/* Basketing Session Modal */}
+      <BasketingSessionModal
+        visible={isBasketingModalVisible}
+        onClose={() => setIsBasketingModalVisible(false)}
+        raceName={releaseLocation}
+        onSaveBasket={handleSaveBasketing}
       />
     </SafeAreaView>
   );
