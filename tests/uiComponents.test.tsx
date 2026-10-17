@@ -1290,6 +1290,51 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('KOPROSKOPIA I PASO\u017bYTY');
     expect(tree).toContain('Drukuj Raport A4');
   });
+
+  test('ClutchYoungstersTransferModal (Z-089) renders breeding pair, banding window, and transfer button', () => {
+    const { ClutchYoungstersTransferModal } = require('../src/components/ClutchYoungstersTransferModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <ClutchYoungstersTransferModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('REJESTR L\u0118G\u00d3W & M\u0141ODYCH');
+    expect(tree).toContain('Cela Rozp\u0142odowa A-04');
+    expect(tree).toContain('KRYTYCZNE OKNO OBR\u0104CZKOWANIA');
+    expect(tree).toContain('Przenie\u015b M\u0142ode do Stada Lotowego');
+    expect(tree).toContain('AirPrint Karta L\u0119gu');
+  });
+
+  test('PigeonMortalityProtocolModal (Z-090) renders cause classification, autopsy tabs, and disposal actions', () => {
+    const { PigeonMortalityProtocolModal } = require('../src/components/PigeonMortalityProtocolModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <PigeonMortalityProtocolModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('\u015aWIADECTWO ZGONU & PROTOK\u00d3\u0141 UTYLIZACJI');
+    expect(tree).toContain('Procedura PIW / UPPZ');
+    expect(tree).toContain('DANE FORMALNE I IDENTYFIKACJA PTAKA');
+    expect(tree).toContain('PRZYCZYNA UPADKU');
+    expect(tree).toContain('Wyrejestruj Ptaka i Zatwierd\u017a Protok\u00f3\u0142');
+    expect(tree).toContain('AirPrint \u015awiadectwo Zgonu');
+  });
 });
 
 

@@ -28,6 +28,7 @@ import { LoftVentilationModal } from '../../src/components/LoftVentilationModal'
 import { VaccinationProtocolModal } from '../../src/components/VaccinationProtocolModal';
 import { NewInmateQuarantineModal } from '../../src/components/NewInmateQuarantineModal';
 import { VeterinaryLabRegistryModal } from '../../src/components/VeterinaryLabRegistryModal';
+import { PigeonMortalityProtocolModal } from '../../src/components/PigeonMortalityProtocolModal';
 import { analyzeWingMoult, getPhotoperiodStatus } from '../../src/domain/moult';
 import { PdfService } from '../../src/services/pdfService';
 import { FeatherStatus, MoultLog } from '../../src/domain/types';
@@ -76,6 +77,7 @@ export default function HealthScreen() {
   const [isVaccinationModalVisible, setIsVaccinationModalVisible] = useState(false);
   const [isNewInmateQuarantineModalVisible, setIsNewInmateQuarantineModalVisible] = useState(false);
   const [isVetLabRegistryModalVisible, setIsVetLabRegistryModalVisible] = useState(false);
+  const [isMortalityProtocolModalVisible, setIsMortalityProtocolModalVisible] = useState(false);
   const [treatments, setTreatments] = useState<TreatmentRecordItem[]>(INITIAL_TREATMENTS);
   const [moultLogs, setMoultLogs] = useState<MoultLog[]>(INITIAL_MOULT_LOGS);
 
@@ -409,6 +411,13 @@ export default function HealthScreen() {
           style={{ marginTop: 10 }}
           testID="btn-open-vet-lab-registry"
         />
+        <FieldButton
+          title="⚠️ Świadectwo Zgonu i Protokół Utylizacji (Z-090)"
+          onPress={() => setIsMortalityProtocolModalVisible(true)}
+          variant="secondary"
+          style={{ marginTop: 10, marginBottom: 12 }}
+          testID="btn-open-mortality-protocol"
+        />
       </ScrollView>
 
       {/* Add Treatment Modal */}
@@ -507,6 +516,13 @@ export default function HealthScreen() {
       <VeterinaryLabRegistryModal
         visible={isVetLabRegistryModalVisible}
         onClose={() => setIsVetLabRegistryModalVisible(false)}
+      />
+
+      {/* Pigeon Mortality Certificate & Disposal Protocol Modal (Z-090 / DEC-104) */}
+      <PigeonMortalityProtocolModal
+        visible={isMortalityProtocolModalVisible}
+        onClose={() => setIsMortalityProtocolModalVisible(false)}
+        defaultRingNumber={selectedPigeonRing}
       />
     </SafeAreaView>
   );
