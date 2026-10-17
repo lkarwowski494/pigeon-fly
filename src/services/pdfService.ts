@@ -18,12 +18,14 @@ import {
   generateQrStickerSheetHtml,
   generateNestBoxCardsHtml,
   generateConcourseSheetHtml,
+  generateYpdsEmergencyReportHtml,
   PedigreePdfOptions,
   BasketingListPdfOptions,
   TreatmentRecordItem,
   StickerSheetOptions,
   NestBoxCardsPdfOptions,
   ConcourseSheetPdfOptions,
+  YpdsEmergencyReportPdfOptions,
 } from '../domain/pdfExport';
 import { PedigreeNode } from '../domain/types';
 
@@ -165,6 +167,24 @@ export class PdfService {
     return await this.shareHtmlAsPdf(
       html,
       `Lista Konkursowa — ${options.raceName}`
+    );
+  }
+
+  /**
+   * Generuje i drukuje lub udostępnia Kliniczny Protokół Triage YPDS (Z-305, RD-27)
+   */
+  static async exportYpdsReport(
+    options: YpdsEmergencyReportPdfOptions,
+    mode: 'print' | 'share' = 'print'
+  ): Promise<string | void> {
+    const html = generateYpdsEmergencyReportHtml(options);
+    if (mode === 'print') {
+      await this.printHtml(html);
+      return;
+    }
+    return await this.shareHtmlAsPdf(
+      html,
+      `Protokół Triage YPDS — ${options.pigeonRingNumber}`
     );
   }
 }

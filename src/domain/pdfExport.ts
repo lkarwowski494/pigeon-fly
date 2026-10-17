@@ -1118,5 +1118,140 @@ export function generateConcourseSheetHtml(options: ConcourseSheetPdfOptions): s
   `.trim();
 }
 
+export interface YpdsEmergencyReportPdfOptions {
+  loftName: string;
+  breederName: string;
+  pigeonRingNumber: string;
+  isYoungBird: boolean;
+  date: string;
+  symptoms: string[];
+  riskLevel: string;
+  summary: string;
+  contraindications: string[];
+  protocols: { title: string; description: string; priority: string }[];
+  veterinarianNotes?: string;
+}
+
+export function generateYpdsEmergencyReportHtml(options: YpdsEmergencyReportPdfOptions): string {
+  const isEmergency = options.riskLevel === 'acute' || options.riskLevel === 'critical';
+  const badgeColor =
+    options.riskLevel === 'critical'
+      ? '#DC2626'
+      : options.riskLevel === 'acute'
+      ? '#EA580C'
+      : options.riskLevel === 'suspected'
+      ? '#D97706'
+      : '#16A34A';
+
+  const riskLabel =
+    options.riskLevel === 'critical'
+      ? 'KRYTYCZNE ZAGROŻENIE ŻYCIA (ZAPAŚĆ ADENO-COLI)'
+      : options.riskLevel === 'acute'
+      ? 'OSTRE ADENO-COLI / YPDS (ALARM EPIDEMIOLOGICZNY)'
+      : options.riskLevel === 'suspected'
+      ? 'PODEJRZENIE NIESTRAWNOŚCI / ZASTOJU WOLA'
+      : 'BRAK ZAGROŻENIA (PTAK ZDROWY)';
+
+  const symptomsList =
+    options.symptoms.length > 0
+      ? options.symptoms
+          .map((s) => `<li style="margin-bottom: 4px; color: #DC2626; font-weight: 700;">⚠️ ${s}</li>`)
+          .join('')
+      : '<li style="color: #16A34A;">Brak objawów chorobowych</li>';
+
+  const contraindicationsList = options.contraindications
+    .map((c) => `<li style="margin-bottom: 4px; color: #991B1B;">⛔ ${c}</li>`)
+    .join('');
+
+  const protocolsList = options.protocols
+    .map(
+      (p) => `
+    <div style="background: #F8FAFC; border-left: 3px solid #0284C7; padding: 6px 10px; margin-bottom: 6px; border-radius: 4px;">
+      <div style="font-weight: 800; font-size: 11px; color: #0369A1;">${p.title}</div>
+      <div style="font-size: 9.5px; color: #334155; margin-top: 2px;">${p.description}</div>
+    </div>
+  `
+    )
+    .join('');
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Karta Triage YPDS — ${options.pigeonRingNumber}</title>
+  <style>
+    @page { size: A4 portrait; margin: 12mm; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; font-size: 10px; color: #0F172A; margin: 0; padding: 0; }
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0F172A; padding-bottom: 8px; margin-bottom: 12px; }
+    .title { font-size: 18px; font-weight: 900; color: #0F172A; letter-spacing: 0.5px; }
+    .subtitle { font-size: 10px; font-weight: 700; color: #64748B; text-transform: uppercase; margin-top: 2px; }
+    .alert-banner { background: #FEF2F2; border: 2px solid ${badgeColor}; border-radius: 6px; padding: 10px; margin-bottom: 14px; }
+    .alert-badge { display: inline-block; background: ${badgeColor}; color: #FFFFFF; font-size: 11px; font-weight: 900; padding: 4px 8px; border-radius: 4px; margin-bottom: 6px; letter-spacing: 0.5px; }
+    .alert-summary { font-size: 11px; font-weight: 700; color: #0F172A; line-height: 1.4; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .card { background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 6px; padding: 10px; }
+    .card-title { font-size: 11px; font-weight: 800; color: #0F172A; border-bottom: 1px solid #E2E8F0; padding-bottom: 4px; margin-bottom: 8px; text-transform: uppercase; }
+    ul { margin: 0; padding-left: 16px; }
+    .footer { margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px solid #CBD5E1; padding-top: 14px; }
+    .sign-box { border-bottom: 1px dashed #94A3B8; height: 35px; margin-top: 25px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <div class="title">KLINICZNY PROTOKÓŁ TRIAGE YPDS</div>
+      <div class="subtitle">${options.loftName} • Hodowca: ${options.breederName}</div>
+    </div>
+    <div style="text-align: right;">
+      <div style="font-size: 12px; font-weight: 900; font-family: monospace;">${options.pigeonRingNumber}</div>
+      <div style="font-size: 9px; color: #64748B;">Wiek: ${options.isYoungBird ? 'Młode (<1 rok)' : 'Dorosły (≥1 rok)'} • Data: ${options.date}</div>
+    </div>
+  </div>
+
+  <div class="alert-banner">
+    <div class="alert-badge">${riskLabel}</div>
+    <div class="alert-summary">${options.summary}</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-title">Stwierdzone Objawy Kliniczne</div>
+      <ul>${symptomsList}</ul>
+    </div>
+    <div class="card">
+      <div class="card-title">Bezwzględne Przeciwwskazania</div>
+      <ul>${contraindicationsList}</ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 14px;">
+    <div class="card-title">Zalecana Procedura Ratunkowa RD-27</div>
+    ${protocolsList}
+  </div>
+
+  <div class="card">
+    <div class="card-title">Zalecenia Lekarza Weterynarii / Wynik Sekcji</div>
+    <div style="min-height: 40px; color: #64748B; font-style: italic;">
+      ${options.veterinarianNotes || 'Wpis lekarza weterynarii lub zalecenia antybiogramu (w przypadku powikłań bakteryjnych Salmonella / E. coli):'}
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>
+      <div style="font-weight: 700; color: #475569;">Podpis hodowcy / zgłaszającego kwarantannę:</div>
+      <div class="sign-box"></div>
+    </div>
+    <div>
+      <div style="font-weight: 700; color: #475569;">Pieczęć i podpis lekarza weterynarii:</div>
+      <div class="sign-box"></div>
+    </div>
+  </div>
+</body>
+</html>
+  `.trim();
+}
+
+
 
 

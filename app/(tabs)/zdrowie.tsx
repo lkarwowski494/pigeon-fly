@@ -105,6 +105,20 @@ export default function HealthScreen() {
     });
   };
 
+  const handleIsolatePigeon = (ringNumber: string) => {
+    setTreatments((prev) => [
+      {
+        date: new Date().toISOString().slice(0, 10),
+        eventType: 'Kwarantanna YPDS (Izolatka)',
+        productName: 'Protokół Ratunkowy RD-27 (Elektrolit + Kwas Masłowy)',
+        targetPigeon: `Ptak: ${ringNumber}`,
+        withdrawalDays: 14,
+        notes: 'Izolacja w boksie kwarantannowym z powodu podejrzenia Adeno-Coli. Blokada koszowania.',
+      },
+      ...prev,
+    ]);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -347,6 +361,7 @@ export default function HealthScreen() {
         visible={isVetLabModalVisible}
         onClose={() => setIsVetLabModalVisible(false)}
         selectedPigeonRing={selectedPigeonRing}
+        onIsolatePigeon={handleIsolatePigeon}
       />
 
       {/* FCI Antidoping & Prohibited Substances Guard Modal (Z-304, BR-ZDR-009) */}

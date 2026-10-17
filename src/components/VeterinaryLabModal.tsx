@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
@@ -22,10 +23,12 @@ import {
   CoccidiaLevel,
   TrichomonasLevel,
   evaluateCoproscopy,
+  classifyCoccidiaOpg,
   getVeterinaryCalendarMonth,
   getAnnualVeterinaryCalendar,
 } from '../domain/health';
 import { FieldButton } from './FieldButton';
+import { PdfService } from '../services/pdfService';
 
 export interface VeterinaryLabModalProps {
   visible: boolean;
@@ -48,6 +51,8 @@ export function VeterinaryLabModal({
 
   // Coproscopy state
   const [coccidia, setCoccidia] = useState<CoccidiaLevel>('mild');
+  const [opgInput, setOpgInput] = useState<string>('');
+  const [hpfInput, setHpfInput] = useState<string>('');
   const [nematodes, setNematodes] = useState(false);
   const [capillaria, setCapillaria] = useState(false);
   const [trichomonas, setTrichomonas] = useState<TrichomonasLevel>('negative');
@@ -56,6 +61,11 @@ export function VeterinaryLabModal({
   const currentMonthNum = new Date().getMonth() + 1;
   const [selectedMonth, setSelectedMonth] = useState<number>(currentMonthNum);
 
+  const parsedOpg =
+    opgInput.trim() !== '' && !isNaN(Number(opgInput)) ? Number(opgInput) : undefined;
+  const parsedHpf =
+    hpfInput.trim() !== '' && !isNaN(Number(hpfInput)) ? Number(hpfInput) : undefined;
+
   const ypdsAssessment = evaluateYpdsRisk({
     symptoms: selectedSymptoms,
     isYoungBird,
@@ -63,7 +73,9 @@ export function VeterinaryLabModal({
 
   const coproscopyEvaluation = evaluateCoproscopy({
     coccidia,
+    coccidiaOpg: parsedOpg,
     nematodesPresent: nematodes,
+    nematodeHpf: parsedHpf,
     capillariaPresent: capillaria,
     trichomonas,
   });
@@ -91,6 +103,40 @@ export function VeterinaryLabModal({
       'Ptak Przeniesiony do Izolatki',
       `Gołąb ${selectedPigeonRing} został przypisany do przedziału kwarantannowego (Izolatka). Zablokowano możliwość koszowania.`
     );
+  };
+
+  const handleExportYpdsReport = async (mode: 'print' | 'share' = 'print') => {
+    try {
+      try {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      } catch {}
+
+      const symptomLabels: Record<YpdsSymptom, string> = {
+        crop_stasis: 'Wole lejące / zaleganie płynu i fermentującego ziarna',
+        vomiting: 'Wymioty ziarnem po napojeniu / karmieniu',
+        green_mucoid_diarrhea: 'Zielonkawa cuchnąca śluzowata biegunka',
+        lethargy: 'Apatia, nastroszone pióra, chowanie głowy w ramionach',
+        rapid_weight_loss: 'Gwałtowne chudnięcie / ostry spadek masy mięśniowej',
+      };
+
+      await PdfService.exportYpdsReport(
+        {
+          loftName: 'Gołębnik Mistrza',
+          breederName: 'Hodowca Pigeon-Fly',
+          pigeonRingNumber: selectedPigeonRing,
+          isYoungBird,
+          date: new Date().toISOString().slice(0, 10),
+          symptoms: selectedSymptoms.map((s) => symptomLabels[s] || s),
+          riskLevel: ypdsAssessment.riskLevel,
+          summary: ypdsAssessment.summary,
+          contraindications: ypdsAssessment.contraindications,
+          protocols: ypdsAssessment.recommendedProtocols,
+        },
+        mode
+      );
+    } catch (err: any) {
+      Alert.alert('Błąd eksportu', err.message || 'Nie udało się wygenerować raportu YPDS.');
+    }
   };
 
   return (
@@ -246,6 +292,23 @@ export function VeterinaryLabModal({
                       onPress={handleIsolateClick}
                       style={{ marginTop: 14 }}
                     />
+
+                    <View style={styles.ypdsPdfActionsRow}>
+                      <TouchableOpacity
+                        style={styles.ypdsPrintBtn}
+                        onPress={() => handleExportYpdsReport('print')}
+                        testID="btn-print-ypds-report"
+                      >
+                        <Text style={styles.ypdsPrintBtnText}>🖨️ Drukuj Raport (PDF)</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.ypdsShareBtn}
+                        onPress={() => handleExportYpdsReport('share')}
+                        testID="btn-share-ypds-report"
+                      >
+                        <Text style={styles.ypdsShareBtnText}>📤 Udostępnij Lekarzowi</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 )}
               </View>
@@ -257,11 +320,93 @@ export function VeterinaryLabModal({
             <View>
               <Text style={styles.sectionHeader}>PARAMETRY BADANIA PARAZYTOLOGICZNEGO</Text>
               <Text style={styles.guideText}>
-                Wprowadź wynik mikroskopowego badania kału stada (metoda flotacyjna) lub wymazu z wola.
+                Wprowadź wynik mikroskopowego badania kału stada (metoda McMastera OPG / flotacja) lub wymazu z wola.
               </Text>
 
-              {/* Coccidia selector */}
-              <Text style={styles.inputLabel}>Kokcydia (Eimeria labbeana / columbae):</Text>
+              {/* McMaster Quantitative OPG */}
+              <View style={styles.opgContainer}>
+                <View style={styles.opgHeaderRow}>
+                  <Text style={styles.opgTitle}>KOMORA McMASTERA — OPG (OOCYSTY / GRAM KAŁU)</Text>
+                  <Text style={styles.opgSubtitle}>Standard ilościowy Z-306 • Próg leczenia: &ge;1000 OPG</Text>
+                </View>
+
+                <View style={styles.opgInputRow}>
+                  <TextInput
+                    style={styles.opgInputField}
+                    keyboardType="numeric"
+                    placeholder="Wpisz OPG (np. 850)"
+                    placeholderTextColor="#6B7280"
+                    value={opgInput}
+                    onChangeText={(val) => {
+                      setOpgInput(val);
+                      const num = parseInt(val, 10);
+                      if (!isNaN(num)) {
+                        setCoccidia(classifyCoccidiaOpg(num).level);
+                      }
+                    }}
+                  />
+                  {opgInput !== '' && (
+                    <TouchableOpacity
+                      style={styles.opgClearBtn}
+                      onPress={() => {
+                        setOpgInput('');
+                        setCoccidia('negative');
+                      }}
+                    >
+                      <Text style={styles.opgClearBtnText}>✕ Wyczyść</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+
+                {/* Quick Presets */}
+                <View style={styles.opgPresetsRow}>
+                  {[
+                    { label: '0 (Czysto)', opg: '0', lvl: 'negative' as CoccidiaLevel },
+                    { label: '600 (Subkliniczny)', opg: '600', lvl: 'mild' as CoccidiaLevel },
+                    { label: '2500 (Średni)', opg: '2500', lvl: 'moderate' as CoccidiaLevel },
+                    { label: '8000 (Masowy +++)', opg: '8000', lvl: 'heavy' as CoccidiaLevel },
+                  ].map((preset) => {
+                    const isSel = opgInput === preset.opg;
+                    return (
+                      <TouchableOpacity
+                        key={preset.opg}
+                        style={[styles.opgPresetChip, isSel && styles.opgPresetChipActive]}
+                        onPress={() => {
+                          setOpgInput(preset.opg);
+                          setCoccidia(preset.lvl);
+                        }}
+                      >
+                        <Text
+                          style={[
+                            styles.opgPresetChipText,
+                            isSel && styles.opgPresetChipTextActive,
+                          ]}
+                        >
+                          {preset.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+
+                {parsedOpg !== undefined && (
+                  <View
+                    style={[
+                      styles.opgResultBadge,
+                      classifyCoccidiaOpg(parsedOpg).isChemicalNeeded
+                        ? styles.opgResultBadgeChemical
+                        : styles.opgResultBadgeNatural,
+                    ]}
+                  >
+                    <Text style={styles.opgResultText}>
+                      {classifyCoccidiaOpg(parsedOpg).thresholdLabel}
+                    </Text>
+                  </View>
+                )}
+              </View>
+
+              {/* Qualitative Coccidia Fallback selector */}
+              <Text style={styles.inputLabel}>Kokcydia — Kategoria jakościowa (Eimeria labbeana):</Text>
               <View style={styles.optionsRow}>
                 {(['negative', 'mild', 'moderate', 'heavy'] as CoccidiaLevel[]).map((lvl) => {
                   const labels = {
@@ -275,7 +420,13 @@ export function VeterinaryLabModal({
                     <TouchableOpacity
                       key={lvl}
                       style={[styles.optionBtn, isSel && styles.optionBtnActive]}
-                      onPress={() => setCoccidia(lvl)}
+                      onPress={() => {
+                        setCoccidia(lvl);
+                        if (lvl === 'negative') setOpgInput('0');
+                        else if (lvl === 'mild') setOpgInput('600');
+                        else if (lvl === 'moderate') setOpgInput('2500');
+                        else if (lvl === 'heavy') setOpgInput('8000');
+                      }}
                     >
                       <Text style={[styles.optionText, isSel && styles.optionTextActive]}>
                         {labels[lvl]}
@@ -309,15 +460,31 @@ export function VeterinaryLabModal({
                 })}
               </View>
 
-              {/* Worms toggles */}
-              <Text style={styles.inputLabel}>Nicienie jelitowe (Jaja w polu widzenia):</Text>
-              <View style={{ flexDirection: 'row', gap: 10, marginBottom: 12 }}>
+              {/* Worms toggles & HPF */}
+              <Text style={styles.inputLabel}>Nicienie jelitowe (Jaja w polu widzenia HPF):</Text>
+              <View style={{ flexDirection: 'row', gap: 10, marginBottom: 8 }}>
                 <TouchableOpacity
-                  style={[styles.toggleBtn, nematodes && styles.toggleBtnActive]}
-                  onPress={() => setNematodes(!nematodes)}
+                  style={[
+                    styles.toggleBtn,
+                    (nematodes || (parsedHpf !== undefined && parsedHpf > 0)) &&
+                      styles.toggleBtnActive,
+                  ]}
+                  onPress={() => {
+                    const next = !nematodes;
+                    setNematodes(next);
+                    if (!next) setHpfInput('');
+                  }}
                 >
-                  <Text style={[styles.toggleBtnText, nematodes && styles.toggleBtnTextActive]}>
-                    {nematodes ? '⚠️ Glisty (Ascaridia): OBECNE' : '✓ Glisty: Brak'}
+                  <Text
+                    style={[
+                      styles.toggleBtnText,
+                      (nematodes || (parsedHpf !== undefined && parsedHpf > 0)) &&
+                        styles.toggleBtnTextActive,
+                    ]}
+                  >
+                    {nematodes || (parsedHpf !== undefined && parsedHpf > 0)
+                      ? `⚠️ Glisty (Ascaridia): OBECNE${parsedHpf ? ` (${parsedHpf} HPF)` : ''}`
+                      : '✓ Glisty: Brak'}
                   </Text>
                 </TouchableOpacity>
 
@@ -329,6 +496,25 @@ export function VeterinaryLabModal({
                     {capillaria ? '⚠️ Włosogłówki (Capillaria): OBECNE' : '✓ Włosogłówki: Brak'}
                   </Text>
                 </TouchableOpacity>
+              </View>
+
+              {/* HPF Input row */}
+              <View style={styles.hpfRow}>
+                <Text style={styles.hpfLabel}>Ilość jaj glist w polu widzenia (HPF):</Text>
+                <TextInput
+                  style={styles.hpfInput}
+                  keyboardType="numeric"
+                  placeholder="0"
+                  placeholderTextColor="#6B7280"
+                  value={hpfInput}
+                  onChangeText={(val) => {
+                    setHpfInput(val);
+                    const n = parseInt(val, 10);
+                    if (!isNaN(n) && n > 0) {
+                      setNematodes(true);
+                    }
+                  }}
+                />
               </View>
 
               {/* Coproscopy Evaluation Box */}
@@ -851,5 +1037,170 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '700',
     lineHeight: 16,
+  },
+  ypdsPdfActionsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 10,
+  },
+  ypdsPrintBtn: {
+    flex: 1,
+    minHeight: 46,
+    backgroundColor: '#E5A93C',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+  },
+  ypdsPrintBtnText: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#121417',
+  },
+  ypdsShareBtn: {
+    flex: 1,
+    minHeight: 46,
+    backgroundColor: '#2A303C',
+    borderWidth: 1,
+    borderColor: '#3E4756',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+  },
+  ypdsShareBtnText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  opgContainer: {
+    backgroundColor: '#16191E',
+    borderWidth: 1,
+    borderColor: '#2F343F',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 14,
+  },
+  opgHeaderRow: {
+    marginBottom: 8,
+  },
+  opgTitle: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#E5A93C',
+    letterSpacing: 0.5,
+  },
+  opgSubtitle: {
+    fontSize: 11,
+    color: '#94A3B8',
+    marginTop: 2,
+  },
+  opgInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+  },
+  opgInputField: {
+    flex: 1,
+    height: 48,
+    backgroundColor: '#1E232B',
+    borderWidth: 1,
+    borderColor: '#3E4756',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  opgClearBtn: {
+    paddingHorizontal: 12,
+    height: 48,
+    backgroundColor: '#2A303C',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  opgClearBtnText: {
+    color: '#94A3B8',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  opgPresetsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginTop: 8,
+  },
+  opgPresetChip: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    backgroundColor: '#20252F',
+    borderWidth: 1,
+    borderColor: '#3E4756',
+  },
+  opgPresetChipActive: {
+    backgroundColor: '#E5A93C',
+    borderColor: '#E5A93C',
+  },
+  opgPresetChipText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#D4D8E0',
+  },
+  opgPresetChipTextActive: {
+    color: '#121417',
+    fontWeight: '900',
+  },
+  opgResultBadge: {
+    marginTop: 10,
+    padding: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  opgResultBadgeChemical: {
+    backgroundColor: '#2D1B1B',
+    borderColor: '#EF4444',
+  },
+  opgResultBadgeNatural: {
+    backgroundColor: '#14281E',
+    borderColor: '#10B981',
+  },
+  opgResultText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    lineHeight: 16,
+  },
+  hpfRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#16191E',
+    padding: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#2F343F',
+    marginBottom: 14,
+  },
+  hpfLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#D4D8E0',
+    flex: 1,
+  },
+  hpfInput: {
+    width: 60,
+    height: 40,
+    backgroundColor: '#1E232B',
+    borderWidth: 1,
+    borderColor: '#3E4756',
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
+    textAlign: 'center',
   },
 });

@@ -1,7 +1,7 @@
 # Pigeon-Fly — Rejestr Bieżący Decyzji i Stanu Projektu
 **Data aktualizacji:** 17.10.2026 (Przyjęcie 10 Zasad Uniwersalnych i Odkrycie Ról z Biblioteki na Dysku)  
 **Właściciel:** Łukasz (`lkarwowski494`)  
-**Status projektu:** Faza wdrożeniowa — 37 zestawów testowych, 277 testów zaliczonych (100%), 0 błędów TypeScript i i18n
+**Status projektu:** Faza wdrożeniowa — 40 zestawów testowych, 299 testów zaliczonych (100%), 0 błędów TypeScript i i18n
 
 ---
 
@@ -82,6 +82,10 @@
   * *Rozstrzygnięcie:* Implementacja `src/domain/flightEnergetics.ts` symulującego spalanie kwasów tłuszczowych (39.0 kJ/g), glikogenu (17.5 kJ/g), katabolizmu białek mięśni piersiowych (17.0 kJ/g) przy deficycie energetycznym, utraty wody/odwodnienia ze współczynnikiem termicznym oraz 2-fazowego protokołu regeneracji (Faza 1: izotonik 300 mOsm/L, Faza 2: Sedochol + aminokwasy BCAA + karma Depurative). Integracja w `app/(tabs)/kalkulator.tsx` (Sekcja 3). Pokrycie testami 100% (6/6 passing w `tests/flightEnergetics.test.ts`).
 * **DEC-58 (Generator Kart Lęgowych Celi PDF z Kodem QR — Z-270): Opcja 1 (17.10.2026 — Zatwierdzona przez Łukasza)**
   * *Rozstrzygnięcie:* Implementacja funkcji `mapNestBoxToCardItem` w `src/domain/nestBoxMatrix.ts` łączącej pozycję celi z chronometrażem lęgowym (jaja, owoskopia, wylęg, okno obrączkowania 6–8 dni, odsadzenie) i mikrokodem QR (`PIGEONFLY:NESTBOX:...`). Integracja akcji drukowania AirPrint oraz udostępniania PDF pojedynczej celi i zbiorczego arkusza A4 dla całego przedziału lęgowego w `src/components/NestBoxMatrixModal.tsx`. Pokrycie testami 100% (4/4 passing w `tests/nestBoxCards.test.ts`, łącznie 37 zestawów i 277 testów).
+* **DEC-59 (Triage YPDS Adeno-Coli RD-27 oraz Koproskopia Ilościowa McMaster OPG / HPF — Z-305, Z-306, BR-ZDR-008): Opcja 1 (17.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Implementacja triage klinicznego Zespołu Choroby Młodych (YPDS / Adeno-Coli) w `src/domain/health.ts` (zakazy koszowania, twardego ziarna, 5-etapowy protokół ratunkowy RD-27, automatyczne przenoszenie do Izolatki z 14-dniową karencją, generator raportu ratunkowego PDF dla lekarza weterynarii `exportYpdsReport` w `src/services/pdfService.ts`). Rozbudowa modułu koproskopii o ilościową komorę McMastera (OPG: <1000 profilaktyka naturalna octem/oregano bez chemii, 1000–5000 kuracja celowana, &ge;5000 Baycox 2.5% + wypalenie rusztów palnikiem gazowym) oraz mikroskopową ocenę HPF jaj glistnicy/kapilariozy z powtórzeniem kuracji po 14 dniach. Integracja UI w `src/components/VeterinaryLabModal.tsx`. Pokrycie testami 100% (5/5 w `tests/ypdsTriage.test.ts`, 9/9 w `tests/coproscopyLab.test.ts`).
+* **DEC-60 (Moduł Transmisji Przylotów na Żywo Supabase Realtime — Z-049, DEC-35): Opcja 1 (17.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Implementacja `src/services/liveBroadcastService.ts` zarządzającego subskrypcją kanałów WebSocket (`race-live-[CODE]`), emisją zdarzeń przylotów w czasie rzeczywistym, generowaniem kanonicznych linków kibica (`https://pigeonfly.app/live/...`), lokalnym powiadamianiem subskrybentów oraz buforem kolejki offline (`offlineQueue`). Integracja wskaźników statusu połączenia i automatycznej synchronizacji w `src/components/LiveDerbyModal.tsx` oraz podpięcie w `app/(tabs)/loty.tsx`. Pokrycie testami 100% (8/8 passing w `tests/liveBroadcast.test.ts`, stan całkowity projektu: 40 zestawów, 299 testów 100% zaliczonych).
 
 ---
 

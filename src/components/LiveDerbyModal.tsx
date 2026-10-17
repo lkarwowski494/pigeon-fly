@@ -5,7 +5,7 @@
  * gaps to leader, and live race commentary feed.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -28,6 +28,10 @@ import {
   DerbyStanding,
 } from '../domain/derby';
 import { FieldButton } from './FieldButton';
+import {
+  LiveBroadcastService,
+  BroadcastConnectionStatus,
+} from '../services/liveBroadcastService';
 
 export interface LiveDerbyModalProps {
   visible: boolean;
@@ -110,23 +114,54 @@ const INITIAL_DEMO_ARRIVALS: DerbyArrival[] = [
 
 export function LiveDerbyModal({ visible, onClose, derby }: LiveDerbyModalProps) {
   const currentDerby = derby || DEFAULT_DEMO_DERBY;
+  const broadcastService = LiveBroadcastService.getInstance();
+  const broadcastCode = generateDerbyBroadcastCode(currentDerby.name, 2026);
+  const spectatorUrl = broadcastService.generateSpectatorLink(broadcastCode);
+
   const [arrivals, setArrivals] = useState<DerbyArrival[]>(INITIAL_DEMO_ARRIVALS);
+  const [connectionStatus, setConnectionStatus] = useState<BroadcastConnectionStatus>(
+    broadcastService.getConnectionStatus()
+  );
+  const [offlineCount, setOfflineCount] = useState<number>(
+    broadcastService.getOfflineQueue().length
+  );
+
+  useEffect(() => {
+    const unsubStatus = broadcastService.onStatusChange((status) => {
+      setConnectionStatus(status);
+      setOfflineCount(broadcastService.getOfflineQueue().length);
+    });
+
+    const unsubArrivals = broadcastService.subscribeToDerby(broadcastCode, (payload) => {
+      const incoming = broadcastService.payloadToDerbyArrival(payload);
+      setArrivals((prev) => {
+        if (prev.some((a) => a.arrivalId === incoming.arrivalId)) {
+          return prev;
+        }
+        return [incoming, ...prev];
+      });
+    });
+
+    return () => {
+      unsubStatus();
+      unsubArrivals();
+    };
+  }, [broadcastCode]);
 
   const standings: DerbyStanding[] = calculateDerbyStandings(currentDerby, arrivals);
-  const broadcastCode = generateDerbyBroadcastCode(currentDerby.name, 2026);
 
   const handleCopyCode = async () => {
-    await Clipboard.setStringAsync(`https://pigeonfly.app/live/${broadcastCode}`);
+    await Clipboard.setStringAsync(spectatorUrl);
     try {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {}
     Alert.alert(
       'Skopiowano Link Transmisji!',
-      `Link do kibicowania na żywo: https://pigeonfly.app/live/${broadcastCode}`
+      `Link do kibicowania na żywo: ${spectatorUrl}`
     );
   };
 
-  const handleSimulateNewArrival = () => {
+  const handleSimulateNewArrival = async () => {
     const nextArrId = `arr-${Date.now()}`;
     const newArrival: DerbyArrival = {
       arrivalId: nextArrId,
@@ -138,7 +173,16 @@ export function LiveDerbyModal({ visible, onClose, derby }: LiveDerbyModalProps)
       velocityMPerMin: 1360.05, // Rocket arrival!
     };
 
-    setArrivals((prev) => [newArrival, ...prev]);
+    const payload = broadcastService.createPayloadFromArrival({
+      derbyCode: broadcastCode,
+      arrival: newArrival,
+      loftName: 'Piorun Team',
+      fancierName: 'Janusz Zieliński',
+      commentary: 'Rakieta! Ptak melduje się z dużą przewagą prędkości.',
+    });
+
+    await broadcastService.broadcastArrival(payload);
+    setOfflineCount(broadcastService.getOfflineQueue().length);
     try {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {}
@@ -156,6 +200,22 @@ export function LiveDerbyModal({ visible, onClose, derby }: LiveDerbyModalProps)
                   <View style={styles.livePill}>
                     <Text style={styles.liveDot}>●</Text>
                     <Text style={styles.liveText}>TRANSMISJA NA ŻYWO</Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.statusPill,
+                      connectionStatus === 'connected'
+                        ? styles.statusPillConnected
+                        : styles.statusPillOffline,
+                    ]}
+                  >
+                    <Text style={styles.statusPillText}>
+                      {connectionStatus === 'connected'
+                        ? '🟢 REALTIME ONLINE'
+                        : offlineCount > 0
+                        ? `🟡 OFFLINE (${offlineCount} W KOLEJCE)`
+                        : '🟡 TRYB LOKALNY'}
+                    </Text>
                   </View>
                 </View>
                 <Text style={styles.title}>{currentDerby.name.toUpperCase()}</Text>
@@ -284,6 +344,8 @@ const styles = StyleSheet.create({
   },
   liveBadgeRow: {
     flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     marginBottom: 4,
   },
   livePill: {
@@ -295,6 +357,25 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 1,
     borderColor: '#E53935',
+  },
+  statusPill: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 1,
+  },
+  statusPillConnected: {
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    borderColor: '#10B981',
+  },
+  statusPillOffline: {
+    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    borderColor: '#F59E0B',
+  },
+  statusPillText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#FFFFFF',
   },
   liveDot: {
     color: '#E53935',

@@ -274,6 +274,8 @@ export interface CoproscopyEvaluation {
   overallHealthStatus: 'clean' | 'mild_infestation' | 'treatment_required';
   requiresChemicalMedication: boolean;
   requiresLoftDisinfection: boolean;
+  coccidiaOpg?: number;
+  nematodeHpf?: number;
   recommendations: {
     target: string;
     protocol: string;
@@ -282,18 +284,73 @@ export interface CoproscopyEvaluation {
   summary: string;
 }
 
-export function evaluateCoproscopy(record: {
-  coccidia: CoccidiaLevel;
-  nematodesPresent: boolean;
-  capillariaPresent: boolean;
-  trichomonas: TrichomonasLevel;
-}): CoproscopyEvaluation {
+/**
+ * Classifies quantitative Coccidia OPG (Oocysts Per Gram of feces)
+ * according to veterinary clinical parasitology thresholds (Z-306):
+ * - 0: negative
+ * - 1-999: mild / subclinical (natural acids, no chemical coccidiostat)
+ * - 1000-4999: moderate (toltrazuril or sulfonamides under vet control)
+ * - >=5000: heavy / acute clinical coccidiosis (urgent therapy + flaming/disinfection)
+ */
+export function classifyCoccidiaOpg(opg: number): {
+  level: CoccidiaLevel;
+  thresholdLabel: string;
+  isChemicalNeeded: boolean;
+} {
+  if (opg <= 0) {
+    return { level: 'negative', thresholdLabel: '0 OPG — Wynik ujemny', isChemicalNeeded: false };
+  } else if (opg < 1000) {
+    return {
+      level: 'mild',
+      thresholdLabel: `${opg} OPG — Poziom subkliniczny (<1000 OPG). Tylko terapia naturalna!`,
+      isChemicalNeeded: false,
+    };
+  } else if (opg < 5000) {
+    return {
+      level: 'moderate',
+      thresholdLabel: `${opg} OPG — Poziom umiarkowany (1000–5000 OPG). Zalecana kuracja celowana.`,
+      isChemicalNeeded: true,
+    };
+  } else {
+    return {
+      level: 'heavy',
+      thresholdLabel: `⚠️ ${opg} OPG — Poziom masowy (>5000 OPG)! Bezwzględna kuracja i wypalenie rusztów.`,
+      isChemicalNeeded: true,
+    };
+  }
+}
+
+export interface CoproscopyInput {
+  coccidia?: CoccidiaLevel;
+  coccidiaOpg?: number;
+  nematodesPresent?: boolean;
+  nematodeHpf?: number;
+  capillariaPresent?: boolean;
+  trichomonas?: TrichomonasLevel;
+}
+
+export function evaluateCoproscopy(record: CoproscopyInput): CoproscopyEvaluation {
   const recommendations: CoproscopyEvaluation['recommendations'] = [];
   let requiresChemicalMedication = false;
   let requiresLoftDisinfection = false;
 
+  // Determine effective coccidia level
+  let effectiveCoccidia: CoccidiaLevel = record.coccidia || 'negative';
+  if (record.coccidiaOpg !== undefined && record.coccidiaOpg >= 0) {
+    effectiveCoccidia = classifyCoccidiaOpg(record.coccidiaOpg).level;
+  }
+
+  // Determine effective nematode status
+  let effectiveNematodes = record.nematodesPresent ?? false;
+  if (record.nematodeHpf !== undefined && record.nematodeHpf > 0) {
+    effectiveNematodes = true;
+  }
+
+  const effectiveCapillaria = record.capillariaPresent ?? false;
+  const effectiveTrichomonas = record.trichomonas || 'negative';
+
   // Coccidia evaluation
-  if (record.coccidia === 'heavy') {
+  if (effectiveCoccidia === 'heavy') {
     requiresChemicalMedication = true;
     requiresLoftDisinfection = true;
     recommendations.push({
@@ -302,14 +359,14 @@ export function evaluateCoproscopy(record: {
         'Kuracja toltrazurilem (Baycox 2.5%, 1 ml/L przez 2 dni) + wypalenie podłogi palnikiem gazowym.',
       isChemical: true,
     });
-  } else if (record.coccidia === 'moderate') {
+  } else if (effectiveCoccidia === 'moderate') {
     requiresChemicalMedication = true;
     recommendations.push({
       target: 'Kokcydioza (Pojedyncza ++)',
       protocol: 'Kuracja sulfonamidem lub toltrazurilem pod kontrolą weterynarza.',
       isChemical: true,
     });
-  } else if (record.coccidia === 'mild') {
+  } else if (effectiveCoccidia === 'mild') {
     recommendations.push({
       target: 'Kokcydioza (Nieliczne +)',
       protocol:
@@ -319,7 +376,7 @@ export function evaluateCoproscopy(record: {
   }
 
   // Nematodes evaluation
-  if (record.nematodesPresent) {
+  if (effectiveNematodes) {
     requiresChemicalMedication = true;
     requiresLoftDisinfection = true;
     recommendations.push({
@@ -331,7 +388,7 @@ export function evaluateCoproscopy(record: {
   }
 
   // Capillaria evaluation
-  if (record.capillariaPresent) {
+  if (effectiveCapillaria) {
     requiresChemicalMedication = true;
     requiresLoftDisinfection = true;
     recommendations.push({
@@ -343,7 +400,7 @@ export function evaluateCoproscopy(record: {
   }
 
   // Trichomonas evaluation
-  if (record.trichomonas === 'severe') {
+  if (effectiveTrichomonas === 'severe') {
     requiresChemicalMedication = true;
     recommendations.push({
       target: 'Trichomonadoza (Rzęsistek / Żółty guzek)',
@@ -351,7 +408,7 @@ export function evaluateCoproscopy(record: {
         'Ronidazol 10% (lub karnidazol 1 tabl./ptaka) przez 5-7 dni + zakwaszenie poidła do pH 4.2.',
       isChemical: true,
     });
-  } else if (record.trichomonas === 'mild') {
+  } else if (effectiveTrichomonas === 'mild') {
     recommendations.push({
       target: 'Trichomonadoza (Niska liczba trofozoitów)',
       protocol:
@@ -377,6 +434,8 @@ export function evaluateCoproscopy(record: {
     overallHealthStatus,
     requiresChemicalMedication,
     requiresLoftDisinfection,
+    coccidiaOpg: record.coccidiaOpg,
+    nematodeHpf: record.nematodeHpf,
     recommendations,
     summary,
   };
