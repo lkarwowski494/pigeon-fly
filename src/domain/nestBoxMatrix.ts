@@ -4,6 +4,9 @@
  * egg swapping protocols (jajka gipsowe), and critical banding alerts (6-8 days old).
  */
 
+import { calculateClutchMilestones } from './breeding';
+import { NestBoxCardItem } from './pdfExport';
+
 export type NestBoxState =
   | 'empty'           // Pusta, czysta, gotowa
   | 'pairing'         // Para zestawiona (Dzień 0-8)
@@ -206,3 +209,62 @@ export function calculateFlockBreedingSummary(boxes: NestBoxItem[]): BreedingSum
     urgentBandingAlertsCount,
   };
 }
+
+/**
+ * Maps a NestBoxItem to a printable NestBoxCardItem for physical PDF export (Z-270).
+ */
+export function mapNestBoxToCardItem(
+  box: NestBoxItem,
+  roundNumber: number = 1
+): NestBoxCardItem {
+  let expectedHatch = box.hatchDate || '—';
+  let bandingWindow = '—';
+  let weanedDate = '—';
+
+  if (box.egg1Date || box.pairedDate) {
+    const milestones = calculateClutchMilestones({
+      pairDate: box.pairedDate,
+      egg1Date: box.egg1Date,
+    });
+    if (!box.hatchDate) {
+      expectedHatch = milestones.expectedHatchDate;
+    }
+    bandingWindow = `${milestones.bandingStartDate} do ${milestones.bandingEndDate}`;
+    weanedDate = milestones.weaningDate;
+  }
+
+  let eggStatusText = 'Oczekiwanie';
+  if (box.egg1Status === 'fertile' && box.egg2Status === 'fertile') {
+    eggStatusText = '2x Zapłodnione (Pajączek)';
+  } else if (box.egg1Status === 'fertile' || box.egg2Status === 'fertile') {
+    eggStatusText = '1x Zapłodnione';
+  } else if (box.egg1Status === 'clear' || box.egg2Status === 'clear') {
+    eggStatusText = 'Czyste / Niezapłodnione';
+  } else if (box.egg1Date && box.egg2Date) {
+    eggStatusText = 'Złożone (2 jaja)';
+  } else if (box.egg1Date) {
+    eggStatusText = 'Złożone (1. jajo)';
+  }
+
+  const qrPayload = `PIGEONFLY:NESTBOX:${box.section}:${box.boxNumber}:${box.cockRingNumber || 'EMPTY'}:${box.henRingNumber || 'EMPTY'}`;
+
+  return {
+    nestBox: `Cela ${box.boxNumber}`,
+    roundNumber,
+    cockRingNumber: box.cockRingNumber || 'Nieobsadzona',
+    henRingNumber: box.henRingNumber || 'Nieobsadzona',
+    pairedDate: box.pairedDate || '—',
+    egg1Date: box.egg1Date || '—',
+    egg2Date: box.egg2Date || '—',
+    eggStatus: eggStatusText,
+    expectedHatchDate: expectedHatch,
+    bandingWindow,
+    weanedDate,
+    chick1RingNumber: box.chick1RingNumber,
+    chick2RingNumber: box.chick2RingNumber,
+    inbreedingF: box.inbreedingF !== undefined ? (box.inbreedingF > 1 ? box.inbreedingF / 100 : box.inbreedingF) : undefined,
+    notes: box.notes,
+    qrPayload,
+  };
+}
+

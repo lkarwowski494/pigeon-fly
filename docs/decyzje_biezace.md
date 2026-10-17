@@ -1,7 +1,7 @@
 # Pigeon-Fly — Rejestr Bieżący Decyzji i Stanu Projektu
 **Data aktualizacji:** 17.10.2026 (Przyjęcie 10 Zasad Uniwersalnych i Odkrycie Ról z Biblioteki na Dysku)  
 **Właściciel:** Łukasz (`lkarwowski494`)  
-**Status projektu:** Faza wdrożeniowa — 35 zestawów testowych, 267 testów zaliczonych (100%), 0 błędów TypeScript i i18n
+**Status projektu:** Faza wdrożeniowa — 37 zestawów testowych, 277 testów zaliczonych (100%), 0 błędów TypeScript i i18n
 
 ---
 
@@ -80,6 +80,8 @@
   * *Rozstrzygnięcie:* Przyjęcie 10 Zasad Uniwersalnych jako nadrzędnego protokołu; aktywacja modułów `aplikacje`, `research` i 3 reguł ogólnych; powołanie 7 ról roboczych. Przy każdej zmianie/naprawie bezwzględny wymóg min. 2 realnych opcji z kompromisami do decyzji właściciela.
 * **DEC-57 (Model Spalania Energii w Locie i Regeneracji Powrotowej — RD-15, RD-16, Z-047, Z-284): Opcja 1 (17.10.2026 — Zatwierdzona przez Łukasza)**
   * *Rozstrzygnięcie:* Implementacja `src/domain/flightEnergetics.ts` symulującego spalanie kwasów tłuszczowych (39.0 kJ/g), glikogenu (17.5 kJ/g), katabolizmu białek mięśni piersiowych (17.0 kJ/g) przy deficycie energetycznym, utraty wody/odwodnienia ze współczynnikiem termicznym oraz 2-fazowego protokołu regeneracji (Faza 1: izotonik 300 mOsm/L, Faza 2: Sedochol + aminokwasy BCAA + karma Depurative). Integracja w `app/(tabs)/kalkulator.tsx` (Sekcja 3). Pokrycie testami 100% (6/6 passing w `tests/flightEnergetics.test.ts`).
+* **DEC-58 (Generator Kart Lęgowych Celi PDF z Kodem QR — Z-270): Opcja 1 (17.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Implementacja funkcji `mapNestBoxToCardItem` w `src/domain/nestBoxMatrix.ts` łączącej pozycję celi z chronometrażem lęgowym (jaja, owoskopia, wylęg, okno obrączkowania 6–8 dni, odsadzenie) i mikrokodem QR (`PIGEONFLY:NESTBOX:...`). Integracja akcji drukowania AirPrint oraz udostępniania PDF pojedynczej celi i zbiorczego arkusza A4 dla całego przedziału lęgowego w `src/components/NestBoxMatrixModal.tsx`. Pokrycie testami 100% (4/4 passing w `tests/nestBoxCards.test.ts`, łącznie 37 zestawów i 277 testów).
 
 ---
 

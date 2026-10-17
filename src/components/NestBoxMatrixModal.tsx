@@ -23,7 +23,9 @@ import {
   checkBandingUrgency,
   simulateEggSwapProtocol,
   calculateFlockBreedingSummary,
+  mapNestBoxToCardItem,
 } from '../domain/nestBoxMatrix';
+import { PdfService } from '../services/pdfService';
 import { FieldButton } from './FieldButton';
 
 export interface NestBoxMatrixModalProps {
@@ -171,6 +173,60 @@ export function NestBoxMatrixModal({ visible, onClose, boxes }: NestBoxMatrixMod
     );
   };
 
+  const handlePrintSelectedBox = async (mode: 'print' | 'share' = 'print') => {
+    if (!selectedBox) return;
+    if (!selectedBox.cockRingNumber && !selectedBox.henRingNumber) {
+      Alert.alert('Pusta cela', 'Ta cela nie ma przypisanej pary lęgowej.');
+      return;
+    }
+
+    try {
+      try {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      } catch {}
+
+      const card = mapNestBoxToCardItem(selectedBox, 1);
+      await PdfService.exportNestBoxCards(
+        {
+          loftName: 'Gołębnik Mistrza',
+          breederName: 'Hodowca Pigeon-Fly',
+          seasonYear: 2026,
+          cards: [card],
+        },
+        mode
+      );
+    } catch (err: any) {
+      Alert.alert('Błąd eksportu', err.message || 'Nie udało się wygenerować karty celi.');
+    }
+  };
+
+  const handlePrintAllBoxes = async (mode: 'print' | 'share' = 'print') => {
+    const occupied = boxList.filter((b) => b.cockRingNumber || b.henRingNumber);
+    if (occupied.length === 0) {
+      Alert.alert('Brak par', 'Żadna cela nie ma przypisanej pary lęgowej.');
+      return;
+    }
+
+    try {
+      try {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      } catch {}
+
+      const cards = occupied.map((b) => mapNestBoxToCardItem(b, 1));
+      await PdfService.exportNestBoxCards(
+        {
+          loftName: 'Gołębnik Mistrza',
+          breederName: 'Hodowca Pigeon-Fly',
+          seasonYear: 2026,
+          cards,
+        },
+        mode
+      );
+    } catch (err: any) {
+      Alert.alert('Błąd eksportu', err.message || 'Nie udało się wygenerować kart cel.');
+    }
+  };
+
   const eggSwapAdvice = selectedBox
     ? simulateEggSwapProtocol(selectedBox.egg1Date, selectedBox.egg2Date)
     : null;
@@ -261,6 +317,25 @@ export function NestBoxMatrixModal({ visible, onClose, boxes }: NestBoxMatrixMod
               })}
             </View>
 
+            {/* Multi-Card Bulk PDF Export for Entire Loft (Z-270) */}
+            <TouchableOpacity
+              style={styles.bulkPdfBtn}
+              onPress={() =>
+                Alert.alert(
+                  'Karty Cel Gniazdowych (Arkusz A4)',
+                  `Wygenerować karty cel dla ${boxList.filter((b) => b.cockRingNumber || b.henRingNumber).length} obsadzonych klatek?`,
+                  [
+                    { text: '🖨️ Drukuj (AirPrint)', onPress: () => handlePrintAllBoxes('print') },
+                    { text: '📤 Udostępnij PDF', onPress: () => handlePrintAllBoxes('share') },
+                    { text: 'Anuluj', style: 'cancel' },
+                  ]
+                )
+              }
+              testID="btn-print-all-box-cards"
+            >
+              <Text style={styles.bulkPdfBtnText}>📑 Drukuj Wszystkie Karty Cel (Arkusz A4 / PDF)</Text>
+            </TouchableOpacity>
+
             {/* Selected Box Inspector Card */}
             {selectedBox && (
               <View style={styles.inspectorCard}>
@@ -327,6 +402,26 @@ export function NestBoxMatrixModal({ visible, onClose, boxes }: NestBoxMatrixMod
                       CHRONOMETRAŻ OBRĄCZKOWANIA RODOWEGO (8.0 mm)
                     </Text>
                     <Text style={styles.urgencyContent}>{bandingUrgency.statusText}</Text>
+                  </View>
+                )}
+
+                {/* Print Nest Box Card Action Buttons (Z-270) */}
+                {selectedBox.cockRingNumber && (
+                  <View style={styles.cardActionsRow}>
+                    <TouchableOpacity
+                      style={styles.printCardBtn}
+                      onPress={() => handlePrintSelectedBox('print')}
+                      testID="btn-print-box-card"
+                    >
+                      <Text style={styles.printCardBtnText}>🖨️ Drukuj Kartę Celi</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.shareCardBtn}
+                      onPress={() => handlePrintSelectedBox('share')}
+                      testID="btn-share-box-card"
+                    >
+                      <Text style={styles.shareCardBtnText}>📤 Udostępnij PDF</Text>
+                    </TouchableOpacity>
                   </View>
                 )}
               </View>
@@ -558,5 +653,56 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#D4D8E0',
     lineHeight: 17,
+  },
+  cardActionsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 12,
+  },
+  printCardBtn: {
+    flex: 1,
+    minHeight: 48,
+    backgroundColor: '#E5A93C',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+  },
+  printCardBtnText: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#121417',
+  },
+  shareCardBtn: {
+    flex: 1,
+    minHeight: 48,
+    backgroundColor: '#2A303C',
+    borderWidth: 1,
+    borderColor: '#3E4756',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+  },
+  shareCardBtnText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  bulkPdfBtn: {
+    minHeight: 48,
+    backgroundColor: '#1E2838',
+    borderWidth: 1.5,
+    borderColor: '#3B82F6',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    marginBottom: 16,
+  },
+  bulkPdfBtnText: {
+    fontSize: 13,
+    fontWeight: '900',
+    color: '#93C5FD',
   },
 });
