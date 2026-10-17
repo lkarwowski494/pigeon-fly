@@ -21,6 +21,7 @@ import { NestBoxMatrixModal } from '../../src/components/NestBoxMatrixModal';
 import { PairingAssistantModal } from '../../src/components/PairingAssistantModal';
 import { MaternalLineModal } from '../../src/components/MaternalLineModal';
 import { WingAerodynamicsModal } from '../../src/components/WingAerodynamicsModal';
+import { PigeonTransferModal } from '../../src/components/PigeonTransferModal';
 import { calculateClutchMilestones } from '../../src/domain/breeding';
 import { PdfService } from '../../src/services/pdfService';
 
@@ -80,6 +81,7 @@ export default function BreedingScreen() {
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [isMaternalModalOpen, setIsMaternalModalOpen] = useState(false);
   const [isWingAerodynamicsOpen, setIsWingAerodynamicsOpen] = useState(false);
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
 
   const handleApplyAiPairing = (cockRing: string, henRing: string, inbreedingF: number) => {
     handlePairSaved({
@@ -287,9 +289,18 @@ export default function BreedingScreen() {
           title="🪽 Aerodynamika Skrzydła i Biomechanika (Z-064)"
           variant="secondary"
           onPress={() => setIsWingAerodynamicsOpen(true)}
-          style={{ marginBottom: 12, minHeight: 44 }}
+          style={{ marginBottom: 10, minHeight: 44 }}
           textStyle={{ fontSize: 13 }}
           testID="btn-open-wing-aerodynamics"
+        />
+
+        <FieldButton
+          title="🤝 E-Księga Wywozu i Umowy Przekazania (Z-065)"
+          variant="secondary"
+          onPress={() => setIsTransferModalOpen(true)}
+          style={{ marginBottom: 12, minHeight: 44 }}
+          textStyle={{ fontSize: 13 }}
+          testID="btn-open-pigeon-transfer"
         />
 
         {/* Season Summary Bar */}
@@ -371,6 +382,12 @@ export default function BreedingScreen() {
       <WingAerodynamicsModal
         visible={isWingAerodynamicsOpen}
         onClose={() => setIsWingAerodynamicsOpen(false)}
+      />
+
+      {/* Pigeon Sales & Transfer Agreement Modal (Z-065) */}
+      <PigeonTransferModal
+        visible={isTransferModalOpen}
+        onClose={() => setIsTransferModalOpen(false)}
       />
     </SafeAreaView>
   );

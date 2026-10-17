@@ -285,6 +285,26 @@ export class PdfService {
       `Swiadectwo-TRACES-${consignment.certificateId || 'export'}`
     );
   }
+
+  /**
+   * Generuje i drukuje lub udostępnia Umowę Zbycia / Protokół Transferu Gołębi (Z-065)
+   */
+  static async exportPigeonTransferAgreement(
+    contract: any,
+    evaluation: any,
+    mode: 'print' | 'share' = 'print'
+  ): Promise<string | void> {
+    const { generateTransferContractHtml } = await import('../domain/pigeonTransfer');
+    const html = generateTransferContractHtml(contract, evaluation);
+    if (mode === 'print') {
+      await this.printHtml(html);
+      return;
+    }
+    return await this.shareHtmlAsPdf(
+      html,
+      `Umowa-Transferu-${contract.contractNumber || 'pigeons'}`
+    );
+  }
 }
 
 
