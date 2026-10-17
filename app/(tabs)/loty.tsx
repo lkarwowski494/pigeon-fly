@@ -22,6 +22,7 @@ import { BasketingSessionModal } from '../../src/components/BasketingSessionModa
 import { LiveDerbyModal } from '../../src/components/LiveDerbyModal';
 import { ConcourseSheetModal } from '../../src/components/ConcourseSheetModal';
 import { EskImportModal } from '../../src/components/EskImportModal';
+import { FlightComparisonModal } from '../../src/components/FlightComparisonModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -84,6 +85,7 @@ export default function RacesScreen() {
   const [isDerbyModalVisible, setIsDerbyModalVisible] = useState(false);
   const [isConcourseModalVisible, setIsConcourseModalVisible] = useState(false);
   const [isEskModalVisible, setIsEskModalVisible] = useState(false);
+  const [isComparisonModalVisible, setIsComparisonModalVisible] = useState(false);
 
   const handleImportEskArrivals = (importedArrivals: ArrivalWithPigeon[]) => {
     setArrivals((prev) => {
@@ -330,6 +332,13 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="📈 Porównaj z Oddziałem PZHGP"
+            onPress={() => setIsComparisonModalVisible(true)}
+            testID="btn-open-flight-comparison"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -418,6 +427,16 @@ export default function RacesScreen() {
         releaseTimeIso={releaseTimeIso}
         raceName={raceName}
         onImportArrivals={handleImportEskArrivals}
+      />
+
+      {/* Branch Race Comparison Modal */}
+      <FlightComparisonModal
+        visible={isComparisonModalVisible}
+        onClose={() => setIsComparisonModalVisible(false)}
+        raceName={raceName}
+        loftDistanceKm={raceDistanceMeters / 1000}
+        basketedCount={basketedCount}
+        arrivals={arrivals}
       />
     </SafeAreaView>
   );
