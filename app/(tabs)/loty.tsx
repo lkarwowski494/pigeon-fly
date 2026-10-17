@@ -27,6 +27,7 @@ import { TrainingTossModal } from '../../src/components/TrainingTossModal';
 import { BasketingProtocolModal } from '../../src/components/BasketingProtocolModal';
 import { TransportWelfareModal } from '../../src/components/TransportWelfareModal';
 import { LoftGeodesyModal } from '../../src/components/LoftGeodesyModal';
+import { WindTacticsModal } from '../../src/components/WindTacticsModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -94,6 +95,7 @@ export default function RacesScreen() {
   const [isBasketingProtocolModalVisible, setIsBasketingProtocolModalVisible] = useState(false);
   const [isWelfareModalVisible, setIsWelfareModalVisible] = useState(false);
   const [isGeodesyModalVisible, setIsGeodesyModalVisible] = useState(false);
+  const [isWindTacticsModalVisible, setIsWindTacticsModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -385,6 +387,13 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="🌬️ Symulator Wiatru i Korytarzy Przylotu (Z-070)"
+            onPress={() => setIsWindTacticsModalVisible(true)}
+            testID="btn-open-wind-tactics"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -511,6 +520,12 @@ export default function RacesScreen() {
       <LoftGeodesyModal
         visible={isGeodesyModalVisible}
         onClose={() => setIsGeodesyModalVisible(false)}
+      />
+
+      {/* Wind Tactics & Release Windows Simulator Modal (Z-070) */}
+      <WindTacticsModal
+        visible={isWindTacticsModalVisible}
+        onClose={() => setIsWindTacticsModalVisible(false)}
       />
     </SafeAreaView>
   );

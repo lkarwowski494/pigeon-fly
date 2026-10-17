@@ -25,6 +25,7 @@ import { WinterScheduleModal } from '../../src/components/WinterScheduleModal';
 import { BiosecurityModal } from '../../src/components/BiosecurityModal';
 import { VetPassportModal } from '../../src/components/VetPassportModal';
 import { LoftVentilationModal } from '../../src/components/LoftVentilationModal';
+import { VaccinationProtocolModal } from '../../src/components/VaccinationProtocolModal';
 import { analyzeWingMoult, getPhotoperiodStatus } from '../../src/domain/moult';
 import { PdfService } from '../../src/services/pdfService';
 import { FeatherStatus, MoultLog } from '../../src/domain/types';
@@ -70,6 +71,7 @@ export default function HealthScreen() {
   const [isBiosecurityModalVisible, setIsBiosecurityModalVisible] = useState(false);
   const [isVetPassportModalVisible, setIsVetPassportModalVisible] = useState(false);
   const [isVentilationModalVisible, setIsVentilationModalVisible] = useState(false);
+  const [isVaccinationModalVisible, setIsVaccinationModalVisible] = useState(false);
   const [treatments, setTreatments] = useState<TreatmentRecordItem[]>(INITIAL_TREATMENTS);
   const [moultLogs, setMoultLogs] = useState<MoultLog[]>(INITIAL_MOULT_LOGS);
 
@@ -148,6 +150,14 @@ export default function HealthScreen() {
           <Text style={styles.cardSub}>
             Ważność odporności do 15.02.2027. Zgodność z wymogami PZHGP / FCI: 100%.
           </Text>
+          <FieldButton
+            title="💉 Urzędowy Protokół Szczepień PZHGP (Z-069)"
+            variant="secondary"
+            onPress={() => setIsVaccinationModalVisible(true)}
+            style={{ marginTop: 10, minHeight: 44 }}
+            textStyle={{ fontSize: 13 }}
+            testID="btn-open-vaccination-protocol"
+          />
         </View>
 
         {/* 12-Month Veterinary & Prevention Calendar */}
@@ -461,6 +471,12 @@ export default function HealthScreen() {
       <LoftVentilationModal
         visible={isVentilationModalVisible}
         onClose={() => setIsVentilationModalVisible(false)}
+      />
+
+      {/* Official Vaccination Protocol Modal (Z-069) */}
+      <VaccinationProtocolModal
+        visible={isVaccinationModalVisible}
+        onClose={() => setIsVaccinationModalVisible(false)}
       />
     </SafeAreaView>
   );
