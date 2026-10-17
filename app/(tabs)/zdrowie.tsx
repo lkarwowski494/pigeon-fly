@@ -23,6 +23,7 @@ import { QuarantineModal } from '../../src/components/QuarantineModal';
 import { MoultTrackerModal } from '../../src/components/MoultTrackerModal';
 import { WinterScheduleModal } from '../../src/components/WinterScheduleModal';
 import { BiosecurityModal } from '../../src/components/BiosecurityModal';
+import { VetPassportModal } from '../../src/components/VetPassportModal';
 import { analyzeWingMoult, getPhotoperiodStatus } from '../../src/domain/moult';
 import { PdfService } from '../../src/services/pdfService';
 import { FeatherStatus, MoultLog } from '../../src/domain/types';
@@ -66,6 +67,7 @@ export default function HealthScreen() {
   const [isMoultTrackerModalVisible, setIsMoultTrackerModalVisible] = useState(false);
   const [isWinterScheduleModalVisible, setIsWinterScheduleModalVisible] = useState(false);
   const [isBiosecurityModalVisible, setIsBiosecurityModalVisible] = useState(false);
+  const [isVetPassportModalVisible, setIsVetPassportModalVisible] = useState(false);
   const [treatments, setTreatments] = useState<TreatmentRecordItem[]>(INITIAL_TREATMENTS);
   const [moultLogs, setMoultLogs] = useState<MoultLog[]>(INITIAL_MOULT_LOGS);
 
@@ -363,6 +365,13 @@ export default function HealthScreen() {
           style={{ marginTop: 10 }}
           testID="btn-open-biosecurity-modal"
         />
+        <FieldButton
+          title="🇪🇺 E-Paszport i Świadectwo TRACES-NT (Z-063)"
+          onPress={() => setIsVetPassportModalVisible(true)}
+          variant="secondary"
+          style={{ marginTop: 10 }}
+          testID="btn-open-vet-passport-modal"
+        />
       </ScrollView>
 
       {/* Add Treatment Modal */}
@@ -431,6 +440,12 @@ export default function HealthScreen() {
       <BiosecurityModal
         visible={isBiosecurityModalVisible}
         onClose={() => setIsBiosecurityModalVisible(false)}
+      />
+
+      {/* EU TRACES-NT Health Certificate Modal (Z-063) */}
+      <VetPassportModal
+        visible={isVetPassportModalVisible}
+        onClose={() => setIsVetPassportModalVisible(false)}
       />
     </SafeAreaView>
   );

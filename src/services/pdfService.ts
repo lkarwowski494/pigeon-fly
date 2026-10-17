@@ -265,6 +265,26 @@ export class PdfService {
       `Protokol-Bioasekuracji-PIW-${data.loftInfo?.wniNumber || 'inspekcja'}`
     );
   }
+
+  /**
+   * Generuje i drukuje lub udostępnia Urzędowe Świadectwo Zdrowia TRACES-NT (Z-063)
+   */
+  static async exportTracesHealthCertificate(
+    consignment: any,
+    validation: any,
+    mode: 'print' | 'share' = 'print'
+  ): Promise<string | void> {
+    const { generateTracesCertificateHtml } = await import('../domain/vetPassportTraces');
+    const html = generateTracesCertificateHtml(consignment, validation);
+    if (mode === 'print') {
+      await this.printHtml(html);
+      return;
+    }
+    return await this.shareHtmlAsPdf(
+      html,
+      `Swiadectwo-TRACES-${consignment.certificateId || 'export'}`
+    );
+  }
 }
 
 
