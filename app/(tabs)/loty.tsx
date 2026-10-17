@@ -31,6 +31,8 @@ import { WindTacticsModal } from '../../src/components/WindTacticsModal';
 import { ClockSyncModal } from '../../src/components/ClockSyncModal';
 import { CabinSealingModal } from '../../src/components/CabinSealingModal';
 import { NationalChampionshipModal } from '../../src/components/NationalChampionshipModal';
+import { PostRaceRestitutionModal } from '../../src/components/PostRaceRestitutionModal';
+import { TrainingTossLogModal } from '../../src/components/TrainingTossLogModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -102,6 +104,8 @@ export default function RacesScreen() {
   const [isClockSyncModalVisible, setIsClockSyncModalVisible] = useState(false);
   const [isCabinSealingModalVisible, setIsCabinSealingModalVisible] = useState(false);
   const [isChampionshipModalVisible, setIsChampionshipModalVisible] = useState(false);
+  const [isRestitutionModalVisible, setIsRestitutionModalVisible] = useState(false);
+  const [isTossLogModalVisible, setIsTossLogModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -421,6 +425,20 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="⚡ Bilans Elektrolitowy i Restytucja (Z-077)"
+            onPress={() => setIsRestitutionModalVisible(true)}
+            testID="btn-open-post-race-restitution"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
+            title="🧭 Dziennik Wywózek i Zwartość Stada (Z-078)"
+            onPress={() => setIsTossLogModalVisible(true)}
+            testID="btn-open-training-toss-log"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -574,6 +592,17 @@ export default function RacesScreen() {
       <NationalChampionshipModal
         visible={isChampionshipModalVisible}
         onClose={() => setIsChampionshipModalVisible(false)}
+      />
+
+      <PostRaceRestitutionModal
+        visible={isRestitutionModalVisible}
+        onClose={() => setIsRestitutionModalVisible(false)}
+        defaultRaceName={raceName}
+      />
+
+      <TrainingTossLogModal
+        visible={isTossLogModalVisible}
+        onClose={() => setIsTossLogModalVisible(false)}
       />
     </SafeAreaView>
   );

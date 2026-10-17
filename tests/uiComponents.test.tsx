@@ -1029,6 +1029,51 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('Wymaz z wola');
     expect(tree).toContain('Drukuj \u015awiadectwo Kwarantanny');
   });
+
+  test('PostRaceRestitutionModal (Z-077) renders electrolyte drinker, deficit stats and BCAA tabs', () => {
+    const { PostRaceRestitutionModal } = require('../src/components/PostRaceRestitutionModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <PostRaceRestitutionModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Bilans Elektrolitowy i Restytucja');
+    expect(tree).toContain('Deficyt & Objawy');
+    expect(tree).toContain('Pomiary Wagowe & Parametry Trasy');
+    expect(tree).toContain('Faza I: Poid\u0142o 0-3h');
+    expect(tree).toContain('Faza II: Mi\u0119\u015bnie & BCAA');
+    expect(tree).toContain('Drukuj Protok\u00f3\u0142 A4 (AirPrint)');
+  });
+
+  test('TrainingTossLogModal (Z-078) renders training tosses, flock cohesion index, and readiness verdict', () => {
+    const { TrainingTossLogModal } = require('../src/components/TrainingTossLogModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <TrainingTossLogModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Dziennik Wyw\u00f3zek Treningowych');
+    expect(tree).toContain('Wyw\u00f3zki');
+    expect(tree).toContain('Gotowo\u015b\u0107 Bojowa');
+    expect(tree).toContain('Borek Wlkp (Pola)');
+    expect(tree).toContain('Drukuj Dziennik Wyw\u00f3zek A4');
+  });
 });
 
 
