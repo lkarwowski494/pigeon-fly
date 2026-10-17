@@ -24,6 +24,9 @@ import { WingAerodynamicsModal } from '../../src/components/WingAerodynamicsModa
 import { PigeonTransferModal } from '../../src/components/PigeonTransferModal';
 import { calculateClutchMilestones } from '../../src/domain/breeding';
 import { PdfService } from '../../src/services/pdfService';
+import { ClutchScheduleModal } from '../../src/components/ClutchScheduleModal';
+import { BreedingNutritionModal } from '../../src/components/BreedingNutritionModal';
+import { ClutchScheduleInput } from '../../src/domain/clutchSchedulePlanner';
 
 
 const INITIAL_CLUTCHES: ClutchWithParents[] = [
@@ -82,6 +85,45 @@ export default function BreedingScreen() {
   const [isMaternalModalOpen, setIsMaternalModalOpen] = useState(false);
   const [isWingAerodynamicsOpen, setIsWingAerodynamicsOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [isClutchScheduleOpen, setIsClutchScheduleOpen] = useState(false);
+  const [isBreedingNutritionOpen, setIsBreedingNutritionOpen] = useState(false);
+
+  const scheduleInputs: ClutchScheduleInput[] = clutches.map((c) => ({
+    clutchId: c.id,
+    loftId: c.loftId,
+    nestBox: c.nestBox,
+    roundNumber: c.roundNumber,
+    cockRingNumber: c.cockRingNumber || 'PL-0284-23-1402',
+    henRingNumber: c.henRingNumber || 'PL-0284-22-9854',
+    pairedDate: c.pairedDate,
+    egg1Date: c.egg1Date,
+    egg2Date: c.egg2Date,
+    egg1Status: c.egg1Status,
+    egg2Status: c.egg2Status,
+    hatchDate: c.hatchDate,
+    chick1RingNumber: c.chick1RingNumber,
+    chick2RingNumber: c.chick2RingNumber,
+    chick1Banded: c.chick1Banded,
+    chick2Banded: c.chick2Banded,
+    weanedDate: c.weanedDate,
+    notes: c.notes,
+  }));
+
+  const handleUpdateClutchFromSchedule = (updated: ClutchScheduleInput) => {
+    setClutches((prev) =>
+      prev.map((c) =>
+        c.id === updated.clutchId
+          ? {
+              ...c,
+              chick1Banded: Boolean(updated.chick1Banded),
+              chick2Banded: Boolean(updated.chick2Banded),
+              chick1RingNumber: updated.chick1RingNumber || c.chick1RingNumber,
+              chick2RingNumber: updated.chick2RingNumber || c.chick2RingNumber,
+            }
+          : c
+      )
+    );
+  };
 
   const handleApplyAiPairing = (cockRing: string, henRing: string, inbreedingF: number) => {
     handlePairSaved({
@@ -298,9 +340,27 @@ export default function BreedingScreen() {
           title="🤝 E-Księga Wywozu i Umowy Przekazania (Z-065)"
           variant="secondary"
           onPress={() => setIsTransferModalOpen(true)}
-          style={{ marginBottom: 12, minHeight: 44 }}
+          style={{ marginBottom: 10, minHeight: 44 }}
           textStyle={{ fontSize: 13 }}
           testID="btn-open-pigeon-transfer"
+        />
+
+        <FieldButton
+          title="📅 Harmonogram Lęgów i Karty Cel (Z-073)"
+          variant="secondary"
+          onPress={() => setIsClutchScheduleOpen(true)}
+          style={{ marginBottom: 10, minHeight: 44 }}
+          textStyle={{ fontSize: 13 }}
+          testID="btn-open-clutch-schedule"
+        />
+
+        <FieldButton
+          title="🥣 Asystent Żywieniowy Lęgów i Karmnik (Z-074)"
+          variant="secondary"
+          onPress={() => setIsBreedingNutritionOpen(true)}
+          style={{ marginBottom: 12, minHeight: 44 }}
+          textStyle={{ fontSize: 13 }}
+          testID="btn-open-breeding-nutrition"
         />
 
         {/* Season Summary Bar */}
@@ -388,6 +448,21 @@ export default function BreedingScreen() {
       <PigeonTransferModal
         visible={isTransferModalOpen}
         onClose={() => setIsTransferModalOpen(false)}
+      />
+
+      {/* Clutch Schedule Planner & Nest Box Cards Modal (Z-073) */}
+      <ClutchScheduleModal
+        visible={isClutchScheduleOpen}
+        clutches={scheduleInputs}
+        onClose={() => setIsClutchScheduleOpen(false)}
+        onUpdateClutch={handleUpdateClutchFromSchedule}
+      />
+
+      {/* Breeding Nutrition & Feeder Assistant Modal (Z-074) */}
+      <BreedingNutritionModal
+        visible={isBreedingNutritionOpen}
+        onClose={() => setIsBreedingNutritionOpen(false)}
+        initialPairsCount={clutches.length}
       />
     </SafeAreaView>
   );

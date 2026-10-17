@@ -925,7 +925,68 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('Synowie (1.0)');
     expect(tree).toContain('Córki (0.1)');
   });
+
+  test('ClutchScheduleModal (Z-073) renders schedule, banding alerts, and card print options', () => {
+    const { ClutchScheduleModal } = require('../src/components/ClutchScheduleModal');
+    const onClose = jest.fn();
+    const testClutches = [
+      {
+        clutchId: 'c-test-1',
+        nestBox: 'Cela A-04',
+        roundNumber: 1,
+        cockRingNumber: 'PL-0284-23-1402',
+        henRingNumber: 'PL-0284-22-9854',
+        pairedDate: '2026-03-01',
+        egg1Date: '2026-03-10',
+        egg2Date: '2026-03-12',
+        hatchDate: '2026-03-30',
+        chick1Banded: false,
+        chick2Banded: false,
+      },
+    ];
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <ClutchScheduleModal
+          visible={true}
+          clutches={testClutches}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Harmonogram i Karty Cel');
+    expect(tree).toContain('Cela A-04');
+    expect(tree).toContain('PL-0284-23-1402');
+    expect(tree).toContain('Drukuj Kart\u0119 Celi');
+  });
+
+  test('BreedingNutritionModal (Z-074) renders nutrition assistant, phases, and feeder calculator', () => {
+    const { BreedingNutritionModal } = require('../src/components/BreedingNutritionModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <BreedingNutritionModal
+          visible={true}
+          onClose={onClose}
+          initialPairsCount={12}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Asystent Żywieniowy Lęgów');
+    expect(tree).toContain('Mleczko Wola');
+    expect(tree).toContain('Bia\u0142ko Surowe');
+    expect(tree).toContain('KALKULATOR KARMNIKA L\u0118GOWEGO');
+    expect(tree).toContain('Drukuj Kart\u0119 \u017bywieniow\u0105');
+  });
 });
+
 
 
 
