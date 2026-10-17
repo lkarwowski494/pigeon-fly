@@ -1424,6 +1424,48 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('Wypo\u017cyczone');
     expect(tree).toContain('Wydaj Kosz');
   });
+
+  test('PreSeasonFlockCensusModal (Z-095) renders census stats, PMV-1 veterinary box, and 3-copy selector', () => {
+    const { PreSeasonFlockCensusModal } = require('../src/components/PreSeasonFlockCensusModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <PreSeasonFlockCensusModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('URZ\u0118DOWY SPIS GO\u0141\u0118BI PZHGP');
+    expect(tree).toContain('Zg\u0142oszono');
+    expect(tree).toContain('GMP 50-tka');
+    expect(tree).toContain('ATESTACJA WETERYNARYJNA PMV-1');
+  });
+
+  test('EmergencyCabinReleaseModal (Z-096) renders welfare alert banner, incident fields, and crisis authorization', () => {
+    const { EmergencyCabinReleaseModal } = require('../src/components/EmergencyCabinReleaseModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <EmergencyCabinReleaseModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('AWARIA KABINY & WYPUSZCZENIE AWARYJNE');
+    expect(tree).toContain('KRYTYCZNE ZAGRO\u017bENIE \u017bYCIA STADA');
+    expect(tree).toContain('IDENTYFIKACJA LOTU I PROTOKO\u0141U');
+    expect(tree).toContain('LOKALIZACJA ZDARZENIA NA TRASIE');
+  });
 });
 
 

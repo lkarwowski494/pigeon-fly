@@ -44,6 +44,8 @@ import { LoftInspectionProtocolModal } from '../../src/components/LoftInspection
 import { BasketingStationSanitationModal } from '../../src/components/BasketingStationSanitationModal';
 import { AntidopingSamplingModal } from '../../src/components/AntidopingSamplingModal';
 import { CrateInventoryRentalModal } from '../../src/components/CrateInventoryRentalModal';
+import { PreSeasonFlockCensusModal } from '../../src/components/PreSeasonFlockCensusModal';
+import { EmergencyCabinReleaseModal } from '../../src/components/EmergencyCabinReleaseModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -128,6 +130,8 @@ export default function RacesScreen() {
   const [isStationSanitationModalVisible, setIsStationSanitationModalVisible] = useState(false);
   const [isAntidopingSamplingModalVisible, setIsAntidopingSamplingModalVisible] = useState(false);
   const [isCrateRentalModalVisible, setIsCrateRentalModalVisible] = useState(false);
+  const [isFlockCensusModalVisible, setIsFlockCensusModalVisible] = useState(false);
+  const [isEmergencyReleaseModalVisible, setIsEmergencyReleaseModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -538,6 +542,20 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="📋 Urzędowy Spis Gołębi PZHGP (Z-095)"
+            onPress={() => setIsFlockCensusModalVisible(true)}
+            testID="btn-open-flock-census"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
+            title="🚨 Awaria Kabiny i Wypuszczenie Awaryjne (Z-096)"
+            onPress={() => setIsEmergencyReleaseModalVisible(true)}
+            testID="btn-open-emergency-release"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -761,6 +779,17 @@ export default function RacesScreen() {
       <CrateInventoryRentalModal
         visible={isCrateRentalModalVisible}
         onClose={() => setIsCrateRentalModalVisible(false)}
+      />
+
+      <PreSeasonFlockCensusModal
+        visible={isFlockCensusModalVisible}
+        onClose={() => setIsFlockCensusModalVisible(false)}
+      />
+
+      <EmergencyCabinReleaseModal
+        visible={isEmergencyReleaseModalVisible}
+        onClose={() => setIsEmergencyReleaseModalVisible(false)}
+        defaultRaceName={raceName}
       />
     </SafeAreaView>
   );
