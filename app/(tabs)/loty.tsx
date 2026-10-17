@@ -28,6 +28,8 @@ import { BasketingProtocolModal } from '../../src/components/BasketingProtocolMo
 import { TransportWelfareModal } from '../../src/components/TransportWelfareModal';
 import { LoftGeodesyModal } from '../../src/components/LoftGeodesyModal';
 import { WindTacticsModal } from '../../src/components/WindTacticsModal';
+import { ClockSyncModal } from '../../src/components/ClockSyncModal';
+import { CabinSealingModal } from '../../src/components/CabinSealingModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -96,6 +98,8 @@ export default function RacesScreen() {
   const [isWelfareModalVisible, setIsWelfareModalVisible] = useState(false);
   const [isGeodesyModalVisible, setIsGeodesyModalVisible] = useState(false);
   const [isWindTacticsModalVisible, setIsWindTacticsModalVisible] = useState(false);
+  const [isClockSyncModalVisible, setIsClockSyncModalVisible] = useState(false);
+  const [isCabinSealingModalVisible, setIsCabinSealingModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -394,6 +398,20 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="⏱️ Rozliczenie i Odchyłka Zegarowa PZHGP (Z-071)"
+            onPress={() => setIsClockSyncModalVisible(true)}
+            testID="btn-open-clock-sync"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
+            title="🚛 Plombowanie Kabiny i Klatek PZHGP (Z-072)"
+            onPress={() => setIsCabinSealingModalVisible(true)}
+            testID="btn-open-cabin-sealing"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -526,6 +544,22 @@ export default function RacesScreen() {
       <WindTacticsModal
         visible={isWindTacticsModalVisible}
         onClose={() => setIsWindTacticsModalVisible(false)}
+      />
+
+      {/* Clock Synchronization & Offset Calculator Modal (Z-071) */}
+      <ClockSyncModal
+        visible={isClockSyncModalVisible}
+        onClose={() => setIsClockSyncModalVisible(false)}
+        defaultRaceName={raceName}
+        defaultRaceDistanceKm={raceDistanceMeters / 1000}
+      />
+
+      {/* Cabin Sealing & Welfare Verification Protocol Modal (Z-072) */}
+      <CabinSealingModal
+        visible={isCabinSealingModalVisible}
+        onClose={() => setIsCabinSealingModalVisible(false)}
+        defaultRaceName={raceName}
+        defaultReleasePlace={releaseLocation}
       />
     </SafeAreaView>
   );

@@ -344,6 +344,44 @@ export class PdfService {
       `Protokol-Wykreslenia-${data.protocolNumber || 'PZHGP'}`
     );
   }
+
+  /**
+   * Generuje i drukuje lub udostępnia Protokół Zegarowy Otwierania i Rozliczania Zegarów dla PZHGP (Z-071)
+   */
+  static async exportClockSyncProtocol(
+    data: any,
+    mode: 'print' | 'share' = 'print'
+  ): Promise<string | void> {
+    const { generateClockProtocolHtml } = await import('../domain/clockSynchronization');
+    const html = generateClockProtocolHtml(data);
+    if (mode === 'print') {
+      await this.printHtml(html);
+      return;
+    }
+    return await this.shareHtmlAsPdf(
+      html,
+      `Protokol-Zegarowy-${data.protocolNumber || 'PZHGP'}`
+    );
+  }
+
+  /**
+   * Generuje i drukuje lub udostępnia Protokół Plombowania i Stanu Technicznego Kabiny PZHGP (Z-072)
+   */
+  static async exportCabinSealingProtocol(
+    data: any,
+    mode: 'print' | 'share' = 'print'
+  ): Promise<string | void> {
+    const { generateCabinSealingProtocolHtml } = await import('../domain/cabinSealingProtocol');
+    const html = generateCabinSealingProtocolHtml(data);
+    if (mode === 'print') {
+      await this.printHtml(html);
+      return;
+    }
+    return await this.shareHtmlAsPdf(
+      html,
+      `Protokol-Plombowania-Kabiny-${data.protocolNumber || 'PZHGP'}`
+    );
+  }
 }
 
 
