@@ -23,6 +23,8 @@ import { LiveDerbyModal } from '../../src/components/LiveDerbyModal';
 import { ConcourseSheetModal } from '../../src/components/ConcourseSheetModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
+import { CsvService } from '../../src/services/csvService';
+import { exportBasketingToCsv } from '../../src/domain/csvExport';
 import { Alert } from 'react-native';
 import { calculateFciCoefficient, calculateConcourseLimit } from '../../src/domain/concourse';
 
@@ -159,6 +161,33 @@ export default function RacesScreen() {
               );
             } catch (e: any) {
               Alert.alert('Błąd', e?.message || 'Nie udało się wyeksportować PDF');
+            }
+          },
+        },
+        {
+          text: '📥 Eksportuj do CSV',
+          onPress: async () => {
+            try {
+              const csv = exportBasketingToCsv({
+                clubBranch: 'Oddział 0284 Gostyń',
+                raceName: releaseLocation,
+                releaseLocation: releaseLocation,
+                basketingDate: new Date().toISOString().slice(0, 10),
+                pigeons: arrivals.map((a, idx) => ({
+                  index: idx + 1,
+                  ringNumber: a.ringNumber,
+                  color: a.plumageColor,
+                  sex: a.sex,
+                  isTip: idx < 5,
+                })),
+              });
+              await CsvService.shareCsv(
+                `lista-wkladaniowa-${releaseLocation.replace(/[^a-zA-Z0-9]/g, '_')}.csv`,
+                csv,
+                'Udostępnij listę wkładaniową CSV'
+              );
+            } catch (e: any) {
+              Alert.alert('Błąd CSV', e?.message || 'Nie udało się wyeksportować CSV');
             }
           },
         },

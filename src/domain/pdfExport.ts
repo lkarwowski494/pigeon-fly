@@ -939,5 +939,184 @@ export function generateNestBoxCardsHtml(options: NestBoxCardsPdfOptions): strin
   `.trim();
 }
 
+export interface ConcourseSheetPdfItem {
+  position: number;
+  ringNumber: string;
+  plumageColor?: string;
+  sex?: 'cock' | 'hen' | 'unknown' | string;
+  fancierName?: string;
+  loftName?: string;
+  arrivalTime: string;
+  distanceKm: number;
+  velocityMPerMin: number;
+  fciCoeff: number;
+  gmpPoints: number;
+  isTip?: boolean;
+}
+
+export interface ConcourseSheetPdfOptions {
+  clubBranch?: string;
+  raceName: string;
+  releaseLocation: string;
+  releaseDateTime?: string;
+  distanceKm: number;
+  totalBasketed: number;
+  basePercent: 20 | 25 | 33;
+  prizeLimit: number;
+  winningVelocity: number;
+  lastPrizeVelocity: number;
+  items: ConcourseSheetPdfItem[];
+  seriesSummary?: {
+    seriesName: string;
+    totalPoints: number;
+    countingBirdsCount: number;
+  };
+}
+
+export function generateConcourseSheetHtml(options: ConcourseSheetPdfOptions): string {
+  const rows = options.items
+    .map((item) => {
+      const sexLabel = item.sex === 'cock' ? '1.0 ♂' : item.sex === 'hen' ? '0.1 ♀' : '—';
+      const seriesBadge = item.isTip
+        ? '<span style="background: #FEF3C7; color: #B45309; padding: 2px 6px; border-radius: 3px; font-weight: bold;">★ 5/50</span>'
+        : '<span style="color: #94A3B8;">—</span>';
+
+      return `
+      <tr>
+        <td style="text-align: center; font-weight: 900; background: #F8FAFC;">${item.position}</td>
+        <td style="font-weight: 700;">${item.fancierName || 'Hodowca Pigeon-Fly'}</td>
+        <td style="font-family: monospace; font-size: 11px; font-weight: 900; color: #0F172A;">${item.ringNumber}</td>
+        <td style="text-align: center; font-size: 10px;">${sexLabel}</td>
+        <td style="font-size: 10px; color: #475569;">${item.plumageColor || '—'}</td>
+        <td style="text-align: center; font-family: monospace; font-size: 10.5px;">${item.arrivalTime}</td>
+        <td style="text-align: right; font-family: monospace;">${item.distanceKm.toFixed(3)}</td>
+        <td style="text-align: right; font-weight: 900; color: #1E293B; font-family: monospace;">${item.velocityMPerMin.toFixed(3)}</td>
+        <td style="text-align: right; font-family: monospace; color: #0369A1; font-weight: 700;">${item.fciCoeff.toFixed(3)}</td>
+        <td style="text-align: right; font-weight: 900; color: #15803D; font-family: monospace;">${item.gmpPoints.toFixed(2)}</td>
+        <td style="text-align: center; font-size: 9.5px;">${seriesBadge}</td>
+      </tr>
+      `;
+    })
+    .join('');
+
+  const seriesHtml = options.seriesSummary
+    ? `
+    <div class="series-card">
+      <div class="series-title">🏆 ${options.seriesSummary.seriesName}</div>
+      <div class="series-body">
+        Zdobyte punkty: <strong>${options.seriesSummary.totalPoints.toFixed(2)} pkt</strong> &nbsp;•&nbsp; 
+        Liczba ptaków punktujących w serii: <strong>${options.seriesSummary.countingBirdsCount}</strong>
+      </div>
+    </div>
+    `
+    : '';
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Lista Konkursowa — ${options.raceName}</title>
+  <style>
+    @page { size: A4 portrait; margin: 10mm; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #0F172A; font-size: 10px; margin: 0; line-height: 1.3; }
+    .header { border-bottom: 2px solid #0F172A; padding-bottom: 8px; margin-bottom: 10px; }
+    .union-title { font-size: 12px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: #475569; }
+    .main-title { font-size: 20px; font-weight: 900; text-transform: uppercase; margin: 2px 0; color: #0F172A; }
+    .branch-subtitle { font-size: 12px; font-weight: 700; color: #2563EB; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 10px 0; }
+    .stat-box { border: 1px solid #CBD5E1; border-radius: 4px; padding: 6px; background: #F8FAFC; text-align: center; }
+    .stat-label { font-size: 8px; color: #64748B; text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
+    .stat-value { font-size: 12px; font-weight: 900; color: #0F172A; font-family: monospace; }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th { background: #0F172A; color: #FFFFFF; font-size: 9px; padding: 5px 4px; text-transform: uppercase; border: 1px solid #0F172A; }
+    td { border: 1px solid #CBD5E1; padding: 4px; font-size: 9.5px; }
+    tr:nth-child(even) { background-color: #F8FAFC; }
+    
+    .series-card { margin-top: 12px; padding: 8px 12px; border: 1px solid #FCD34D; background: #FFFBEB; border-radius: 6px; }
+    .series-title { font-size: 11px; font-weight: 800; color: #92400E; margin-bottom: 2px; }
+    .series-body { font-size: 10px; color: #78350F; }
+    
+    .footer { margin-top: 25px; display: flex; justify-content: space-between; page-break-inside: avoid; }
+    .signature-block { width: 160px; text-align: center; border-top: 1px solid #0F172A; padding-top: 4px; margin-top: 35px; font-size: 9px; color: #475569; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="union-title">Polski Związek Hodowców Gołębi Pocztowych • Regulamin FCI</div>
+    <div class="main-title">Oficjalna Lista Konkursowa</div>
+    <div class="branch-subtitle">${options.clubBranch || 'Zarząd Oddziału / Sekcji Hodowlanej'}</div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-label">Miejscowość / Lot</div>
+      <div class="stat-value" style="font-size: 10.5px;">${options.releaseLocation}</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Godzina Wypuszczenia</div>
+      <div class="stat-value">${options.releaseDateTime || '—'}</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Średni Dystans</div>
+      <div class="stat-value">${options.distanceKm.toFixed(3)} km</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Baza Konkursowa</div>
+      <div class="stat-value">${options.basePercent}% (1 : ${Math.round(100 / options.basePercent)})</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Gołębi w Koszu</div>
+      <div class="stat-value">${options.totalBasketed}</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Liczba Konkursów</div>
+      <div class="stat-value" style="color: #D97706;">${options.prizeLimit}</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Prędkość I Ptaka</div>
+      <div class="stat-value" style="color: #15803D;">${options.winningVelocity.toFixed(2)} m/m</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Prędkość Ostatniego</div>
+      <div class="stat-value" style="color: #B45309;">${options.lastPrizeVelocity.toFixed(2)} m/m</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 32px;">Lp.</th>
+        <th>Hodowca / Gołębnik</th>
+        <th>Nr Obrączki Rodowej</th>
+        <th style="width: 44px;">Płeć</th>
+        <th>Barwa</th>
+        <th>Czas Przylotu</th>
+        <th>Dyst. [km]</th>
+        <th>Prędkość [m/m]</th>
+        <th>Coeff.</th>
+        <th>Pkt. GMP</th>
+        <th style="width: 50px;">Seria</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows}
+    </tbody>
+  </table>
+
+  ${seriesHtml}
+
+  <div class="footer">
+    <div class="signature-block">Przewodniczący Komisji Lotowej</div>
+    <div class="signature-block">Komisja Obliczeniowa</div>
+    <div class="signature-block">Przewodniczący Komisji Zegarowej</div>
+  </div>
+</body>
+</html>
+  `.trim();
+}
+
 
 

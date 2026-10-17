@@ -774,6 +774,8 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('Baza Konkursowa');
     expect(tree).toContain('PL-0284-23-1402');
     expect(tree).toContain('KONKURS');
+    expect(tree).toContain('btn-export-concourse-pdf');
+    expect(tree).toContain('btn-export-concourse-csv');
   });
 
   test('TandemModal renders loft sharing, members list, invite tab, and audit log', () => {

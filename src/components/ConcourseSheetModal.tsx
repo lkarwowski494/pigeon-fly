@@ -26,6 +26,9 @@ import {
 } from '../domain/concourse';
 import { ArrivalWithPigeon } from '../db/raceRepository';
 import { FieldButton } from './FieldButton';
+import { PdfService } from '../services/pdfService';
+import { CsvService } from '../services/csvService';
+import { exportConcourseToCsv } from '../domain/csvExport';
 
 export interface ConcourseSheetModalProps {
   visible: boolean;
@@ -85,13 +88,128 @@ export function ConcourseSheetModal({
       ? prizeWinners[prizeWinners.length - 1].velocityMPerMin
       : 0;
 
+  const concourseItems = evaluatedArrivals
+    .filter((a) => a.prize.isPrize)
+    .map((a) => ({
+      position: a.position,
+      ringNumber: a.ringNumber,
+      plumageColor: a.plumageColor,
+      sex: a.sex,
+      fancierName: 'Hodowca Pigeon-Fly',
+      loftName: 'Gołębnik Mistrza',
+      arrivalTime: new Date(a.arrivalTime).toLocaleTimeString('pl-PL', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      }),
+      distanceKm,
+      velocityMPerMin: a.velocityMPerMin,
+      fciCoeff: a.prize.fciCoefficient,
+      gmpPoints: a.prize.gmpPoints,
+      isTip: a.isTip,
+    }));
+
+  const handleExportCsv = async () => {
+    try {
+      try {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } catch {}
+      const csv = exportConcourseToCsv({
+        clubBranch: 'Oddział 0284 Gostyń • Sekcja Poniec',
+        raceName,
+        releaseLocation,
+        releaseDateTime: new Date().toLocaleDateString('pl-PL'),
+        distanceKm,
+        totalBasketed,
+        basePercent,
+        prizeLimit: concourseLimit.prizeLimit,
+        items: concourseItems,
+      });
+      await CsvService.shareCsv(
+        `lista-konkursowa-${raceName.replace(/[^a-zA-Z0-9]/g, '_')}.csv`,
+        csv,
+        'Udostępnij listę konkursową CSV'
+      );
+    } catch (err: any) {
+      Alert.alert('Błąd CSV', err?.message || 'Nie udało się wyeksportować CSV');
+    }
+  };
+
   const handleExportConcoursePdf = () => {
     try {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {}
+
     Alert.alert(
-      'Lista Konkursowa',
-      `Wygenerowano oficjalną listę konkursową dla lotu ${releaseLocation} (${prizeWinners.length} konkursów w bazie ${basePercent}%).`
+      'Oficjalna Lista Konkursowa (PZHGP / FCI)',
+      `Wybierz format dokumentu dla lotu ${releaseLocation} (${prizeWinners.length} konkursów w bazie ${basePercent}%):`,
+      [
+        {
+          text: '🖨️ Drukuj (AirPrint)',
+          onPress: async () => {
+            try {
+              await PdfService.exportConcourseSheet(
+                {
+                  clubBranch: 'Oddział 0284 Gostyń • Sekcja Poniec',
+                  raceName,
+                  releaseLocation,
+                  releaseDateTime: new Date().toLocaleDateString('pl-PL'),
+                  distanceKm,
+                  totalBasketed,
+                  basePercent,
+                  prizeLimit: concourseLimit.prizeLimit,
+                  winningVelocity,
+                  lastPrizeVelocity,
+                  items: concourseItems,
+                  seriesSummary: {
+                    seriesName: 'Mistrzostwo Polski GMP (5 z 50)',
+                    totalPoints: teamSeries.totalSeriesPoints,
+                    countingBirdsCount: teamSeries.countingPigeonsCount,
+                  },
+                },
+                'print'
+              );
+            } catch (err: any) {
+              Alert.alert('Błąd', err?.message || 'Nie udało się wydrukować listy konkursowej');
+            }
+          },
+        },
+        {
+          text: '📤 Udostępnij PDF (A4)',
+          onPress: async () => {
+            try {
+              await PdfService.exportConcourseSheet(
+                {
+                  clubBranch: 'Oddział 0284 Gostyń • Sekcja Poniec',
+                  raceName,
+                  releaseLocation,
+                  releaseDateTime: new Date().toLocaleDateString('pl-PL'),
+                  distanceKm,
+                  totalBasketed,
+                  basePercent,
+                  prizeLimit: concourseLimit.prizeLimit,
+                  winningVelocity,
+                  lastPrizeVelocity,
+                  items: concourseItems,
+                  seriesSummary: {
+                    seriesName: 'Mistrzostwo Polski GMP (5 z 50)',
+                    totalPoints: teamSeries.totalSeriesPoints,
+                    countingBirdsCount: teamSeries.countingPigeonsCount,
+                  },
+                },
+                'share'
+              );
+            } catch (err: any) {
+              Alert.alert('Błąd', err?.message || 'Nie udało się wyeksportować listy konkursowej');
+            }
+          },
+        },
+        {
+          text: '📥 Eksportuj do CSV (Excel)',
+          onPress: handleExportCsv,
+        },
+        { text: 'Anuluj', style: 'cancel' },
+      ]
     );
   };
 
@@ -312,12 +430,19 @@ export function ConcourseSheetModal({
               </View>
             )}
 
-            {/* Action Export Button */}
+            {/* Action Export Buttons */}
             <FieldButton
               title="📄 Drukuj / Udostępnij Listę Konkursową (PDF)"
               onPress={handleExportConcoursePdf}
               style={{ marginTop: 14 }}
               testID="btn-export-concourse-pdf"
+            />
+            <FieldButton
+              title="📥 Eksportuj CSV do Programów Obliczeniowych"
+              variant="secondary"
+              onPress={handleExportCsv}
+              style={{ marginTop: 8 }}
+              testID="btn-export-concourse-csv"
             />
           </ScrollView>
         </SafeAreaView>

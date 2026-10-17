@@ -233,5 +233,65 @@ describe('PdfService', () => {
     expect(Sharing.shareAsync).toHaveBeenCalled();
     expect(uri).toBe('file:///mock/pedigree.pdf');
   });
+
+  it('exports concourse sheet in print mode', async () => {
+    await PdfService.exportConcourseSheet(
+      {
+        clubBranch: 'Oddział 0284 Gostyń',
+        raceName: 'Lot Narodowy Bruksela',
+        releaseLocation: 'Bruksela (BE)',
+        releaseDateTime: '2026-06-20 06:00:00',
+        distanceKm: 785.45,
+        totalBasketed: 3500,
+        basePercent: 20,
+        prizeLimit: 700,
+        winningVelocity: 1342.54,
+        lastPrizeVelocity: 1105.12,
+        items: [
+          {
+            position: 1,
+            ringNumber: 'PL-0284-23-1402',
+            sex: 'cock',
+            plumageColor: 'Niebieski',
+            fancierName: 'Stanisław Kowalski',
+            loftName: 'Mistrz Loft',
+            arrivalTime: '15:45:12',
+            distanceKm: 785.45,
+            velocityMPerMin: 1342.54,
+            fciCoeff: 0.286,
+            gmpPoints: 40.0,
+            isTip: true,
+          },
+        ],
+        seriesSummary: {
+          seriesName: 'GMP 5 z 50',
+          totalPoints: 195.45,
+          countingBirdsCount: 5,
+        },
+      },
+      'print'
+    );
+    expect(Print.printAsync).toHaveBeenCalled();
+  });
+
+  it('exports concourse sheet in share mode', async () => {
+    const uri = await PdfService.exportConcourseSheet(
+      {
+        raceName: 'Magdeburg',
+        releaseLocation: 'Magdeburg',
+        distanceKm: 345.2,
+        totalBasketed: 1200,
+        basePercent: 20,
+        prizeLimit: 240,
+        winningVelocity: 1250.0,
+        lastPrizeVelocity: 1050.0,
+        items: [],
+      },
+      'share'
+    );
+    expect(Print.printToFileAsync).toHaveBeenCalled();
+    expect(Sharing.shareAsync).toHaveBeenCalled();
+    expect(uri).toBe('file:///mock/pedigree.pdf');
+  });
 });
 

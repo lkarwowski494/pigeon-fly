@@ -126,6 +126,7 @@ pigeon-fly/
 │   │   ├── compartments.ts     # Sektory i przedziały gołębnika (Wdowce, Wdówki, Młode, Rozpłód, Izolatka) i normy FCI (BR-STADO-005)
 │   │   ├── concourse.ts        # Baza konkursowa (20%), FCI Coeff i punkty GMP Asów
 │   │   ├── costCalculator.ts   # Kalkulator budżetu stada, ziarna i weterynarii
+│   │   ├── csvExport.ts        # Silnik eksportu CSV list konkursowych, koszowania i spisu stada (PZHGP / Excel) (Z-039, BR-LOT-007)
 │   │   ├── derby.ts            # Mini-Derby Sekcji, wielogołębnikowe live standings i feed
 │   │   ├── drinkerLab.ts       # Laboratorium poidła, buforowanie pH przeciw rzęsistkowi (RD-17), izotonik (RD-18) i Carbo-Lipid Shift (RD-15/16)
 │   │   ├── feedCompounder.ts   # Laboratorium paszowe 20 ziaren, bilans makro i energia MJ/kg
@@ -135,7 +136,7 @@ pigeon-fly/
 │   │   ├── moult.ts            # Regeneracja 10 lotek skrzydła i fotoperiod
 │   │   ├── nestBoxMatrix.ts    # Wirtualna siatka cel lęgowych, jajka gipsowe i alarmy 6-8 dni
 │   │   ├── nutrition.ts        # 4-fazowe protokoły żywieniowe i bilans makro
-│   │   ├── pdfExport.ts        # Generatory HTML A4: rodowody, kosz, naklejki QR, PIW i karty cel gniazdowych (Z-270)
+│   │   ├── pdfExport.ts        # Generatory HTML A4: rodowody, kosz, naklejki QR, PIW, karty cel i listy konkursowe (Z-044, Z-270)
 │   │   ├── performance.ts      # Silnik formy sportowej, dynamika prędkości m/min i taktyka
 │   │   ├── photoperiod.ts      # Chronobiologia stada, systemy Verdunkelung / Belichtung (RD-13/14) i alerty rolet
 │   │   ├── qr.ts               # Bezpieczne identyfikatory i weryfikacja rodowodów
@@ -158,6 +159,7 @@ pigeon-fly/
 │   ├── services/               # Usługi systemowe i integracje
 │   │   ├── appleWatchService.ts # Komunikacja i odbijanie przylotów na Apple Watch
 │   │   ├── backupService.ts    # 10-plikowa rotacyjna kopia zapasowa JSON/SQLite
+│   │   ├── csvService.ts       # Udostępnianie i zapis plików CSV na urządzeniu
 │   │   └── pdfService.ts       # Natywny wydruk (expo-print) i udostępnianie (expo-sharing)
 │   ├── components/             # Ergonomiczne komponenty interfejsu (Field Mode)
 │   │   ├── AddFeedingLogModal.tsx # Formularz dziennika karmy i suplementacji
@@ -198,7 +200,7 @@ pigeon-fly/
 │   └── lib/                    # Współdzielone moduły pomocnicze
 │       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
 ├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
-├── tests/                      # 34 zestawy testowe (259 testów jednostkowych i fast-check)
+├── tests/                      # 35 zestawów testowych (267 testów jednostkowych i fast-check)
 ├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
 └── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
     └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)

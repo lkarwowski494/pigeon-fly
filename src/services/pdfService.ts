@@ -17,11 +17,13 @@ import {
   generateVeterinaryTreatmentBookHtml,
   generateQrStickerSheetHtml,
   generateNestBoxCardsHtml,
+  generateConcourseSheetHtml,
   PedigreePdfOptions,
   BasketingListPdfOptions,
   TreatmentRecordItem,
   StickerSheetOptions,
   NestBoxCardsPdfOptions,
+  ConcourseSheetPdfOptions,
 } from '../domain/pdfExport';
 import { PedigreeNode } from '../domain/types';
 
@@ -147,5 +149,24 @@ export class PdfService {
       `Karty Cel Lęgowych — ${options.loftName}`
     );
   }
+
+  /**
+   * Generuje i drukuje lub udostępnia oficjalną listę konkursową PZHGP / FCI (A4)
+   */
+  static async exportConcourseSheet(
+    options: ConcourseSheetPdfOptions,
+    mode: 'print' | 'share' = 'print'
+  ): Promise<string | void> {
+    const html = generateConcourseSheetHtml(options);
+    if (mode === 'print') {
+      await this.printHtml(html);
+      return;
+    }
+    return await this.shareHtmlAsPdf(
+      html,
+      `Lista Konkursowa — ${options.raceName}`
+    );
+  }
 }
+
 

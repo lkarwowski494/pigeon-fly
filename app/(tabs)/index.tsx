@@ -23,6 +23,8 @@ import { LostPigeonReportModal } from '../../src/components/LostPigeonReportModa
 import { CompartmentsModal } from '../../src/components/CompartmentsModal';
 import { SquadsModal } from '../../src/components/SquadsModal';
 import { PdfService } from '../../src/services/pdfService';
+import { CsvService } from '../../src/services/csvService';
+import { exportFlockToCsv } from '../../src/domain/csvExport';
 
 // Initial demo pigeons for immediate offline usability
 const INITIAL_DEMO_PIGEONS: Pigeon[] = [
@@ -174,6 +176,21 @@ export default function FlockScreen() {
               );
             } catch (e: any) {
               Alert.alert('Błąd', e?.message || 'Nie udało się wyeksportować naklejek');
+            }
+          },
+        },
+        {
+          text: '📥 Eksportuj Spis Stada (CSV)',
+          onPress: async () => {
+            try {
+              const csv = exportFlockToCsv(pigeons);
+              await CsvService.shareCsv(
+                `spis-stada-${new Date().toISOString().slice(0, 10)}.csv`,
+                csv,
+                'Udostępnij spis stada CSV'
+              );
+            } catch (e: any) {
+              Alert.alert('Błąd CSV', e?.message || 'Nie udało się wyeksportować spisu stada');
             }
           },
         },
