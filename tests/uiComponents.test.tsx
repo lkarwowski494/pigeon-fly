@@ -1380,6 +1380,50 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('Zatwierd\u017a Atestacj\u0119 Sanitarn\u0105 Punktu');
     expect(tree).toContain('AirPrint Protok\u00f3\u0142');
   });
+
+  test('AntidopingSamplingModal (Z-093) renders dual-seal highlights, sample codes, and chain of custody tabs', () => {
+    const { AntidopingSamplingModal } = require('../src/components/AntidopingSamplingModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <AntidopingSamplingModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('KONTROLA ANTYDOPINGOWA FCI / PZHGP');
+    expect(tree).toContain('PR\u00d3BKA A (G\u0141\u00d3WNA)');
+    expect(tree).toContain('KONTRPR\u00d3BKA B');
+    expect(tree).toContain('Zatwierd\u017a i Zaplombuj Pr\u00f3bki Antydopingowe');
+    expect(tree).toContain('AirPrint Protok\u00f3\u0142');
+  });
+
+  test('CrateInventoryRentalModal (Z-094) renders depot summary stats, crate inventory, and rental forms', () => {
+    const { CrateInventoryRentalModal } = require('../src/components/CrateInventoryRentalModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <CrateInventoryRentalModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('KSI\u0118GA INWENTARZA & WYPO\u017bYCZE\u0143 KOSZY');
+    expect(tree).toContain('Klatek \u0142\u0105cznie');
+    expect(tree).toContain('W magazynie');
+    expect(tree).toContain('Wypo\u017cyczone');
+    expect(tree).toContain('Wydaj Kosz');
+  });
 });
 
 

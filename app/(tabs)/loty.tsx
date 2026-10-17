@@ -42,6 +42,8 @@ import { CabinDehydrationModal } from '../../src/components/CabinDehydrationModa
 import { PzhgpMembershipCertificateModal } from '../../src/components/PzhgpMembershipCertificateModal';
 import { LoftInspectionProtocolModal } from '../../src/components/LoftInspectionProtocolModal';
 import { BasketingStationSanitationModal } from '../../src/components/BasketingStationSanitationModal';
+import { AntidopingSamplingModal } from '../../src/components/AntidopingSamplingModal';
+import { CrateInventoryRentalModal } from '../../src/components/CrateInventoryRentalModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -124,6 +126,8 @@ export default function RacesScreen() {
   const [isPzhgpCertificateModalVisible, setIsPzhgpCertificateModalVisible] = useState(false);
   const [isLoftInspectionModalVisible, setIsLoftInspectionModalVisible] = useState(false);
   const [isStationSanitationModalVisible, setIsStationSanitationModalVisible] = useState(false);
+  const [isAntidopingSamplingModalVisible, setIsAntidopingSamplingModalVisible] = useState(false);
+  const [isCrateRentalModalVisible, setIsCrateRentalModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -520,6 +524,20 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="💉 Kontrola Antydopingowa FCI (Z-093)"
+            onPress={() => setIsAntidopingSamplingModalVisible(true)}
+            testID="btn-open-antidoping-sampling"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
+            title="📦 E-Rejestr Koszy i Klatek Sekcyjnych (Z-094)"
+            onPress={() => setIsCrateRentalModalVisible(true)}
+            testID="btn-open-crate-rental"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -732,6 +750,17 @@ export default function RacesScreen() {
         visible={isStationSanitationModalVisible}
         onClose={() => setIsStationSanitationModalVisible(false)}
         defaultRaceName={raceName}
+      />
+
+      <AntidopingSamplingModal
+        visible={isAntidopingSamplingModalVisible}
+        onClose={() => setIsAntidopingSamplingModalVisible(false)}
+        defaultRaceName={raceName}
+      />
+
+      <CrateInventoryRentalModal
+        visible={isCrateRentalModalVisible}
+        onClose={() => setIsCrateRentalModalVisible(false)}
       />
     </SafeAreaView>
   );
