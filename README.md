@@ -129,7 +129,7 @@ pigeon-fly/
 │   │   ├── derby.ts            # Mini-Derby Sekcji, wielogołębnikowe live standings i feed
 │   │   ├── drinkerLab.ts       # Laboratorium poidła, buforowanie pH przeciw rzęsistkowi (RD-17), izotonik (RD-18) i Carbo-Lipid Shift (RD-15/16)
 │   │   ├── feedCompounder.ts   # Laboratorium paszowe 20 ziaren, bilans makro i energia MJ/kg
-│   │   ├── genetics.ts         # Matematyczny algorytm inbredu Wrighta (F)
+│   │   ├── genetics.ts         # Matematyczny algorytm inbredu Wrighta (F), dziedziczenie maści i autoseksing piskląt w celi (RD-38/39)
 │   │   ├── health.ts           # Profilaktyka, szczepienia PMV-1, karencje, triage YPDS/Adeno-Coli (RD-27) i koproskopia (BR-ZDR-008/010)
 │   │   ├── lostAndFound.ts     # Rejestr zagubionych ptaków (SOS), geodezyjny drift i ochrona prywatności
 │   │   ├── moult.ts            # Regeneracja 10 lotek skrzydła i fotoperiod
@@ -198,7 +198,7 @@ pigeon-fly/
 │   └── lib/                    # Współdzielone moduły pomocnicze
 │       └── i18n.ts             # Wielojęzyczność (PL/EN) i żargon hodowlany
 ├── supabase/                   # Chmura Supabase: schemat PostgreSQL 16 i polityki RLS
-├── tests/                      # 34 zestawy testowe (250 testów jednostkowych i fast-check)
+├── tests/                      # 34 zestawy testowe (259 testów jednostkowych i fast-check)
 ├── scripts/                    # Narzędzia CI: weryfikator tłumaczeń i18n
 └── docs/                       # Dokumentacja biznesowa, BRD i specyfikacje zgodności
     └── brd/                    # Kompletna dokumentacja wymagań biznesowych (18 rozdziałów)

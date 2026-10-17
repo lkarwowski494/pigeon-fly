@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FieldButton } from './FieldButton';
-import { calculateWrightInbreeding } from '../domain/genetics';
+import { calculateWrightInbreeding, predictPlumageAndAutosexing } from '../domain/genetics';
 import { Pigeon } from '../domain/types';
 import { t } from '../lib/i18n';
 
@@ -104,6 +104,11 @@ export function PairingModal({
   const inbreedingResult = calculateWrightInbreeding(selectedCock.id, selectedHen.id, lookup);
   const inbreedingPct = (inbreedingResult.coefficientF * 100).toFixed(2);
   const isSafe = inbreedingResult.level === 'none' || inbreedingResult.level === 'low';
+
+  const plumagePrediction = predictPlumageAndAutosexing(
+    (selectedCock as any).color || selectedCock.name || 'Niebieski',
+    (selectedHen as any).color || selectedHen.name || 'Czerwona płowa'
+  );
 
 
 
@@ -220,6 +225,38 @@ export function PairingModal({
             </Text>
           </View>
 
+          {/* Genetyka Umaszczenia & Autoseksing Piskląt (RD-38, RD-39) */}
+          <View
+            style={[
+              styles.geneticsBox,
+              plumagePrediction.isAutosexing ? styles.boxAutosexing : styles.boxGeneticsNeutral,
+            ]}
+          >
+            <View style={styles.geneticsHeader}>
+              <Text style={styles.geneticsTitle}>GENETYKA UMASZCZENIA & AUTOSEKSING</Text>
+              {plumagePrediction.isAutosexing && (
+                <View style={styles.autosexingBadge}>
+                  <Text style={styles.autosexingBadgeText}>✨ 100% AUTOSEKSING</Text>
+                </View>
+              )}
+            </View>
+            {plumagePrediction.autosexingExplanation && (
+              <Text style={styles.geneticsDesc}>{plumagePrediction.autosexingExplanation}</Text>
+            )}
+            <View style={styles.geneticsChicksRow}>
+              <View style={styles.geneticsChickItem}>
+                <Text style={styles.geneticsChickHeader}>♂ Synowie (1.0):</Text>
+                <Text style={styles.geneticsChickVal}>{plumagePrediction.sonsExpected.join(', ')}</Text>
+              </View>
+              <View style={styles.geneticsChickItem}>
+                <Text style={styles.geneticsChickHeader}>♀ Córki (0.1):</Text>
+                <Text style={styles.geneticsChickVal}>{plumagePrediction.daughtersExpected.join(', ')}</Text>
+              </View>
+            </View>
+            {plumagePrediction.hatchlingDownDescription && (
+              <Text style={styles.downNote}>🐣 W 1. dobie: {plumagePrediction.hatchlingDownDescription}</Text>
+            )}
+          </View>
 
           {/* Akcja Zapisz */}
           <FieldButton
@@ -362,5 +399,76 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#E2E8F0',
     lineHeight: 18,
+  },
+  geneticsBox: {
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 12,
+    borderWidth: 1,
+  },
+  boxAutosexing: {
+    backgroundColor: '#0F261C',
+    borderColor: '#10B981',
+  },
+  boxGeneticsNeutral: {
+    backgroundColor: '#1E293B',
+    borderColor: '#334155',
+  },
+  geneticsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  geneticsTitle: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#F8FAFC',
+    letterSpacing: 0.5,
+  },
+  autosexingBadge: {
+    backgroundColor: '#10B981',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  autosexingBadgeText: {
+    color: '#064E3B',
+    fontSize: 10,
+    fontWeight: '900',
+  },
+  geneticsDesc: {
+    fontSize: 12,
+    color: '#CBD5E1',
+    lineHeight: 17,
+    marginBottom: 8,
+  },
+  geneticsChicksRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 4,
+  },
+  geneticsChickItem: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
+    padding: 8,
+    borderRadius: 8,
+  },
+  geneticsChickHeader: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#60A5FA',
+    marginBottom: 2,
+  },
+  geneticsChickVal: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#F8FAFC',
+  },
+  downNote: {
+    fontSize: 11,
+    color: '#FBBF24',
+    fontStyle: 'italic',
+    marginTop: 8,
   },
 });

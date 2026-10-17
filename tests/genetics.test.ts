@@ -110,3 +110,56 @@ describe('Genetics Engine — Wright Inbreeding Coefficient (F)', () => {
     expect(result.percentage).toBe(6.25);
   });
 });
+
+describe('Genetics Engine — Plumage Color & Sex-Linked Autosexing (RD-38, RD-39)', () => {
+  const {
+    parsePlumageBaseColor,
+    predictPlumageAndAutosexing,
+  } = require('../src/domain/genetics');
+
+  test('parses Polish plumage color descriptions into genetic base alleles', () => {
+    expect(parsePlumageBaseColor('Niebieski nakrapiany').base).toBe('blue_bar');
+    expect(parsePlumageBaseColor('Ciemna płowa').base).toBe('ash_red');
+    expect(parsePlumageBaseColor('Czerwony szpak').base).toBe('ash_red');
+    expect(parsePlumageBaseColor('Brązowy czekoladowy').base).toBe('brown');
+    expect(parsePlumageBaseColor('Srebrna').dilution).toBe('dilute');
+    expect(parsePlumageBaseColor('Żółty nakrapiany').dilution).toBe('dilute');
+  });
+
+  test('detects 100% autosexing for Blue Cock x Ash-Red Hen cross', () => {
+    const prediction = predictPlumageAndAutosexing('Niebieski', 'Czerwona płowa');
+
+    expect(prediction.isAutosexing).toBe(true);
+    expect(prediction.autosexingCategory).toBe('color_linked');
+    expect(prediction.autosexingBadge).toContain('AUTOSEKSING');
+    expect(prediction.sonsExpected[0]).toContain('Czerwon');
+    expect(prediction.daughtersExpected[0]).toContain('Niebiesk');
+    expect(prediction.autosexingExplanation).toContain('1.0 ♂');
+    expect(prediction.autosexingExplanation).toContain('0.1 ♀');
+  });
+
+  test('detects 100% autosexing for Brown Cock x Blue Hen cross', () => {
+    const prediction = predictPlumageAndAutosexing('Brązowy', 'Niebieska');
+
+    expect(prediction.isAutosexing).toBe(true);
+    expect(prediction.autosexingCategory).toBe('color_linked');
+    expect(prediction.daughtersExpected[0]).toContain('Brązowa');
+  });
+
+  test('detects 100% autosexing for Dilute Cock x Dense Hen (down length)', () => {
+    const prediction = predictPlumageAndAutosexing('Srebrny', 'Niebieska');
+
+    expect(prediction.isAutosexing).toBe(true);
+    expect(prediction.autosexingCategory).toBe('dilution_linked');
+    expect(prediction.hatchlingDownDescription).toContain('puch');
+  });
+
+  test('identifies non-autosexing crosses correctly', () => {
+    const prediction = predictPlumageAndAutosexing('Niebieski', 'Niebieska');
+    expect(prediction.isAutosexing).toBe(false);
+    expect(prediction.autosexingCategory).toBe('none');
+
+    const redCross = predictPlumageAndAutosexing('Czerwony', 'Niebieska');
+    expect(redCross.isAutosexing).toBe(false);
+  });
+});

@@ -899,6 +899,30 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('NAJWCZEŚNIEJSZA DATA KOSZOWANIA');
     expect(tree).toContain('PROTOKÓŁ DETOKSU & OSŁONY');
   });
+
+  test('PairingModal renders cocks, hens, inbreeding F, and plumage genetics autosexing', () => {
+    const { PairingModal } = require('../src/components/PairingModal');
+    const onClose = jest.fn();
+    const onPairSaved = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <PairingModal
+          visible={true}
+          onClose={onClose}
+          onPairSaved={onPairSaved}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Kojarzenie Nowej Pary');
+    expect(tree).toContain('Współczynnik Inbredu Sewalla Wrighta (F)');
+    expect(tree).toContain('GENETYKA UMASZCZENIA & AUTOSEKSING');
+    expect(tree).toContain('Synowie (1.0)');
+    expect(tree).toContain('Córki (0.1)');
+  });
 });
 
 
