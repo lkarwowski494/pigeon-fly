@@ -25,6 +25,7 @@ import {
 import { formatVelocity, formatDistance, UnitSystem } from '../../src/domain/units';
 import { calculateWindImpact } from '../../src/domain/weather';
 import { evaluatePigeonPrize } from '../../src/domain/concourse';
+import { calculateFlightEnergetics } from '../../src/domain/flightEnergetics';
 import { FieldButton } from '../../src/components/FieldButton';
 
 interface GpsPreset {
@@ -72,6 +73,10 @@ export default function CalculatorScreen() {
   const [basketedCount, setBasketedCount] = useState('2850');
   const [concoursePosition, setConcoursePosition] = useState('14');
   const [concourseBasePercent, setConcourseBasePercent] = useState<20 | 25 | 33>(20);
+
+  // Flight Energetics state (RD-15, RD-16, Z-047, Z-284)
+  const [airTempCelsius, setAirTempCelsius] = useState('20');
+  const [preFlightFatGrams, setPreFlightFatGrams] = useState('35');
 
   // Compute distance in meters based on mode
   let effectiveDistanceMeters = parseFloat(distanceKm) * 1000;
@@ -161,6 +166,23 @@ export default function CalculatorScreen() {
     distanceKm: (effectiveDistanceMeters || 345000) / 1000,
     basePercent: concourseBasePercent,
   });
+
+  // Flight Energetics calculation (RD-15, RD-16, Z-047, Z-284)
+  const effDistKm = (effectiveDistanceMeters && effectiveDistanceMeters > 0 ? effectiveDistanceMeters : 345000) / 1000;
+  const currentSpeed = speedResult ? speedResult.mPerMin : (windImpact.estimatedVelocityMPerMin > 0 ? windImpact.estimatedVelocityMPerMin : 1250);
+  const currentHeadwind = -windImpact.effectiveTailwindKmh;
+
+  let energeticsResult = null;
+  try {
+    energeticsResult = calculateFlightEnergetics({
+      distanceKm: effDistKm,
+      groundSpeedMPerMin: currentSpeed,
+      airTemperatureCelsius: parseFloat(airTempCelsius) || 20,
+      headwindKmh: currentHeadwind,
+      birdWeightGrams: 420,
+      preFlightFatReserveGrams: parseFloat(preFlightFatGrams) || 35,
+    });
+  } catch {}
 
   // Format speed and distance in active unit system
   const formattedSpeed = speedResult
@@ -559,6 +581,171 @@ export default function CalculatorScreen() {
             )}
           </View>
         </View>
+
+        {/* SECTION 3: Bioenergetyka Lotu i Protokół Regeneracji (RD-15, RD-16, Z-047, Z-284) */}
+        {energeticsResult && (
+          <View style={styles.toolCard}>
+            <View style={styles.toolHeaderRow}>
+              <Text style={styles.toolHeader}>⚡ BIOENERGETYKA LOTU I REGENERACJA (RD-15/16)</Text>
+              <View style={styles.toolBadge}>
+                <Text style={styles.toolBadgeText}>FIZJOLOGIA FCI</Text>
+              </View>
+            </View>
+            <Text style={styles.toolDesc}>
+              Szacowanie spalania kwasów tłuszczowych, rozpadu glikogenu, ryzyka katabolizmu białek piersiowych i odwodnienia w locie konkursowym.
+            </Text>
+
+            {/* Quick environmental & physical adjustments */}
+            <View style={{ flexDirection: 'row', gap: 10, marginBottom: 10 }}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.inputLabel}>Temperatura (°C):</Text>
+                <TextInput
+                  style={styles.textInput}
+                  keyboardType="numeric"
+                  value={airTempCelsius}
+                  onChangeText={setAirTempCelsius}
+                  placeholder="20"
+                  placeholderTextColor="#8E94A0"
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.inputLabel}>Zapas tłuszczu (g):</Text>
+                <TextInput
+                  style={styles.textInput}
+                  keyboardType="numeric"
+                  value={preFlightFatGrams}
+                  onChangeText={setPreFlightFatGrams}
+                  placeholder="35"
+                  placeholderTextColor="#8E94A0"
+                />
+              </View>
+            </View>
+
+            {/* Catabolism Risk Status Badge */}
+            <View
+              style={[
+                styles.energyRiskCard,
+                {
+                  borderColor:
+                    energeticsResult.muscleCatabolismRisk === 'critical'
+                      ? '#EF4444'
+                      : energeticsResult.muscleCatabolismRisk === 'high'
+                      ? '#F97316'
+                      : energeticsResult.muscleCatabolismRisk === 'moderate'
+                      ? '#F59E0B'
+                      : '#10B981',
+                },
+              ]}
+            >
+              <View style={styles.energyRiskHeader}>
+                <Text style={styles.energyRiskTitle}>STAN METABOLICZNY PO POWROCIE:</Text>
+                <Text
+                  style={[
+                    styles.energyRiskBadge,
+                    {
+                      color:
+                        energeticsResult.muscleCatabolismRisk === 'critical'
+                          ? '#EF4444'
+                          : energeticsResult.muscleCatabolismRisk === 'high'
+                          ? '#F97316'
+                          : energeticsResult.muscleCatabolismRisk === 'moderate'
+                          ? '#F59E0B'
+                          : '#10B981',
+                    },
+                  ]}
+                >
+                  {energeticsResult.muscleCatabolismRisk === 'critical' && '⚠️ KATABOLIZM KRYTYCZNY (ROZPAD MIĘŚNI)'}
+                  {energeticsResult.muscleCatabolismRisk === 'high' && '🔥 WYSOKIE ZUŻYCIE REZERW'}
+                  {energeticsResult.muscleCatabolismRisk === 'moderate' && '⚡ UMIARKOWANY WYSIŁEK'}
+                  {energeticsResult.muscleCatabolismRisk === 'low' && '✓ NISKIE ZMĘCZENIE (KOMFORT)'}
+                  {energeticsResult.muscleCatabolismRisk === 'none' && '✓ BIEG JAŁOWY (MINIMALNY WYSIŁEK)'}
+                </Text>
+              </View>
+              {energeticsResult.fatDeficit && (
+                <Text style={styles.fatDeficitAlert}>
+                  Wyczerpanie rezerw tłuszczowych! Ptak spala własne białko mięśni piersiowych ({energeticsResult.muscleProteinBurnedGrams} g), aby utrzymać siłę nośną.
+                </Text>
+              )}
+            </View>
+
+            {/* Energetic Breakdown Grid */}
+            <View style={styles.bioGrid}>
+              <View style={styles.bioItem}>
+                <Text style={styles.bioLabel}>Całkowity wydatek</Text>
+                <Text style={styles.bioValue}>{energeticsResult.totalEnergyExpenditureKj} kJ</Text>
+                <Text style={styles.bioSubValue}>~{Math.round(energeticsResult.totalEnergyExpenditureKj / 4.184)} kcal</Text>
+              </View>
+              <View style={styles.bioItem}>
+                <Text style={styles.bioLabel}>Spalony tłuszcz</Text>
+                <Text style={[styles.bioValue, { color: '#FCD34D' }]}>{energeticsResult.fatBurnedGrams} g</Text>
+                <Text style={styles.bioSubValue}>z {preFlightFatGrams} g zapasu</Text>
+              </View>
+              <View style={styles.bioItem}>
+                <Text style={styles.bioLabel}>Glikogen (start)</Text>
+                <Text style={styles.bioValue}>{energeticsResult.glycogenBurnedGrams} g</Text>
+                <Text style={styles.bioSubValue}>pierwsze 15 min</Text>
+              </View>
+              <View style={styles.bioItem}>
+                <Text style={styles.bioLabel}>Utrata wody</Text>
+                <Text style={[styles.bioValue, { color: '#60A5FA' }]}>{energeticsResult.waterLossMilliliters} ml</Text>
+                <Text style={styles.bioSubValue}>odparowanie i oddech</Text>
+              </View>
+              <View style={styles.bioItem}>
+                <Text style={styles.bioLabel}>Białko mięśniowe</Text>
+                <Text
+                  style={[
+                    styles.bioValue,
+                    { color: energeticsResult.muscleProteinBurnedGrams > 0 ? '#EF4444' : '#10B981' },
+                  ]}
+                >
+                  {energeticsResult.muscleProteinBurnedGrams} g
+                </Text>
+                <Text style={styles.bioSubValue}>
+                  {energeticsResult.muscleProteinBurnedGrams > 0 ? 'katabolizm' : 'nienaruszone'}
+                </Text>
+              </View>
+              <View style={styles.bioItem}>
+                <Text style={styles.bioLabel}>Szacowana waga</Text>
+                <Text style={styles.bioValue}>{energeticsResult.postFlightWeightGrams} g</Text>
+                <Text style={styles.bioSubValue}>przed lotem: 420 g</Text>
+              </View>
+            </View>
+
+            {/* Protocol Box (RD-16) */}
+            <View style={styles.protocolBox}>
+              <View style={styles.protocolHeaderRow}>
+                <Text style={styles.protocolHeader}>🧬 2-FAZOWY PROTOKÓŁ REGENERACJI (RD-16)</Text>
+                <View style={styles.daysBadge}>
+                  <Text style={styles.daysBadgeText}>
+                    Regeneracja: {energeticsResult.recoveryProtocol.recoveryTimeDays} {energeticsResult.recoveryProtocol.recoveryTimeDays === 1 ? 'dzień' : 'dni'}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.protocolStep}>
+                <Text style={styles.stepTitle}>🥤 {energeticsResult.recoveryProtocol.drinkerPhase1.description}</Text>
+                {energeticsResult.recoveryProtocol.drinkerPhase1.supplements.map((s, idx) => (
+                  <Text key={idx} style={styles.bulletItem}>• {s}</Text>
+                ))}
+              </View>
+
+              <View style={styles.protocolStep}>
+                <Text style={styles.stepTitle}>💊 {energeticsResult.recoveryProtocol.drinkerPhase2.description}</Text>
+                {energeticsResult.recoveryProtocol.drinkerPhase2.supplements.map((s, idx) => (
+                  <Text key={idx} style={styles.bulletItem}>• {s}</Text>
+                ))}
+              </View>
+
+              <View style={styles.protocolStep}>
+                <Text style={styles.stepTitle}>🌾 Żywienie: {energeticsResult.recoveryProtocol.feedRecommendation.feedType}</Text>
+                <Text style={styles.stepSubTitle}>Dodatki na karmę:</Text>
+                {energeticsResult.recoveryProtocol.feedRecommendation.supplementsOnGrain.map((s, idx) => (
+                  <Text key={idx} style={styles.bulletItem}>• {s}</Text>
+                ))}
+              </View>
+            </View>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -958,5 +1145,122 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#FDE68A',
     textAlign: 'center',
+  },
+  energyRiskCard: {
+    backgroundColor: '#15171B',
+    borderRadius: 10,
+    borderWidth: 1.5,
+    padding: 12,
+    marginBottom: 12,
+  },
+  energyRiskHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 4,
+  },
+  energyRiskTitle: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#8E94A0',
+    letterSpacing: 0.5,
+  },
+  energyRiskBadge: {
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  fatDeficitAlert: {
+    marginTop: 8,
+    fontSize: 12,
+    color: '#F87171',
+    lineHeight: 16,
+    fontWeight: '600',
+  },
+  bioGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  bioItem: {
+    width: '31%',
+    backgroundColor: '#15171B',
+    borderRadius: 8,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#2B323F',
+    alignItems: 'center',
+  },
+  bioLabel: {
+    fontSize: 10,
+    color: '#8E94A0',
+    textAlign: 'center',
+    marginBottom: 2,
+  },
+  bioValue: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    fontFamily: 'monospace',
+  },
+  bioSubValue: {
+    fontSize: 9,
+    color: '#6B7280',
+    marginTop: 2,
+    textAlign: 'center',
+  },
+  protocolBox: {
+    backgroundColor: '#1A212D',
+    borderRadius: 10,
+    padding: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: '#3B82F6',
+  },
+  protocolHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  protocolHeader: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#60A5FA',
+  },
+  daysBadge: {
+    backgroundColor: '#1E3A8A',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  daysBadgeText: {
+    color: '#BFDBFE',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  protocolStep: {
+    marginTop: 6,
+    marginBottom: 4,
+  },
+  stepTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#E2E8F0',
+    marginBottom: 2,
+  },
+  stepSubTitle: {
+    fontSize: 11,
+    color: '#94A3B8',
+    marginTop: 2,
+    marginBottom: 2,
+  },
+  bulletItem: {
+    fontSize: 11,
+    color: '#CBD5E1',
+    lineHeight: 16,
+    paddingLeft: 4,
   },
 });

@@ -78,6 +78,8 @@
   * *Rozstrzygnięcie:* Graficzna mapa przedziału rozpłodowego z kolorystycznymi statusami cel.
 * **DEC-56 (Przyjęcie Zasad Uniwersalnych i Biblioteki Ról): Opcja A (17.10.2026 — Zatwierdzona przez Łukasza)**
   * *Rozstrzygnięcie:* Przyjęcie 10 Zasad Uniwersalnych jako nadrzędnego protokołu; aktywacja modułów `aplikacje`, `research` i 3 reguł ogólnych; powołanie 7 ról roboczych. Przy każdej zmianie/naprawie bezwzględny wymóg min. 2 realnych opcji z kompromisami do decyzji właściciela.
+* **DEC-57 (Model Spalania Energii w Locie i Regeneracji Powrotowej — RD-15, RD-16, Z-047, Z-284): Opcja 1 (17.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Implementacja `src/domain/flightEnergetics.ts` symulującego spalanie kwasów tłuszczowych (39.0 kJ/g), glikogenu (17.5 kJ/g), katabolizmu białek mięśni piersiowych (17.0 kJ/g) przy deficycie energetycznym, utraty wody/odwodnienia ze współczynnikiem termicznym oraz 2-fazowego protokołu regeneracji (Faza 1: izotonik 300 mOsm/L, Faza 2: Sedochol + aminokwasy BCAA + karma Depurative). Integracja w `app/(tabs)/kalkulator.tsx` (Sekcja 3). Pokrycie testami 100% (6/6 passing w `tests/flightEnergetics.test.ts`).
 
 ---
 
