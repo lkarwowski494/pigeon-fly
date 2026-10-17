@@ -47,6 +47,8 @@ import { CrateInventoryRentalModal } from '../../src/components/CrateInventoryRe
 import { PreSeasonFlockCensusModal } from '../../src/components/PreSeasonFlockCensusModal';
 import { EmergencyCabinReleaseModal } from '../../src/components/EmergencyCabinReleaseModal';
 import { ClockOpeningAuditModal } from '../../src/components/ClockOpeningAuditModal';
+import { NationalExhibitionModal } from '../../src/components/NationalExhibitionModal';
+import { LoftAnnualPerformanceLedgerModal } from '../../src/components/LoftAnnualPerformanceLedgerModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -134,6 +136,8 @@ export default function RacesScreen() {
   const [isFlockCensusModalVisible, setIsFlockCensusModalVisible] = useState(false);
   const [isEmergencyReleaseModalVisible, setIsEmergencyReleaseModalVisible] = useState(false);
   const [isClockOpeningAuditModalVisible, setIsClockOpeningAuditModalVisible] = useState(false);
+  const [isNationalExhibitionModalVisible, setIsNationalExhibitionModalVisible] = useState(false);
+  const [isAnnualPerformanceLedgerModalVisible, setIsAnnualPerformanceLedgerModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -565,6 +569,20 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="🏆 Reprezentacja na Wystawę Ogólnopolską (Z-099)"
+            onPress={() => setIsNationalExhibitionModalVisible(true)}
+            testID="btn-open-national-exhibition"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
+            title="🌟 Złota Księga Mistrzów & Roczny Bilans (Z-100)"
+            onPress={() => setIsAnnualPerformanceLedgerModalVisible(true)}
+            testID="btn-open-annual-ledger"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -805,6 +823,16 @@ export default function RacesScreen() {
         visible={isClockOpeningAuditModalVisible}
         onClose={() => setIsClockOpeningAuditModalVisible(false)}
         defaultRaceName={raceName}
+      />
+
+      <NationalExhibitionModal
+        visible={isNationalExhibitionModalVisible}
+        onClose={() => setIsNationalExhibitionModalVisible(false)}
+      />
+
+      <LoftAnnualPerformanceLedgerModal
+        visible={isAnnualPerformanceLedgerModalVisible}
+        onClose={() => setIsAnnualPerformanceLedgerModalVisible(false)}
       />
     </SafeAreaView>
   );

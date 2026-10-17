@@ -1508,6 +1508,46 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('DANE FORMALNE LOTU I OTWARCIA');
     expect(tree).toContain('HODOWCA I AUDYT ZEGARA');
   });
+
+  test('NationalExhibitionModal (Z-099) renders candidate roster, sport/standard switch, and criteria gauges', () => {
+    const { NationalExhibitionModal } = require('../src/components/NationalExhibitionModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <NationalExhibitionModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('REPREZENTACJA NA WYSTAW\u0118 OG\u00d3LNOPOLSK\u0104');
+    expect(tree).toContain('Standard FCI (Z-099)');
+    expect(tree).toContain('PL-0284-22-1402');
+  });
+
+  test('LoftAnnualPerformanceLedgerModal (Z-100) renders jubilee banner, KPI tabs, and hall of fame cards', () => {
+    const { LoftAnnualPerformanceLedgerModal } = require('../src/components/LoftAnnualPerformanceLedgerModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <LoftAnnualPerformanceLedgerModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('JUBILEUSZOWY BILANS STADA (Z-100)');
+    expect(tree).toContain('Z\u0142ota Ksi\u0119ga Mistrz\u00f3w');
+    expect(tree).toContain('Go\u0142\u0119bnik');
+  });
 });
 
 
