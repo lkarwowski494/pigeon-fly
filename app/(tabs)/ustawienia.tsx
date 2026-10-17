@@ -30,6 +30,14 @@ import {
 import { UnitSystem } from '../../src/domain/units';
 import { calculateLoftCosts } from '../../src/domain/costCalculator';
 import { useLang, t } from '../../src/lib/i18n';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
+import { getDatabase } from '../../src/db/database';
+import {
+  exportDatabaseBackup,
+  buildBackupEnvelope,
+  generateTimestampString,
+} from '../../src/services/backupService';
 
 export default function SettingsScreen() {
   const lang = useLang();
@@ -63,11 +71,33 @@ export default function SettingsScreen() {
     }, 1200);
   };
 
-  const handleExportBackup = () => {
-    Alert.alert(
-      'Kopia Zapasowa',
-      'Wygenerowano pełny skarbiec danych (pigeons, clutches, races, health, moult) z sygnaturą com.pigeonfly.app. Gotowy do zapisu w Plikach / iCloud.'
-    );
+  const handleExportBackup = async () => {
+    try {
+      const db = await getDatabase();
+      const state = await exportDatabaseBackup(db);
+      const envelope = buildBackupEnvelope(state);
+      const json = JSON.stringify(envelope, null, 2);
+      const filename = `pigeonfly-backup-${generateTimestampString()}.json`;
+      const targetUri = `${FileSystem.cacheDirectory || ''}${filename}`;
+      await FileSystem.writeAsStringAsync(targetUri, json, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      const isAvailable = await Sharing.isAvailableAsync();
+      if (isAvailable) {
+        await Sharing.shareAsync(targetUri, {
+          mimeType: 'application/json',
+          dialogTitle: 'Zapisz kopię zapasową stada (Pigeon-Fly)',
+        });
+      } else {
+        Alert.alert(
+          'Kopia Zapasowa',
+          `Pomyślnie wyeksportowano skarbiec stada do pliku: ${filename}`
+        );
+      }
+    } catch (e: any) {
+      Alert.alert('Błąd kopii', e?.message || 'Nie udało się wyeksportować kopii zapasowej');
+    }
   };
 
   const handleRestoreBackup = () => {
