@@ -1335,6 +1335,51 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('Wyrejestruj Ptaka i Zatwierd\u017a Protok\u00f3\u0142');
     expect(tree).toContain('AirPrint \u015awiadectwo Zgonu');
   });
+
+  test('DnaProfileRegistryModal (Z-091) renders parentage verification banner, STR loci tabs, and performance genetics', () => {
+    const { DnaProfileRegistryModal } = require('../src/components/DnaProfileRegistryModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <DnaProfileRegistryModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('CERTYFIKAT DNA & PARENTAGE');
+    expect(tree).toContain('POCHODZENIE W 100% POTWIERDZONE');
+    expect(tree).toContain('DANE CERTYFIKATU I LABORATORIUM');
+    expect(tree).toContain('Zapisz Profil DNA w Kartotece Ptaka');
+    expect(tree).toContain('AirPrint Certyfikat DNA');
+  });
+
+  test('BasketingStationSanitationModal (Z-092) renders biosecurity verdict, disinfectant params, and crates audit', () => {
+    const { BasketingStationSanitationModal } = require('../src/components/BasketingStationSanitationModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <BasketingStationSanitationModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('ATESTACJA SANITARNA PUNKTU KOSZOWANIA');
+    expect(tree).toContain('DOPUSZCZONY BEZ ZASTRZE\u017bE\u0143');
+    expect(tree).toContain('DANE PUNKTU WK\u0141ADA\u0143 I LOTU');
+    expect(tree).toContain('PREPARAT BIOB\u00d3JCZY / DEZYNFEKCYJNY');
+    expect(tree).toContain('Zatwierd\u017a Atestacj\u0119 Sanitarn\u0105 Punktu');
+    expect(tree).toContain('AirPrint Protok\u00f3\u0142');
+  });
 });
 
 

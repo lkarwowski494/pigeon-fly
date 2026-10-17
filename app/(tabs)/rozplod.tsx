@@ -28,6 +28,7 @@ import { ClutchScheduleModal } from '../../src/components/ClutchScheduleModal';
 import { BreedingNutritionModal } from '../../src/components/BreedingNutritionModal';
 import { StudLeaseAgreementModal } from '../../src/components/StudLeaseAgreementModal';
 import { ClutchYoungstersTransferModal } from '../../src/components/ClutchYoungstersTransferModal';
+import { DnaProfileRegistryModal } from '../../src/components/DnaProfileRegistryModal';
 import { ClutchScheduleInput } from '../../src/domain/clutchSchedulePlanner';
 
 
@@ -91,6 +92,7 @@ export default function BreedingScreen() {
   const [isBreedingNutritionOpen, setIsBreedingNutritionOpen] = useState(false);
   const [isStudLeaseModalOpen, setIsStudLeaseModalOpen] = useState(false);
   const [isClutchYoungstersOpen, setIsClutchYoungstersOpen] = useState(false);
+  const [isDnaModalOpen, setIsDnaModalOpen] = useState(false);
 
   const scheduleInputs: ClutchScheduleInput[] = clutches.map((c) => ({
     clutchId: c.id,
@@ -380,9 +382,18 @@ export default function BreedingScreen() {
           title="🕊️ Rejestr Lęgów i Transfer Młodych (Z-089)"
           variant="secondary"
           onPress={() => setIsClutchYoungstersOpen(true)}
-          style={{ marginBottom: 12, minHeight: 44 }}
+          style={{ marginBottom: 10, minHeight: 44 }}
           textStyle={{ fontSize: 13 }}
           testID="btn-open-clutch-youngsters"
+        />
+
+        <FieldButton
+          title="🧬 Certyfikacja DNA & Parentage ISAG (Z-091)"
+          variant="secondary"
+          onPress={() => setIsDnaModalOpen(true)}
+          style={{ marginBottom: 12, minHeight: 44 }}
+          textStyle={{ fontSize: 13 }}
+          testID="btn-open-dna-modal"
         />
 
         {/* Season Summary Bar */}
@@ -497,6 +508,12 @@ export default function BreedingScreen() {
       <ClutchYoungstersTransferModal
         visible={isClutchYoungstersOpen}
         onClose={() => setIsClutchYoungstersOpen(false)}
+      />
+
+      {/* DNA Profile & Parentage Verification Modal (Z-091 / DEC-105) */}
+      <DnaProfileRegistryModal
+        visible={isDnaModalOpen}
+        onClose={() => setIsDnaModalOpen(false)}
       />
     </SafeAreaView>
   );

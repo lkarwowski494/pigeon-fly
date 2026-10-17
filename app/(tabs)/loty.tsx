@@ -41,6 +41,7 @@ import { EskRegistrationProtocolModal } from '../../src/components/EskRegistrati
 import { CabinDehydrationModal } from '../../src/components/CabinDehydrationModal';
 import { PzhgpMembershipCertificateModal } from '../../src/components/PzhgpMembershipCertificateModal';
 import { LoftInspectionProtocolModal } from '../../src/components/LoftInspectionProtocolModal';
+import { BasketingStationSanitationModal } from '../../src/components/BasketingStationSanitationModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -122,6 +123,7 @@ export default function RacesScreen() {
   const [isCabinDehydrationModalVisible, setIsCabinDehydrationModalVisible] = useState(false);
   const [isPzhgpCertificateModalVisible, setIsPzhgpCertificateModalVisible] = useState(false);
   const [isLoftInspectionModalVisible, setIsLoftInspectionModalVisible] = useState(false);
+  const [isStationSanitationModalVisible, setIsStationSanitationModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -511,6 +513,13 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="🛡️ Atestacja Sanitarna Punktu Koszowania (Z-092)"
+            onPress={() => setIsStationSanitationModalVisible(true)}
+            testID="btn-open-station-sanitation"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -717,6 +726,12 @@ export default function RacesScreen() {
       <LoftInspectionProtocolModal
         visible={isLoftInspectionModalVisible}
         onClose={() => setIsLoftInspectionModalVisible(false)}
+      />
+
+      <BasketingStationSanitationModal
+        visible={isStationSanitationModalVisible}
+        onClose={() => setIsStationSanitationModalVisible(false)}
+        defaultRaceName={raceName}
       />
     </SafeAreaView>
   );
