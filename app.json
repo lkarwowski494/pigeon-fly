@@ -2,7 +2,7 @@
   "expo": {
     "name": "Pigeon-Fly",
     "slug": "pigeon-fly",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -15,9 +15,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.apps4loft.pigeonfly",
+      "buildNumber": "1",
       "infoPlist": {
         "NSCameraUsageDescription": "Aplikacja używa aparatu do błyskawicznego skanowania kodów QR na obrączkach gołębi w gołębniku.",
-        "NSPhotoLibraryUsageDescription": "Aplikacja umożliwia dodawanie zdjęć ptaków, oka i skrzydeł do kart rodowodowych."
+        "NSPhotoLibraryUsageDescription": "Aplikacja umożliwia dodawanie zdjęć ptaków, oka i skrzydeł do kart rodowodowych.",
+        "NSLocationWhenInUseUsageDescription": "Aplikacja używa lokalizacji GPS do precyzyjnego wyznaczania współrzędnych gołębnika i obliczeń odległości lotu WGS-84 (Vincenty)."
       }
     },
     "android": {
@@ -26,6 +28,7 @@
         "backgroundColor": "#121417"
       },
       "package": "com.apps4loft.pigeonfly",
+      "versionCode": 1,
       "permissions": [
         "CAMERA",
         "READ_EXTERNAL_STORAGE",

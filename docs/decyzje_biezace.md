@@ -1,7 +1,7 @@
 # Pigeon-Fly — Rejestr Bieżący Decyzji i Stanu Projektu
-**Data aktualizacji:** 18.10.2026 (Zakończenie procedury Retrofit — Audytor Monetyzacji & WTP Tier 1–3)  
+**Data aktualizacji:** 18.10.2026 (Zakończenie pełnego cyklu Retrofit — Główny Inżynier / QA Release Lead)  
 **Właściciel:** Łukasz (`lkarwowski494`)  
-**Status projektu:** Faza wdrożeniowa / Retrofit — 94 zestawy testowe, 662 testy zaliczone (100%), 0 błędów TypeScript i i18n, zero wycieków monetyzacji (DEC-MON-01..05)
+**Status projektu:** Wersja Produkcyjna v1.0.0 (Release Candidate) — 94 zestawy testowe, 662 testy zaliczone (100%), 0 błędów TypeScript i i18n, zero ostrzeżeń, 100 modułów Z-001..Z-100 w 100% zbieżnych z BRD
 
 ---
 
@@ -228,6 +228,8 @@
   * *Rozstrzygnięcie:* Zasada Zerowej Frustracji — absolutny brak agresywnych pop-upów przy starcie aplikacji lub onboardingu. Użytkownik korzysta z aplikacji w pełni swobodnie, a elegancki modal Paywalla pojawia się wyłącznie w momencie intencjonalnej próby wykonania akcji Pro (dodanie 11. gołębia, drugi eksport rodowodu PDF, aktywacja transmisji na żywo, sync w tandemie).
 * **DEC-MON-05 (Wdrożenie Zbieżności Monetyzacji — AccessProvider + SQLite WAL + Likwidacja Wycieków): Opcja A (18.10.2026 — Zatwierdzona przez Łukasza)**
   * *Rozstrzygnięcie:* Pełna konwergencja monetyzacji: wdrożenie globalnego `AccessProvider` zasilanego bezpośrednio z bazy SQLite WAL (`app_entitlements`), monotoniczny licznik stada (`lifetime_pigeons_created`), 1 darmowy powitalny eksport rodowodu PDF (`free_pdf_exports_used`), usunięcie luki w `restorePurchases()` oraz spięcie ekranów `index.tsx`, `ustawienia.tsx` i `app/modal/new-pigeon.tsx` za pomocą reaktywnego hooka `useAppAccess()`.
+* **DEC-RELEASE-01 (Certyfikacja Wydania v1.0.0 Release Candidate — Zamknięcie Protokołu Retrofit): Opcja A (18.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Oficjalna certyfikacja i zamrożenie wydania produkcyjnego v1.0.0. Konfiguracja `app.json` (wersja `1.0.0`, buildNumber `1`, versionCode `1`, uprawnienia aparatu, biblioteki zdjęć i lokalizacji GPS WGS-84), podbicie wersji w `package.json`, pomyślne przejście 100% testów automatycznych (94 zestawy testowe, 662 testy zaliczone, 0 błędów TypeScript i i18n, zero ostrzeżeń). Pełna zbieżność produktu z normami PZHGP, FCI i wytycznymi App Store.
 
 ---
 
