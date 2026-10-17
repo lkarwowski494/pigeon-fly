@@ -1,0 +1,46 @@
+{
+  "domain": "fci_standard_appraisal_100pt",
+  "max_points": 100,
+  "criteria_weights": {
+    "generalAppearance": 10,
+    "boneStructure": 30,
+    "backAndTail": 20,
+    "musculature": 30,
+    "wingsAndPlumage": 10
+  },
+  "flight_minimums_kkm": {
+    "cock": 2500,
+    "hen": 2000
+  },
+  "vectors": [
+    {
+      "id": "FCI-VEC-01",
+      "sex": "cock",
+      "kkm_2years": 3200,
+      "scores": {
+        "generalAppearance": 9.25,
+        "boneStructure": 28.5,
+        "backAndTail": 19.0,
+        "musculature": 28.25,
+        "wingsAndPlumage": 9.25
+      },
+      "expected_total_score": 94.25,
+      "qualification": "qualified"
+    },
+    {
+      "id": "FCI-VEC-02",
+      "sex": "cock",
+      "kkm_2years": 2100,
+      "scores": {
+        "generalAppearance": 9.5,
+        "boneStructure": 29.0,
+        "backAndTail": 19.5,
+        "musculature": 29.0,
+        "wingsAndPlumage": 9.5
+      },
+      "expected_total_score": 96.5,
+      "qualification": "disqualified_requirements_unmet",
+      "disqualification_reason": "Brak minimum 2500 kkm dla samca w klasie Standard"
+    }
+  ]
+}

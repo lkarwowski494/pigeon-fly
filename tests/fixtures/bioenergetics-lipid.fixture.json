@@ -1,0 +1,34 @@
+{
+  "domain": "bioenergetics_carbo_lipid_supercompensation",
+  "fat_energy_density_kcal_per_g": 9.3,
+  "carb_energy_density_kcal_per_g": 4.1,
+  "vectors": [
+    {
+      "id": "BIO-VEC-01",
+      "distance_km": 350,
+      "flight_duration_hours": 4.5,
+      "headwind_mps": 0,
+      "temp_celsius": 22,
+      "expected_lipid_burn_grams": 13.5,
+      "lipid_share_pct": 91.2
+    },
+    {
+      "id": "BIO-VEC-02",
+      "distance_km": 720,
+      "flight_duration_hours": 9.2,
+      "headwind_mps": 4.5,
+      "temp_celsius": 28,
+      "expected_lipid_burn_grams": 36.8,
+      "lipid_share_pct": 95.8
+    },
+    {
+      "id": "BIO-VEC-03",
+      "distance_km": 150,
+      "flight_duration_hours": 1.8,
+      "headwind_mps": -2.0,
+      "temp_celsius": 18,
+      "expected_lipid_burn_grams": 4.2,
+      "lipid_share_pct": 78.5
+    }
+  ]
+}

@@ -7,7 +7,6 @@
 import React, { useState, useMemo } from 'react';
 import {
   Modal,
-  SafeAreaView,
   View,
   Text,
   StyleSheet,
@@ -16,6 +15,7 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { FieldButton } from './FieldButton';
 import {
   FoundPigeonEntry,

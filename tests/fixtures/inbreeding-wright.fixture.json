@@ -1,0 +1,34 @@
+{
+  "domain": "inbreeding_sewall_wright",
+  "formula": "F = sum((1/2)^(n1 + n2 + 1) * (1 + FA))",
+  "vectors": [
+    {
+      "id": "INB-VEC-01",
+      "description": "Full brother x full sister mating (Rodzeństwo rodzone)",
+      "generation_depth": 5,
+      "expected_F": 0.25,
+      "risk_classification": "critical"
+    },
+    {
+      "id": "INB-VEC-02",
+      "description": "Half brother x half sister mating (Półrodzeństwo - wspólny ojciec)",
+      "generation_depth": 5,
+      "expected_F": 0.125,
+      "risk_classification": "high"
+    },
+    {
+      "id": "INB-VEC-03",
+      "description": "First cousins mating (Kuzyn x kuzynka)",
+      "generation_depth": 5,
+      "expected_F": 0.0625,
+      "risk_classification": "moderate"
+    },
+    {
+      "id": "INB-VEC-04",
+      "description": "Outcross linebreeding (Brak wspólnych przodków w 5 pokoleniach)",
+      "generation_depth": 5,
+      "expected_F": 0.0,
+      "risk_classification": "safe"
+    }
+  ]
+}

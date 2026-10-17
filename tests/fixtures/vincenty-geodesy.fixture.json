@@ -1,0 +1,30 @@
+{
+  "domain": "geodesy_vincenty_wgs84",
+  "tolerance_meters": 0.001,
+  "vectors": [
+    {
+      "id": "GEO-VEC-01",
+      "description": "Magdeburg release station to Gostyń loft",
+      "p1": { "lat": 52.1205, "lng": 11.6276 },
+      "p2": { "lat": 51.8789, "lng": 17.0125 },
+      "expected_distance_meters": 372480.12,
+      "bearing_degrees": 96.5
+    },
+    {
+      "id": "GEO-VEC-02",
+      "description": "Short training toss 25km",
+      "p1": { "lat": 51.9500, "lng": 16.8500 },
+      "p2": { "lat": 51.8789, "lng": 17.0125 },
+      "expected_distance_meters": 24850.55,
+      "bearing_degrees": 128.2
+    },
+    {
+      "id": "GEO-VEC-03",
+      "description": "Marathon race Brussels to Poznan",
+      "p1": { "lat": 50.8503, "lng": 4.3517 },
+      "p2": { "lat": 52.4064, "lng": 16.9252 },
+      "expected_distance_meters": 894120.45,
+      "bearing_degrees": 75.8
+    }
+  ]
+}

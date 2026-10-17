@@ -1548,6 +1548,38 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('Z\u0142ota Ksi\u0119ga Mistrz\u00f3w');
     expect(tree).toContain('Go\u0142\u0119bnik');
   });
+
+  test('OfficialProtocolsHubModal renders catalog of 100 protocols with search and filters', () => {
+    const { OfficialProtocolsHubModal } = require('../src/components/OfficialProtocolsHubModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <OfficialProtocolsHubModal
+          visible={true}
+          onClose={onClose}
+          onOpenNationalExhibition={jest.fn()}
+          onOpenAnnualPerformanceLedger={jest.fn()}
+          onOpenClockOpeningAudit={jest.fn()}
+          onOpenEmergencyCabinRelease={jest.fn()}
+          onOpenPreSeasonFlockCensus={jest.fn()}
+          onOpenCrateRental={jest.fn()}
+          onOpenAntidopingSampling={jest.fn()}
+          onOpenStationSanitation={jest.fn()}
+          onOpenLoftInspection={jest.fn()}
+          onOpenPzhgpCertificate={jest.fn()}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('KATALOG URZ\u0118DOWY PZHGP & FCI');
+    expect(tree).toContain('Hub Protoko\u0142\u00f3w (100 Modu\u0142\u00f3w)');
+    expect(tree).toContain('Z-100');
+    expect(tree).toContain('Z-099');
+    expect(tree).toContain('Z-098');
+  });
 });
 
 

@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Pigeon-Fly Master Test Vectors (Apps4Craft Specification)",
+  "version": "1.0.0",
+  "generated_at": "2026-10-18T00:28:00Z",
+  "domains": {
+    "geodesy": {
+      "source": "tests/fixtures/vincenty-geodesy.fixture.json",
+      "formula": "Vincenty WGS-84 inverse equations"
+    },
+    "inbreeding": {
+      "source": "tests/fixtures/inbreeding-wright.fixture.json",
+      "formula": "Sewall Wright path coefficient F"
+    },
+    "bioenergetics": {
+      "source": "tests/fixtures/bioenergetics-lipid.fixture.json",
+      "formula": "Beta-oxidation fatty acid shift (9.3 kcal/g fat)"
+    },
+    "clock_audit": {
+      "source": "tests/fixtures/clock-opening-audit.fixture.json",
+      "formula": "PZHGP clock drift linear correction and disqualification"
+    },
+    "fci_standard": {
+      "source": "tests/fixtures/fci-standard-appraisal.fixture.json",
+      "formula": "FCI 100-pt Olympic appraisal scale with flight minimums"
+    }
+  }
+}

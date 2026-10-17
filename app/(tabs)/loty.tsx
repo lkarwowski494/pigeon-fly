@@ -49,6 +49,7 @@ import { EmergencyCabinReleaseModal } from '../../src/components/EmergencyCabinR
 import { ClockOpeningAuditModal } from '../../src/components/ClockOpeningAuditModal';
 import { NationalExhibitionModal } from '../../src/components/NationalExhibitionModal';
 import { LoftAnnualPerformanceLedgerModal } from '../../src/components/LoftAnnualPerformanceLedgerModal';
+import { OfficialProtocolsHubModal } from '../../src/components/OfficialProtocolsHubModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -138,6 +139,7 @@ export default function RacesScreen() {
   const [isClockOpeningAuditModalVisible, setIsClockOpeningAuditModalVisible] = useState(false);
   const [isNationalExhibitionModalVisible, setIsNationalExhibitionModalVisible] = useState(false);
   const [isAnnualPerformanceLedgerModalVisible, setIsAnnualPerformanceLedgerModalVisible] = useState(false);
+  const [isProtocolsHubModalVisible, setIsProtocolsHubModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -341,6 +343,13 @@ export default function RacesScreen() {
             onPress={() => setIsClockModalVisible(true)}
             testID="btn-clock-arrival"
             style={{ marginBottom: 10 }}
+          />
+          <FieldButton
+            title="🏛️ Katalog Urzędowy PZHGP & FCI (100 Modułów)"
+            onPress={() => setIsProtocolsHubModalVisible(true)}
+            testID="btn-open-protocols-hub"
+            variant="secondary"
+            style={{ marginBottom: 10, borderColor: '#E5A93C', borderWidth: 1.5 }}
           />
           <View style={{ flexDirection: 'row', gap: 8, marginBottom: 10 }}>
             <FieldButton
@@ -833,6 +842,21 @@ export default function RacesScreen() {
       <LoftAnnualPerformanceLedgerModal
         visible={isAnnualPerformanceLedgerModalVisible}
         onClose={() => setIsAnnualPerformanceLedgerModalVisible(false)}
+      />
+
+      <OfficialProtocolsHubModal
+        visible={isProtocolsHubModalVisible}
+        onClose={() => setIsProtocolsHubModalVisible(false)}
+        onOpenNationalExhibition={() => setIsNationalExhibitionModalVisible(true)}
+        onOpenAnnualPerformanceLedger={() => setIsAnnualPerformanceLedgerModalVisible(true)}
+        onOpenClockOpeningAudit={() => setIsClockOpeningAuditModalVisible(true)}
+        onOpenEmergencyCabinRelease={() => setIsEmergencyReleaseModalVisible(true)}
+        onOpenPreSeasonFlockCensus={() => setIsFlockCensusModalVisible(true)}
+        onOpenCrateRental={() => setIsCrateRentalModalVisible(true)}
+        onOpenAntidopingSampling={() => setIsAntidopingSamplingModalVisible(true)}
+        onOpenStationSanitation={() => setIsStationSanitationModalVisible(true)}
+        onOpenLoftInspection={() => setIsLoftInspectionModalVisible(true)}
+        onOpenPzhgpCertificate={() => setIsPzhgpCertificateModalVisible(true)}
       />
     </SafeAreaView>
   );
