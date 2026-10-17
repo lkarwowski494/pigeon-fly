@@ -1,7 +1,7 @@
 # Pigeon-Fly — Rejestr Bieżący Decyzji i Stanu Projektu
 **Data aktualizacji:** 17.10.2026 (Przyjęcie 10 Zasad Uniwersalnych i Odkrycie Ról z Biblioteki na Dysku)  
 **Właściciel:** Łukasz (`lkarwowski494`)  
-**Status projektu:** Faza wdrożeniowa — 40 zestawów testowych, 299 testów zaliczonych (100%), 0 błędów TypeScript i i18n
+**Status projektu:** Faza wdrożeniowa — 42 zestawy testowe, 312 testów zaliczonych (100%), 0 błędów TypeScript i i18n
 
 ---
 
@@ -86,6 +86,10 @@
   * *Rozstrzygnięcie:* Implementacja triage klinicznego Zespołu Choroby Młodych (YPDS / Adeno-Coli) w `src/domain/health.ts` (zakazy koszowania, twardego ziarna, 5-etapowy protokół ratunkowy RD-27, automatyczne przenoszenie do Izolatki z 14-dniową karencją, generator raportu ratunkowego PDF dla lekarza weterynarii `exportYpdsReport` w `src/services/pdfService.ts`). Rozbudowa modułu koproskopii o ilościową komorę McMastera (OPG: <1000 profilaktyka naturalna octem/oregano bez chemii, 1000–5000 kuracja celowana, &ge;5000 Baycox 2.5% + wypalenie rusztów palnikiem gazowym) oraz mikroskopową ocenę HPF jaj glistnicy/kapilariozy z powtórzeniem kuracji po 14 dniach. Integracja UI w `src/components/VeterinaryLabModal.tsx`. Pokrycie testami 100% (5/5 w `tests/ypdsTriage.test.ts`, 9/9 w `tests/coproscopyLab.test.ts`).
 * **DEC-60 (Moduł Transmisji Przylotów na Żywo Supabase Realtime — Z-049, DEC-35): Opcja 1 (17.10.2026 — Zatwierdzona przez Łukasza)**
   * *Rozstrzygnięcie:* Implementacja `src/services/liveBroadcastService.ts` zarządzającego subskrypcją kanałów WebSocket (`race-live-[CODE]`), emisją zdarzeń przylotów w czasie rzeczywistym, generowaniem kanonicznych linków kibica (`https://pigeonfly.app/live/...`), lokalnym powiadamianiem subskrybentów oraz buforem kolejki offline (`offlineQueue`). Integracja wskaźników statusu połączenia i automatycznej synchronizacji w `src/components/LiveDerbyModal.tsx` oraz podpięcie w `app/(tabs)/loty.tsx`. Pokrycie testami 100% (8/8 passing w `tests/liveBroadcast.test.ts`, stan całkowity projektu: 40 zestawów, 299 testów 100% zaliczonych).
+* **DEC-61 (Paszport Immunologiczny i Urzędowe Zaświadczenie Szczepień Stada — Z-307, BR-ZDR-009): Opcja 1 (17.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Implementacja `src/domain/vaccination.ts` sprawdzającego ważność szczepień PMV-1 (paramyksowiroza — 365 dni), ospy gołębi i salmonellozy, 21-dniowe okno serokonwersji przed koszowaniem, automatyczną blokadę koszowania ptaków bez ważnego szczepienia oraz generatora urzędowego Zaświadczenia Szczepień Gołębi PDF (`generateVaccinationCertificateHtml` / `exportVaccinationCertificate`) zgodnego z wymogami PZHGP i Powiatowego Lekarza Weterynarii (PIW). Integracja akcji druku i udostępniania w `src/components/VeterinaryLabModal.tsx`. Pokrycie testami 100% (8/8 passing w `tests/vaccination.test.ts`).
+* **DEC-62 (Komercyjny Moduł Wyceny Wartości Rynkowej Gołębia — Z-048, DEC-07): Opcja 2 (17.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Implementacja silnika wyceny `calculateMarketValuation` w `src/domain/valuation.ts` w walutach PLN i EUR (kurs 4.30) opartego na dorobku konkursowym (baza 20%), konkursach w szpicy (Top 100), 1. nagrodach, coeficientach FCI (<10 super as, <25 czołówka okręgu), tytułach sportowych, liniach rodowodowych (mnożniki do 2.2x), inbredzie Wrighta F (optymalny 3.125-12.5% vs ciasny >25%), ocenie budowy Standard FCI (90-95 pkt) oraz potomstwie. Integracja z `src/components/AppraisalModal.tsx` w postaci zakładki z medianą cenową, widełkami, kategoryzacją oraz rekomendacją aukcyjną. Pokrycie testami 100% (5/5 passing w `tests/valuation.test.ts`, łącznie 42 zestawy testowe i 312 testów).
 
 ---
 

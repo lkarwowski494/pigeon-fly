@@ -19,6 +19,7 @@ import {
   generateNestBoxCardsHtml,
   generateConcourseSheetHtml,
   generateYpdsEmergencyReportHtml,
+  generateVaccinationCertificateHtml,
   PedigreePdfOptions,
   BasketingListPdfOptions,
   TreatmentRecordItem,
@@ -26,6 +27,7 @@ import {
   NestBoxCardsPdfOptions,
   ConcourseSheetPdfOptions,
   YpdsEmergencyReportPdfOptions,
+  VaccinationCertificatePdfOptions,
 } from '../domain/pdfExport';
 import { PedigreeNode } from '../domain/types';
 
@@ -185,6 +187,24 @@ export class PdfService {
     return await this.shareHtmlAsPdf(
       html,
       `Protokół Triage YPDS — ${options.pigeonRingNumber}`
+    );
+  }
+
+  /**
+   * Generuje i drukuje lub udostępnia Urzędowe Zaświadczenie Szczepienia Stada (Z-307, PZHGP / PIW)
+   */
+  static async exportVaccinationCertificate(
+    options: VaccinationCertificatePdfOptions,
+    mode: 'print' | 'share' = 'print'
+  ): Promise<string | void> {
+    const html = generateVaccinationCertificateHtml(options);
+    if (mode === 'print') {
+      await this.printHtml(html);
+      return;
+    }
+    return await this.shareHtmlAsPdf(
+      html,
+      `Zaświadczenie Szczepienia PMV-1 — ${options.certificateNumber}`
     );
   }
 }

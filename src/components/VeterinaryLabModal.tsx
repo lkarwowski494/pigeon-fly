@@ -139,6 +139,45 @@ export function VeterinaryLabModal({
     }
   };
 
+  const handleExportVaccinationCert = async (mode: 'print' | 'share' = 'print') => {
+    try {
+      try {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      } catch {}
+
+      const mockPigeons = [
+        { ringNumber: selectedPigeonRing, sex: 'cock', color: 'Niebieski', ageYears: 2 },
+        { ringNumber: 'PL-0284-23-1402', sex: 'cock', color: 'Ciemnonakrapiany', ageYears: 3 },
+        { ringNumber: 'PL-0284-24-5501', sex: 'hen', color: 'Płowa', ageYears: 2 },
+        { ringNumber: 'PL-0284-25-8812', sex: 'cock', color: 'Szpak', ageYears: 1 },
+      ];
+
+      const currentYear = new Date().getFullYear();
+      await PdfService.exportVaccinationCertificate(
+        {
+          certificateNumber: `ZAŚ-WET/${currentYear}/048`,
+          issueDate: new Date().toISOString().split('T')[0],
+          vetName: 'dr n. wet. Janusz Kaczmarek',
+          vetLicenseNumber: 'PWZ-WET-18492',
+          clinicName: 'Przychodnia Weterynaryjna Ptaków Ozdobnych i Pocztowych',
+          clinicAddress: 'ul. Parkowa 12, 63-900 Rawicz',
+          loftName: 'Gołębnik Mistrza',
+          fancierName: 'Stanisław Kowalski',
+          fancierAddress: 'ul. Leśna 4, 63-900 Rawicz',
+          pzhgpBranch: 'Oddział 0284 Rawicz (Sekcja 1)',
+          vaccineName: 'Pharmavac Columbi 2 (PMV-1 + Pox)',
+          batchNumber: 'SER-2026-X88',
+          vaccinationDate: new Date().toISOString().split('T')[0],
+          expiryDate: new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString().split('T')[0],
+          pigeons: mockPigeons,
+        },
+        mode
+      );
+    } catch (err: any) {
+      Alert.alert('Błąd eksportu zaświadczenia', err?.message || 'Nie udało się wygenerować PDF.');
+    }
+  };
+
   return (
     <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
       <SafeAreaView style={styles.safeArea}>
@@ -625,6 +664,28 @@ export function VeterinaryLabModal({
                     ))}
                   </View>
                 )}
+
+                {/* Urzędowe Zaświadczenie Szczepienia PIW / PZHGP */}
+                <View style={styles.certExportBox}>
+                  <Text style={styles.certExportTitle}>📑 URZĘDOWE ZAŚWIADCZENIE SZCZEPIEŃ (PIW / PZHGP)</Text>
+                  <Text style={styles.certExportDesc}>
+                    Generuje oficjalne zaświadczenie weterynaryjne z wykazem obrączek i numerem serii szczepionki PMV-1 wymagane do koszowania na loty konkursowe.
+                  </Text>
+                  <View style={styles.ypdsPdfActionsRow}>
+                    <TouchableOpacity
+                      style={styles.ypdsPrintBtn}
+                      onPress={() => handleExportVaccinationCert('print')}
+                    >
+                      <Text style={styles.ypdsPrintBtnText}>🖨️ Drukuj Zaświadczenie PIW</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.ypdsShareBtn}
+                      onPress={() => handleExportVaccinationCert('share')}
+                    >
+                      <Text style={styles.ypdsShareBtnText}>📤 Udostępnij (PDF)</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
             </View>
           )}
@@ -1202,5 +1263,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     textAlign: 'center',
+  },
+  certExportBox: {
+    backgroundColor: '#16191E',
+    borderWidth: 1,
+    borderColor: '#2F343F',
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 14,
+  },
+  certExportTitle: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#60A5FA',
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  certExportDesc: {
+    fontSize: 11,
+    color: '#94A3B8',
+    lineHeight: 15,
+    marginBottom: 8,
   },
 });

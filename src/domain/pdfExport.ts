@@ -1252,6 +1252,167 @@ export function generateYpdsEmergencyReportHtml(options: YpdsEmergencyReportPdfO
   `.trim();
 }
 
+/**
+ * -------------------------------------------------------------
+ * Z-307: Urzędowe Zaświadczenie Szczepienia Stada (PZHGP / PIW)
+ * -------------------------------------------------------------
+ */
+
+export interface VaccinationCertificatePdfOptions {
+  certificateNumber: string;
+  issueDate: string;
+  vetName: string;
+  vetLicenseNumber: string;
+  clinicName: string;
+  clinicAddress: string;
+  loftName: string;
+  fancierName: string;
+  fancierAddress: string;
+  pzhgpBranch: string;
+  vaccineName: string;
+  batchNumber: string;
+  vaccinationDate: string;
+  expiryDate: string;
+  pigeons: {
+    ringNumber: string;
+    sex?: string;
+    color?: string;
+    ageYears?: number;
+  }[];
+}
+
+export function generateVaccinationCertificateHtml(
+  options: VaccinationCertificatePdfOptions
+): string {
+  const pigeonRows = options.pigeons
+    .map(
+      (p, idx) => `
+    <tr>
+      <td style="text-align: center; width: 36px;">${idx + 1}</td>
+      <td style="font-weight: 900; font-family: monospace; font-size: 11px;">${p.ringNumber}</td>
+      <td style="text-align: center;">${p.sex === 'cock' ? '1.0 Samiec' : p.sex === 'hen' ? '0.1 Samica' : '—'}</td>
+      <td>${p.color || '—'}</td>
+      <td style="text-align: center;">${p.ageYears !== undefined ? `${p.ageYears} lat` : '—'}</td>
+    </tr>
+  `
+    )
+    .join('');
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Zaświadczenie Szczepienia — ${options.certificateNumber}</title>
+  <style>
+    @page { size: A4 portrait; margin: 12mm; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; font-size: 11px; line-height: 1.4; color: #0F172A; }
+    .header-table { width: 100%; border-bottom: 2px solid #0F172A; padding-bottom: 8px; margin-bottom: 12px; }
+    .title { font-size: 15px; font-weight: 900; text-transform: uppercase; color: #0F172A; }
+    .subtitle { font-size: 10px; color: #475569; margin-top: 2px; }
+    .cert-no { font-size: 13px; font-weight: 800; color: #E5A93C; font-family: monospace; }
+    
+    .meta-grid { display: table; width: 100%; margin-bottom: 12px; }
+    .meta-col { display: table-cell; width: 50%; vertical-align: top; padding: 4px; }
+    .box { background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 8px; font-size: 10.5px; }
+    .box-title { font-weight: 900; font-size: 11px; color: #1E293B; margin-bottom: 4px; text-transform: uppercase; border-bottom: 1px solid #E2E8F0; padding-bottom: 2px; }
+    
+    .vaccine-card { background: #EFF6FF; border: 1px solid #93C5FD; border-radius: 6px; padding: 8px; margin-bottom: 12px; font-size: 11px; }
+    .vaccine-grid { display: flex; justify-content: space-between; }
+    
+    .table-container { width: 100%; margin-bottom: 14px; }
+    table { width: 100%; border-collapse: collapse; font-size: 10px; }
+    th { background: #1E293B; color: #FFFFFF; font-weight: 800; padding: 5px 8px; text-align: left; }
+    td { border-bottom: 1px solid #E2E8F0; padding: 4px 8px; }
+    tr:nth-child(even) { background: #F8FAFC; }
+    
+    .declaration { background: #F0FDF4; border-left: 3px solid #16A34A; padding: 8px; font-size: 10px; color: #166534; margin-bottom: 16px; border-radius: 4px; }
+    
+    .signatures { display: flex; justify-content: space-between; margin-top: 20px; }
+    .sign-col { width: 45%; text-align: center; }
+    .sign-box { border-bottom: 1px solid #64748B; height: 50px; margin-bottom: 4px; }
+    .sign-label { font-size: 9px; color: #64748B; }
+  </style>
+</head>
+<body>
+  <table class="header-table">
+    <tr>
+      <td>
+        <div class="title">URZĘDOWE ZAŚWIADCZENIE SZCZEPIENIA GOŁĘBI</div>
+        <div class="subtitle">Wymóg PZHGP & Rozporządzenie MRiRW ws. zwalczania rzekomego pomoru drobiu (PMV-1)</div>
+      </td>
+      <td style="text-align: right;">
+        <div class="cert-no">Nr: ${options.certificateNumber}</div>
+        <div style="font-size: 10px; color: #64748B;">Wydano: ${options.issueDate}</div>
+      </td>
+    </tr>
+  </table>
+
+  <div class="meta-grid">
+    <div class="meta-col">
+      <div class="box">
+        <div class="box-title">Lekarz Weterynarii / Przychodnia</div>
+        <div><strong>${options.vetName}</strong></div>
+        <div>Nr PWZ: <strong>${options.vetLicenseNumber}</strong></div>
+        <div>${options.clinicName}</div>
+        <div>${options.clinicAddress}</div>
+      </div>
+    </div>
+    <div class="meta-col">
+      <div class="box">
+        <div class="box-title">Hodowca / Posiadacz Gołębnika</div>
+        <div><strong>${options.fancierName}</strong> — ${options.loftName}</div>
+        <div>${options.fancierAddress}</div>
+        <div>Przynależność: <strong>${options.pzhgpBranch}</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="vaccine-card">
+    <div style="font-weight: 800; color: #1E40AF; margin-bottom: 4px;">DANE ZASTOSOWANEGO BIOPREPARATU:</div>
+    <div>Nazwa handlowa: <strong>${options.vaccineName}</strong> • Seria (Batch): <strong>${options.batchNumber}</strong></div>
+    <div>Data iniekcji: <strong>${options.vaccinationDate}</strong> • Ważność zaświadczenia (365 dni): <strong>${options.expiryDate}</strong></div>
+  </div>
+
+  <div class="table-container">
+    <div style="font-weight: 800; margin-bottom: 4px;">WYKAZ ZASZCZEPIONYCH GOŁĘBI (${options.pigeons.length} szt.):</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 36px; text-align: center;">L.p.</th>
+          <th>Numer Obrączki Rodowej</th>
+          <th style="text-align: center;">Płeć</th>
+          <th>Barwa upierzenia</th>
+          <th style="text-align: center;">Wiek</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${pigeonRows}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="declaration">
+    <strong>OŚWIADCZENIE LEKARZA WETERYNARII:</strong><br>
+    Niniejszym zaświadczam, że wyżej wymienione gołębie pocztowe zostały zbadane klinicznie i zaszczepione przeciwko paramyksowirozie gołębi (PMV-1) zgodnie z instrukcją producenta szczepionki. W momencie szczepienia ptaki nie wykazywały objawów klinicznych chorób zakaźnych. Po upływie 21 dni od iniekcji stado uzyskuje pełną odporność poszczepienną i jest dopuszczone do lotów konkursowych oraz wystaw.
+  </div>
+
+  <div class="signatures">
+    <div class="sign-col">
+      <div class="sign-box"></div>
+      <div class="sign-label">Podpis hodowcy (potwierdzenie tożsamości stada)</div>
+    </div>
+    <div class="sign-col">
+      <div class="sign-box"></div>
+      <div class="sign-label">Pieczęć i podpis uprawnionego lekarza weterynarii</div>
+    </div>
+  </div>
+</body>
+</html>
+  `.trim();
+}
+
+
 
 
 
