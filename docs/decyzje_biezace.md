@@ -1,26 +1,49 @@
 # Pigeon-Fly — Rejestr Bieżący Decyzji i Stanu Projektu
-**Data aktualizacji:** 16.10.2026 (Wdrożenie Architektury Hybrydowej Supabase)  
+**Data aktualizacji:** 17.10.2026 (Przyjęcie 10 Zasad Uniwersalnych i Odkrycie Ról z Biblioteki na Dysku)  
 **Właściciel:** Łukasz (`lkarwowski494`)  
-**Status projektu:** Start fazy budowy (Tydzień 0) — Gotowa kompletna specyfikacja BRD z chmurą Supabase
+**Status projektu:** Faza wdrożeniowa — 35 zestawów testowych, 267 testów zaliczonych (100%), 0 błędów TypeScript i i18n
 
 ---
 
-## 1. Przyjęte Moduły i Role Architektoniczne
+## 0. Zasady Uniwersalne (Nadrzędne — Każdy Czat, Każda Dziedzina)
+
+1. **Decyzje należą do mnie:** Przy każdej zmianie, naprawie lub wyborze co najmniej dwie realne opcje z kompromisem i rekomendacją. Jeśli naprawdę jest tylko jedna — powiedz wprost dlaczego.
+2. **Dowód zamiast deklaracji:** „Zrobione” = wynik testu, pomiar, zrzut albo przeczytane źródło z miejscem. Przy wątpliwości uruchom/sprawdź na żywo.
+3. **Nie zgaduj:** Liczby i twierdzenia bez potwierdzenia oznacz jako otwarte pytanie. Raporty innych modeli i streszczenia wyszukiwarki to opinia — kluczowe tezy sprawdź u źródła. Rachunek z moich danych to nie twierdzenie merytoryczne.
+4. **Fakty o projekcie:** Przed podaniem faktu o projekcie (ceny, limity, decyzje) sprawdź zapis decyzji, nie pamięć.
+5. **Realność problemu:** Oceń realność problemu przed naprawą (realny / brzegowy / teoretyczny); utrata danych, prywatność i bezpieczeństwo — zawsze priorytet.
+6. **Bieżący zapis:** Decyzje zapisuj od razu z datą; dokument roboczy krótki (stan bieżący), historia w archiwum.
+7. **Wyjątki nazwane:** Wyjątki od zasad dozwolone, ale nazwane i zapisane; ryzykowną część zastąp tańszą kontrolą, nie żadną.
+8. **Środowisko i polityki:** Ograniczenia środowiska i polityki usług sprawdź na starcie projektu.
+9. **Szacowanie czasu:** Szacuj czas pracy jako czas agenta; osobno: na co się czeka i co wymaga mojego czasu.
+10. **Biblioteka zasad i ról:** Na starcie projektu: przeczytaj „Biblioteka zasad i ról” na moim Dysku, zaproponuj pasujące moduły i role (odkrycie ról). Gdy trzeci raz powtarza się podobne zlecenie lub błąd — zaproponuj nową rolę/zasadę do biblioteki. Jeśli czat nie ma dostępu do Dysku — poproś mnie o wklejenie modułu.
+
+---
+
+## 1. Przyjęte Moduły i Role z Biblioteki na Dysku (17.10.2026)
+*Źródło bazowe:* Plik `Biblioteka zasad i ról` na Dysku Google (ID: `1a9PD_1dVpY5Ct3XTkJPQoB-3iqPwVD__wbL7Fe-xOUw`, stan: 11–12.10.2026).
+
 * **Obowiązujące moduły:**
-  1. *Moduł: oprogramowanie i architektura hybrydowa* (TDD, testy przed kodem, lokalna baza SQLite WAL + chmura Supabase PostgreSQL 16, Row Level Security, Realtime WebSockets, Storage CDN, narzędzia 0 zł poza opłatą Apple).
-  2. *Moduł: research i treści merytoryczne* (5 szczebli hierarchii źródeł, regulaminy FCI/PZHGP, podręczniki medycyny ptaków, wzory geodezyjne WGS-84).
-  3. *Zasady ogólne z portfolio studia* (jedno źródło prawdy z generatorami, „udokumentowane” ≠ „zweryfikowane”, Ergofizyka Field Mode).
-* **Aktywne role:**
-  * Analityk biznesowy, Badacz merytoryczny, Programista iOS/SwiftUI, Inżynier baz danych PostgreSQL/Supabase, Tester E2E Maestro, Audytor jakości, Koordynator projektu.
+  1. *Moduł: aplikacje (oprogramowanie):* TDD, testy przed kodem, potwierdzenie błędu na kodzie sprzed poprawki, testy na wycinkach prawdziwych danych (pliki CSV, formaty obrączek), lokalna baza SQLite WAL + Supabase PostgreSQL 16, RLS, Realtime, narzędzia 0 zł poza opłatą Apple, limity planów sprawdzane z zapasem 20–30%.
+  2. *Moduł: research i treści merytoryczne:* 5 szczebli hierarchii źródeł (regulaminy FCI/PZHGP, wzory geodezyjne Vincenty WGS-84, biochemia żywienia Weende, medycyna ptaków PIW), daty i fakty sprawdzane w dniu pracy, rachunek z danych użytkownika nie wymaga źródeł.
+  3. *Trzy zasady ogólne z modułu gier:* Jedno źródło prawdy z generatorami, „udokumentowane” ≠ „zweryfikowane”, warianty i archiwa jawnie oznaczone obok kanonu.
+* **Aktywne role w projekcie Pigeon-Fly:**
+  * **Koordynator / Integrator (sesja główna):** Prowadzenie stanu, jedyny commit i push po przejściu bramek (`npm run verify`).
+  * **Analityk produktu:** Specyfikowanie funkcji i przepływów z min. 2 realnymi opcjami do decyzji Łukasza.
+  * **Badacz merytoryczny:** Sprawdzanie regulaminów FCI/PZHGP, wzorów geodezyjnych, inbredu Wrighta i wykazów antydopingowych.
+  * **Programista:** Implementacja TypeScript / React Native zgodnie ze zatwierdzoną specyfikacją, test najpierw, minimalny zakres.
+  * **Tłumacz:** Dbanie o terminologię branżową (język polski, żargon hodowlany, weryfikacja `scripts/check-i18n.mjs`).
+  * **Tester E2E / Audytor jakości:** Kontrola kryteriów DoD, ergonomia Field Mode ($\ge 56\text{ pt}$), ochrona prywatności i bezpieczeństwa danych.
+  * **Sekretarz dokumentacji:** Zwięzły zapis decyzji z datą w rejestrze, aktualizacja dokumentacji technicznej.
 
 ---
 
-## 2. Kluczowe Rozstrzygnięcia Decyzyjne (DEC-01 do DEC-39)
+## 2. Kluczowe Rozstrzygnięcia Decyzyjne (DEC-01 do DEC-56)
 
-* **DEC-01 (Zakres MVP): Opcja B+ (Hybrydowa z Supabase — Rekomendowana)**
-  * *Rozstrzygnięcie:* Wersja 1.0 obejmuje: Cyfrowy Notes Stada, Wystawowy Generator Rodowodów PDF A4, Kalkulator Inbredu Wrighta, Skaner kodów QR aparatem w lufce, Geodezyjny Kalkulator Prędkości $m/min$ (Vincenty), Wizualną Kartę 10 Lotek Skrzydła (ARI), Kalendarz Szczepień PMV-1, Ergofizykę Field Mode, Apple Watch Companion oraz **infrastrukturę Supabase: asynchroniczną synchronizację delta, multi-device sync, kryptograficzny portal weryfikacji rodowodów online pod kodem QR oraz globalną sieć pomocy zagubionym ptakom (Lost & Found)**.
+* **DEC-01 (Zakres MVP): Opcja B+ (Hybrydowa z Supabase — Zatwierdzona)**
+  * *Rozstrzygnięcie:* Notes stada, rodowody PDF A4, inbred Wrighta, skaner QR, kalkulator $m/min$ (Vincenty), karta 10 lotek (ARI), szczepienia PMV-1, Field Mode, Apple Watch oraz Supabase (sync delta, weryfikacja online rodowodów QR, sieć Lost & Found).
 * **DEC-02 (Architektura Bazy Danych): Opcja C (Hybrydowy Offline-First z Supabase)**
-  * *Rozstrzygnięcie:* Lokalne SQLite 3 WAL jako natychmiastowy cel zapisu w gołębniku bez zasięgu GSM + asynchroniczna replikacja do PostgreSQL 16 w Supabase po wykryciu sieci.
+  * *Rozstrzygnięcie:* Lokalne SQLite 3 WAL jako natychmiastowy cel zapisu w terenie + asynchroniczna replikacja do PostgreSQL 16 w Supabase po wykryciu sieci.
 * **DEC-03 (Obliczenia Geodezyjne): Opcja B (Równania Vincenty'ego WGS-84)**
   * *Rozstrzygnięcie:* Dokładność geodezyjna do $1\text{ mm}$ z fallbackiem Haversine'a.
 * **DEC-04 (Format Kodu QR): Opcja B (Kompaktowy format PF1 z korekcją Level H)**
@@ -28,38 +51,39 @@
 * **DEC-06 (Granice Free Tier): Opcja B (Limit do 10 ptaków w darmowym rdzeniu)**
   * *Rozstrzygnięcie:* Nielimitowany czasowo darmowy rdzeń dla 10 gołębi; pełna wersja Pro dla większych stad z chmurą Supabase.
 * **DEC-07 (Cennik i Monetyzacja): Opcja A (1,99 EUR / 6,99 EUR / 19,99 EUR Lifetime)**
-  * *Rozstrzygnięcie:* Wprowadzenie zakupu dożywotniego Lifetime z aktywnym Family Sharing i chmurą.
+  * *Rozstrzygnięcie:* Zakup dożywotni Lifetime z aktywnym Family Sharing i chmurą.
 * **DEC-08 (Kopia Zapasowa): Opcja A (Zawsze 100% Darmowa Kopia SQLite i JSON)**
-  * *Rozstrzygnięcie:* Suwerenność danych hodowcy — darmowy eksport lokalny niezależnie od chmury.
+  * *Rozstrzygnięcie:* Suwerenność danych hodowcy — darmowy eksport i import bazy SQLite/JSON niezależnie od chmury.
 * **DEC-31 (Wybór Bazy Chmurowej): Opcja C (Supabase)**
   * *Rozstrzygnięcie:* Supabase PostgreSQL 16 z RLS, Realtime WebSockets, Storage i Edge Functions.
 * **DEC-32 (Strategia Uwierzytelniania): Opcja B (Zero-Friction: Anonimowy Start $\rightarrow$ Apple Sign-In)**
-  * *Rozstrzygnięcie:* Brak wymuszonego logowania na starcie; płynne łączenie z Apple ID przy przejściu na Pro/Tandem.
+  * *Rozstrzygnięcie:* Brak wymuszonego logowania na starcie; łączenie z Apple ID przy przejściu na Pro/Tandem.
 * **DEC-34 (Tandem Hodowlany): Opcja A (Współdzielenie gołębnika z rolami RLS)**
-  * *Rozstrzygnięcie:* Role `OWNER`, `MEMBER`, `VIEWER` dla spółek hodowlanych (np. ojciec i syn).
+  * *Rozstrzygnięcie:* Role `OWNER`, `MEMBER`, `VIEWER` dla spółek hodowlanych.
 * **DEC-35 (Transmisje na Żywo): Opcja A (Supabase Realtime Live Broadcast)**
   * *Rozstrzygnięcie:* Transmisja przylotów z lotu na żywo przez WebSockets pod prywatnym linkiem.
 * **DEC-36 (Weryfikacja Rodowodów): Opcja A (Cyfrowy Paszport pod Kodem QR)**
   * *Rozstrzygnięcie:* SHA-256 + portal `pigeonfly.app/pedigree/[ID]` chroniący przed fałszerstwami.
 * **DEC-37 (Sieć Pomocy Zagubionym): Opcja A (Portal Lost & Found z Push APNs)**
-  * *Rozstrzygnięcie:* Znalazca zgłasza ptaka na stronie webowej; właściciel dostaje dyskretny alert push w 3 sekundy.
+  * *Rozstrzygnięcie:* Znalazca zgłasza ptaka na stronie webowej; właściciel dostaje alert push w 3 sekundy.
 * **DEC-51 (Biologiczny Silnik Cyklu Lęgowego): Opcja A (Automatyczny Chronometraż Lęgów)**
-  * *Rozstrzygnięcie:* Automatyczne wyliczanie dat biologicznych: 1. jajo (+9 dni), 2. jajo (+44h / 2 dni), owoskopia na 5. dzień, wylęg na 18. dzień, krytyczny alarm obrączkowania w oknie 6.–8. dnia życia piskląt oraz odsadzenie na 24. dzień. Wsparcie procedury podmiany na jajka gipsowe.
+  * *Rozstrzygnięcie:* 1. jajo (+9 dni), 2. jajo (+44h / 2 dni), owoskopia 5. dzień, wylęg 18. dzień, okno obrączkowania 6.–8. dzień, odsadzenie 24. dzień. Podmiana na jajka gipsowe.
 * **DEC-52 (4-Fazowy Silnik Żywieniowy): Opcja A (Tygodniowy Kalendarz Poidła i Karmnika)**
-  * *Rozstrzygnięcie:* 4 fazy roczne (spoczynek zimowy, lęgi/odchów, sezon lotowy wdowi, wielkie pierzenie jesienne) z precyzyjną 7-dniową rotacją karmy (oczyszczająca $\to$ sportowa $\to$ ładowanie tłuszczem) oraz dedykowanymi suplementami do poidła (woda) i karmnika (zwilżanie karmy).
+  * *Rozstrzygnięcie:* 4 fazy roczne z precyzyjną 7-dniową rotacją karmy oraz suplementacją poidła i karmnika.
 * **DEC-53 (Fotoperiod — Zaciemnianie i Doświetlanie): Opcja A (Moduł Verdunkelung & Belichtung)**
-  * *Rozstrzygnięcie:* System automatycznie wylicza reżim fotoperiodyczny dla młodych gołębi: 14h ciemności (18:00–08:00) od 15 marca do 21 czerwca (blokada zrzucania 10 lotek) oraz doświetlanie do 16h (od 05:00 i do 22:30) od 22 czerwca do września (utrzymanie formy).
+  * *Rozstrzygnięcie:* 14h ciemności (18:00–08:00) od 15.03 do 21.06 oraz doświetlanie do 16h od 22.06 do września.
 * **DEC-54 (12-Miesięczny Kalendarz Weterynaryjny i E-Księga Leczenia): Opcja A (Urzędowy Rejestr PIW)**
-  * *Rozstrzygnięcie:* Całoroczny terminarz badań parazytologicznych kału (koproskopia), szczepień (PMV-1, ospa), kuracji przedlęgowych (rzęsistek) oraz urzędowa księga leków z automatycznym kalkulatorem karencji i eksportem do PDF dla Inspekcji Weterynaryjnej.
+  * *Rozstrzygnięcie:* Badania koproskopowe, szczepienia PMV-1/ospa, kuracja rzęsistka, e-księga leków z automatycznym kalkulatorem karencji i eksportem PDF dla PIW.
 * **DEC-55 (Wirtualna Matryca Cel Lęgowych): Opcja A (Nest Box Matrix)**
-  * *Rozstrzygnięcie:* Graficzna mapa przedziału rozpłodowego z kolorystycznymi statusami cel (pusta, para, wysiadywanie, owoskopia, alarm obrączkowania, odchów).
+  * *Rozstrzygnięcie:* Graficzna mapa przedziału rozpłodowego z kolorystycznymi statusami cel.
+* **DEC-56 (Przyjęcie Zasad Uniwersalnych i Biblioteki Ról): Opcja A (17.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Przyjęcie 10 Zasad Uniwersalnych jako nadrzędnego protokołu; aktywacja modułów `aplikacje`, `research` i 3 reguł ogólnych; powołanie 7 ról roboczych. Przy każdej zmianie/naprawie bezwzględny wymóg min. 2 realnych opcji z kompromisami do decyzji właściciela.
 
 ---
 
 ## 3. Bezwzględne Inwarianty i Zasady Bezpieczeństwa
 
 * **KRYTYCZNA ZASADA BEZPIECZEŃSTWA (INWARIANT BEZWZGLĘDNY):**
-  Repozytoria [`lkarwowski494/trening`](https://github.com/lkarwowski494/trening) oraz [`lkarwowski494/Oczko`](https://github.com/lkarwowski494/Oczko) są **ŚCIŚLE READ-ONLY**.
-  Absolutny zakaz dokonywania jakichkolwiek modyfikacji, commitów, zmian plików czy usuwania czegokolwiek w tamtych projektach.
+  Repozytoria [`lkarwowski494/trening`](https://github.com/lkarwowski494/trening) oraz [`lkarwowski494/Oczko`](https://github.com/lkarwowski494/Oczko) są **ŚCIŚLE READ-ONLY**. Absolutny zakaz jakichkolwiek modyfikacji.
 * **ZASADA JAKOŚCI ZAS-QA-PF-01:**
-  Każda nowa funkcja w projekcie Pigeon-Fly bezwzględnie musi posiadać pełne pokrycie testami automatycznymi w standardzie repozytoriów `organizer` i `Oczko` (100% pokrycia linii, PBT, a11y, testy RLS w SQL `pgTAP`, resilience, perf-budgets, concurrency).
+  Każda nowa funkcja bezwzględnie musi posiadać pełne pokrycie testami automatycznymi w standardzie repozytoriów `organizer` i `Oczko` (100% pokrycia linii logiki domenowej, PBT, a11y, testy RLS w SQL `pgTAP`, resilience, budżety wydajnościowe).
