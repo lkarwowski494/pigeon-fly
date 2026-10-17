@@ -1159,6 +1159,50 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('Puchar Przechodni');
     expect(tree).toContain('Drukuj Tabel\u0119 Punktacji A4');
   });
+
+  test('CarboLipidSupercompensationModal (Z-083) renders marathon lipid loading, 96h schedule, and fat requirement', () => {
+    const { CarboLipidSupercompensationModal } = require('../src/components/CarboLipidSupercompensationModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <CarboLipidSupercompensationModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Superkompensacja Lipidowa');
+    expect(tree).toContain('PARAMETRY LOTU I POGODY');
+    expect(tree).toContain('740 km');
+    expect(tree).toContain('Harmonogram 96h');
+    expect(tree).toContain('Drukuj Protok\u00f3\u0142 A4');
+  });
+
+  test('EskRegistrationProtocolModal (Z-084) renders ESK clock base, antenna sensitivity test, and PZHGP compliance', () => {
+    const { EskRegistrationProtocolModal } = require('../src/components/EskRegistrationProtocolModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <EskRegistrationProtocolModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Rejestracja Stacji i Anten ESK');
+    expect(tree).toContain('SYSTEM ZGODNY Z NORM\u0104 PZHGP');
+    expect(tree).toContain('ANT-4P-99210');
+    expect(tree).toContain('Test Czu\u0142o\u015bci Chipa');
+    expect(tree).toContain('Drukuj Protok\u00f3\u0142 A4');
+  });
 });
 
 

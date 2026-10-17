@@ -36,6 +36,8 @@ import { TrainingTossLogModal } from '../../src/components/TrainingTossLogModal'
 import { CareerPassportModal } from '../../src/components/CareerPassportModal';
 import { FairPlayDeclarationModal } from '../../src/components/FairPlayDeclarationModal';
 import { InterTeamChampionshipModal } from '../../src/components/InterTeamChampionshipModal';
+import { CarboLipidSupercompensationModal } from '../../src/components/CarboLipidSupercompensationModal';
+import { EskRegistrationProtocolModal } from '../../src/components/EskRegistrationProtocolModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -112,6 +114,8 @@ export default function RacesScreen() {
   const [isCareerPassportModalVisible, setIsCareerPassportModalVisible] = useState(false);
   const [isFairPlayModalVisible, setIsFairPlayModalVisible] = useState(false);
   const [isTeamChampionshipModalVisible, setIsTeamChampionshipModalVisible] = useState(false);
+  const [isCarboLipidModalVisible, setIsCarboLipidModalVisible] = useState(false);
+  const [isEskProtocolModalVisible, setIsEskProtocolModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -466,6 +470,20 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="⚡ Superkompensacja Tłuszczowa i Maraton (Z-083)"
+            onPress={() => setIsCarboLipidModalVisible(true)}
+            testID="btn-open-carbo-lipid"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
+            title="📡 Rejestracja Zegara i Anten ESK (Z-084)"
+            onPress={() => setIsEskProtocolModalVisible(true)}
+            testID="btn-open-esk-protocol"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -645,6 +663,17 @@ export default function RacesScreen() {
       <InterTeamChampionshipModal
         visible={isTeamChampionshipModalVisible}
         onClose={() => setIsTeamChampionshipModalVisible(false)}
+      />
+
+      <CarboLipidSupercompensationModal
+        visible={isCarboLipidModalVisible}
+        onClose={() => setIsCarboLipidModalVisible(false)}
+        defaultRaceName={raceName}
+      />
+
+      <EskRegistrationProtocolModal
+        visible={isEskProtocolModalVisible}
+        onClose={() => setIsEskProtocolModalVisible(false)}
       />
     </SafeAreaView>
   );
