@@ -7,6 +7,7 @@ import React, { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'react-native';
 import { activateKeepAwakeAsync } from 'expo-keep-awake';
+import { AccessProvider } from '../src/context/AccessContext';
 
 export default function RootLayout() {
   useEffect(() => {
@@ -15,7 +16,7 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <>
+    <AccessProvider>
       <StatusBar barStyle="light-content" backgroundColor="#121417" />
       <Stack
         screenOptions={{
@@ -48,6 +49,6 @@ export default function RootLayout() {
           }}
         />
       </Stack>
-    </>
+    </AccessProvider>
   );
 }

@@ -38,14 +38,22 @@ import {
   buildBackupEnvelope,
   generateTimestampString,
 } from '../../src/services/backupService';
+import { useAppAccess } from '../../src/context/AccessContext';
 
 export default function SettingsScreen() {
   const lang = useLang();
   const isPl = lang === 'pl';
-
-  const [activePlan, setActivePlan] = useState<PlanType>('trial');
+  const {
+    evaluation,
+    entitlements,
+    isPaywallOpen,
+    openPaywall,
+    closePaywall,
+    buyPlan,
+    restore,
+  } = useAppAccess();
+  const activePlan = evaluation.activePlan;
   const [unitSystem, setUnitSystem] = useState<UnitSystem>('metric');
-  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [isTandemOpen, setIsTandemOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [pendingQueueCount, setPendingQueueCount] = useState(0);
@@ -176,7 +184,7 @@ export default function SettingsScreen() {
           <FieldButton
             title={activePlan === 'lifetime' ? '★ Licencja Dożywotnia Aktywna' : '⭐ Odblokuj Pigeon-Fly Pro'}
             variant="primary"
-            onPress={() => setIsPaywallOpen(true)}
+            onPress={openPaywall}
             style={{ marginTop: 8 }}
             testID="btn-open-paywall"
           />
@@ -300,15 +308,33 @@ export default function SettingsScreen() {
       {/* Paywall Modal */}
       <PaywallModal
         visible={isPaywallOpen}
-        onClose={() => setIsPaywallOpen(false)}
+        onClose={closePaywall}
         onSelectPlan={async (plan) => {
-          setActivePlan(plan);
-          Alert.alert('Sukces!', 'Pigeon-Fly Pro został pomyślnie aktywowany. Dziękujemy za wspieranie rozwoju aplikacji!');
+          try {
+            await buyPlan(plan);
+            closePaywall();
+            Alert.alert(
+              'Sukces!',
+              'Pigeon-Fly Pro został pomyślnie aktywowany. Dziękujemy za wspieranie rozwoju aplikacji!'
+            );
+          } catch (e: any) {
+            Alert.alert('Błąd zakupu', e?.message || 'Nie udało się aktywować planu.');
+          }
         }}
         onRestore={async () => {
-          Alert.alert('Przywracanie', 'Sprawdzono zakupy w App Store. Stan licencji zaktualizowany.');
+          try {
+            const res = await restore();
+            if (res.success) {
+              closePaywall();
+              Alert.alert('Przywrócono', res.message);
+            } else {
+              Alert.alert('Brak uprawnień', res.message);
+            }
+          } catch (e: any) {
+            Alert.alert('Błąd przywracania', e?.message || 'Nie udało się sprawdzić uprawnień.');
+          }
         }}
-        currentPigeonsCount={12}
+        currentPigeonsCount={entitlements?.lifetime_pigeons_created ?? 0}
       />
 
       {/* Tandem & Multi-Breeder Sharing Modal (Z-057) */}

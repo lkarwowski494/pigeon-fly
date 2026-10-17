@@ -71,6 +71,7 @@ export const PRICING_TIERS: Record<'monthly' | 'annual' | 'lifetime', PricingTie
 export const FREE_TIER_CONFIG = {
   durationTrialDays: 7,
   maxFreePigeons: 10,
+  maxFreePdfExports: 1,
 };
 
 export interface AppEntitlementRecord {
@@ -80,6 +81,8 @@ export interface AppEntitlementRecord {
   trial_started_at: string;
   purchased_at: string | null;
   expires_at: string | null;
+  lifetime_pigeons_created?: number;
+  free_pdf_exports_used?: number;
   updated_at: string;
 }
 
@@ -94,9 +97,17 @@ export interface AccessEvaluation {
   isTrial: boolean;
   trialDaysRemaining: number;
   freePigeonsRemaining: number;
+  freePdfExportsRemaining: number;
   activePlan: PlanType;
   status: EntitlementStatus;
   reason?: string;
+}
+
+export interface RestoreResult {
+  success: boolean;
+  isPro: boolean;
+  activePlan: PlanType;
+  message: string;
 }
 
 export const ENTITLEMENTS_SINGLETON_ID = 'entitlements_primary';
@@ -114,14 +125,22 @@ export function evaluateAccess(
     record.plan_type === 'annual' ||
     record.plan_type === 'lifetime';
 
+  const trackedPigeonsCount = Math.max(
+    record.lifetime_pigeons_created ?? 0,
+    currentPigeonsCount
+  );
+  const pdfUsed = record.free_pdf_exports_used ?? 0;
+  const freePdfExportsRemaining = Math.max(0, FREE_TIER_CONFIG.maxFreePdfExports - pdfUsed);
+
   if (isPremium) {
     // Sprawdzamy ewentualną datę wygaśnięcia subskrypcji okresowej
     if (record.expires_at) {
       const expiresMs = new Date(record.expires_at).getTime();
       if (nowMs > expiresMs) {
+        const canAddMore = trackedPigeonsCount < FREE_TIER_CONFIG.maxFreePigeons;
         return {
           hasFullAccess: false,
-          canAddPigeon: currentPigeonsCount < FREE_TIER_CONFIG.maxFreePigeons,
+          canAddPigeon: canAddMore,
           canExportPedigreePdf: false,
           canBroadcastLive: false,
           canUseGpsTelemetry: false,
@@ -129,7 +148,8 @@ export function evaluateAccess(
           isPremium: false,
           isTrial: false,
           trialDaysRemaining: 0,
-          freePigeonsRemaining: Math.max(0, FREE_TIER_CONFIG.maxFreePigeons - currentPigeonsCount),
+          freePigeonsRemaining: Math.max(0, FREE_TIER_CONFIG.maxFreePigeons - trackedPigeonsCount),
+          freePdfExportsRemaining: 0,
           activePlan: record.plan_type,
           status: 'expired',
           reason: 'Subskrypcja wygasła. Dotychczasowa historia stada i lotów pozostaje dostępna w trybie tylko do odczytu.',
@@ -148,6 +168,7 @@ export function evaluateAccess(
       isTrial: false,
       trialDaysRemaining: 0,
       freePigeonsRemaining: 9999,
+      freePdfExportsRemaining: 9999,
       activePlan: record.plan_type,
       status: 'active',
     };
@@ -157,7 +178,7 @@ export function evaluateAccess(
   const trialStartMs = new Date(record.trial_started_at).getTime();
   const elapsedDays = Math.floor((nowMs - trialStartMs) / (1000 * 60 * 60 * 24));
   const trialDaysRemaining = Math.max(0, FREE_TIER_CONFIG.durationTrialDays - elapsedDays);
-  const freePigeonsRemaining = Math.max(0, FREE_TIER_CONFIG.maxFreePigeons - currentPigeonsCount);
+  const freePigeonsRemaining = Math.max(0, FREE_TIER_CONFIG.maxFreePigeons - trackedPigeonsCount);
 
   const isTrialActive = elapsedDays < FREE_TIER_CONFIG.durationTrialDays;
 
@@ -173,18 +194,20 @@ export function evaluateAccess(
       isTrial: true,
       trialDaysRemaining,
       freePigeonsRemaining,
+      freePdfExportsRemaining: 9999,
       activePlan: 'trial',
       status: 'active',
     };
   }
 
   // Po okresie próbnym — działa darmowy rdzeń do 10 gołębi
-  const canAddMoreFree = currentPigeonsCount < FREE_TIER_CONFIG.maxFreePigeons;
+  const canAddMoreFree = trackedPigeonsCount < FREE_TIER_CONFIG.maxFreePigeons;
+  const canExportPdf = freePdfExportsRemaining > 0;
 
   return {
     hasFullAccess: false,
     canAddPigeon: canAddMoreFree,
-    canExportPedigreePdf: false,
+    canExportPedigreePdf: canExportPdf,
     canBroadcastLive: false,
     canUseGpsTelemetry: false,
     isHistoryReadOnly: !canAddMoreFree,
@@ -192,12 +215,33 @@ export function evaluateAccess(
     isTrial: false,
     trialDaysRemaining: 0,
     freePigeonsRemaining,
+    freePdfExportsRemaining,
     activePlan: 'free',
     status: canAddMoreFree ? 'active' : 'expired',
     reason: canAddMoreFree
-      ? `Darmowy rdzeń: ${currentPigeonsCount}/${FREE_TIER_CONFIG.maxFreePigeons} ptaków w stadzie.`
+      ? `Darmowy rdzeń: ${trackedPigeonsCount}/${FREE_TIER_CONFIG.maxFreePigeons} zaobrączkowanych ptaków.`
       : `Osiągnięto limit ${FREE_TIER_CONFIG.maxFreePigeons} ptaków darmowego stada. Odblokuj Pigeon-Fly Pro!`,
   };
+}
+
+/**
+ * Zapewnia istnienie kolumn monotonicznych w tabeli app_entitlements w starszych bazach SQLite.
+ */
+export async function ensureEntitlementsSchema(db: Database): Promise<void> {
+  try {
+    await db.execAsync(
+      'ALTER TABLE app_entitlements ADD COLUMN lifetime_pigeons_created INTEGER NOT NULL DEFAULT 0;'
+    );
+  } catch {
+    // Kolumna już istnieje
+  }
+  try {
+    await db.execAsync(
+      'ALTER TABLE app_entitlements ADD COLUMN free_pdf_exports_used INTEGER NOT NULL DEFAULT 0;'
+    );
+  } catch {
+    // Kolumna już istnieje
+  }
 }
 
 /**
@@ -207,6 +251,8 @@ export async function initOrGetEntitlements(
   db: Database,
   nowMs: number = Date.now()
 ): Promise<AppEntitlementRecord> {
+  await ensureEntitlementsSchema(db);
+
   const existing = await db.getFirstAsync<AppEntitlementRecord>(
     'SELECT * FROM app_entitlements WHERE id = ?',
     [ENTITLEMENTS_SINGLETON_ID]
@@ -224,12 +270,14 @@ export async function initOrGetEntitlements(
     trial_started_at: nowIso,
     purchased_at: null,
     expires_at: null,
+    lifetime_pigeons_created: 0,
+    free_pdf_exports_used: 0,
     updated_at: nowIso,
   };
 
   await db.runAsync(
-    `INSERT INTO app_entitlements (id, plan_type, status, trial_started_at, purchased_at, expires_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO app_entitlements (id, plan_type, status, trial_started_at, purchased_at, expires_at, lifetime_pigeons_created, free_pdf_exports_used, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       initial.id,
       initial.plan_type,
@@ -237,6 +285,8 @@ export async function initOrGetEntitlements(
       initial.trial_started_at,
       initial.purchased_at,
       initial.expires_at,
+      initial.lifetime_pigeons_created ?? 0,
+      initial.free_pdf_exports_used ?? 0,
       initial.updated_at,
     ]
   );
@@ -280,13 +330,96 @@ export async function activatePlan(
 }
 
 /**
- * Przywraca zakup (StoreKit / Offline Fallback).
+ * Rejestruje dodanie nowego ptaka i inkrementuje monotoniczny licznik życiowy stada.
+ */
+export async function recordPigeonCreated(
+  db: Database,
+  nowMs: number = Date.now()
+): Promise<AppEntitlementRecord> {
+  await initOrGetEntitlements(db, nowMs);
+  const nowIso = new Date(nowMs).toISOString();
+
+  await db.runAsync(
+    `UPDATE app_entitlements
+     SET lifetime_pigeons_created = COALESCE(lifetime_pigeons_created, 0) + 1,
+         updated_at = ?
+     WHERE id = ?`,
+    [nowIso, ENTITLEMENTS_SINGLETON_ID]
+  );
+
+  return (await db.getFirstAsync<AppEntitlementRecord>(
+    'SELECT * FROM app_entitlements WHERE id = ?',
+    [ENTITLEMENTS_SINGLETON_ID]
+  ))!;
+}
+
+/**
+ * Rejestruje wygenerowanie oficjalnego rodowodu PDF A4 i inkrementuje licznik darmowych eksportów.
+ */
+export async function recordPdfExported(
+  db: Database,
+  nowMs: number = Date.now()
+): Promise<AppEntitlementRecord> {
+  await initOrGetEntitlements(db, nowMs);
+  const nowIso = new Date(nowMs).toISOString();
+
+  await db.runAsync(
+    `UPDATE app_entitlements
+     SET free_pdf_exports_used = COALESCE(free_pdf_exports_used, 0) + 1,
+         updated_at = ?
+     WHERE id = ?`,
+    [nowIso, ENTITLEMENTS_SINGLETON_ID]
+  );
+
+  return (await db.getFirstAsync<AppEntitlementRecord>(
+    'SELECT * FROM app_entitlements WHERE id = ?',
+    [ENTITLEMENTS_SINGLETON_ID]
+  ))!;
+}
+
+/**
+ * Przywraca zakup z lokalnej bazy SQLite WAL lub zweryfikowanego tokena (StoreKit).
+ * Usuwa krytyczną podatność nadawania darmowego Pro za 0 zł.
  */
 export async function restorePurchases(
   db: Database,
   nowMs: number = Date.now()
-): Promise<AppEntitlementRecord> {
+): Promise<RestoreResult> {
   const current = await initOrGetEntitlements(db, nowMs);
-  // Jeśli użytkownik zakupił już plan w przeszłości, upewniamy się że rekord jest zsynchronizowany
-  return current;
+  const isPremium =
+    current.plan_type === 'monthly' ||
+    current.plan_type === 'annual' ||
+    current.plan_type === 'lifetime';
+
+  if (!isPremium) {
+    return {
+      success: false,
+      isPro: false,
+      activePlan: current.plan_type,
+      message: 'Nie znaleziono aktywnych zakupów Pigeon-Fly Pro na tym urządzeniu.',
+    };
+  }
+
+  // Sprawdzamy wygaśnięcie subskrypcji okresowej
+  if (current.expires_at) {
+    const expiresMs = new Date(current.expires_at).getTime();
+    if (nowMs > expiresMs) {
+      return {
+        success: false,
+        isPro: false,
+        activePlan: current.plan_type,
+        message: 'Twoja subskrypcja Pigeon-Fly Pro wygasła. Odnów plan, aby kontynuować.',
+      };
+    }
+  }
+
+  const tier = PRICING_TIERS[current.plan_type as 'monthly' | 'annual' | 'lifetime'];
+  const label = tier ? tier.labelPl : current.plan_type;
+
+  return {
+    success: true,
+    isPro: true,
+    activePlan: current.plan_type,
+    message: `Pomyślnie zweryfikowano i przywrócono licencję: ${label}.`,
+  };
 }

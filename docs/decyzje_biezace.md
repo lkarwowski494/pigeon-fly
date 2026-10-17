@@ -1,7 +1,7 @@
 # Pigeon-Fly — Rejestr Bieżący Decyzji i Stanu Projektu
-**Data aktualizacji:** 18.10.2026 (Zakończenie procedury Retrofit — Lead Business Analyst & Product Discovery Architect)  
+**Data aktualizacji:** 18.10.2026 (Zakończenie procedury Retrofit — Audytor Monetyzacji & WTP Tier 1–3)  
 **Właściciel:** Łukasz (`lkarwowski494`)  
-**Status projektu:** Faza wdrożeniowa / Retrofit — 94 zestawy testowe, 653 testy zaliczone (100%), 0 błędów TypeScript i i18n, zero ostrzeżeń SafeAreaView
+**Status projektu:** Faza wdrożeniowa / Retrofit — 94 zestawy testowe, 662 testy zaliczone (100%), 0 błędów TypeScript i i18n, zero wycieków monetyzacji (DEC-MON-01..05)
 
 ---
 
@@ -218,6 +218,16 @@
   * *Rozstrzygnięcie:* Wdrożenie horyzontalnego paska chipów z licznikami modułów (`Wszystkie (11)`, `Lotowe (5)`, `Zdrowie (3)`, `Wystawy (2)`, `Rozpłód (1)`) o wysokości celu dotykowego min. 48 pt. Zapewnia to natychmiastową informację o zawartości kategorii, płynne przewijanie i pełną responsywność bez obcinania etykiet na małych ekranach.
 * **DEC-UX-04 (Sygnalizacja Błędów Walidacji w Formularzach Polowych — Haptyka i Ramka Pod Polem): Opcja A (18.10.2026 — Zatwierdzona przez Łukasza)**
   * *Rozstrzygnięcie:* Sygnalizacja błędów wejściowych w trybie polowym poprzez sprzężenie haptyczne (`Haptics.notificationAsync`), podświetlenie krawędzi błędnego pola na Crimson (`#FF5252`) oraz jednoznaczny mikro-komunikat bezpośrednio pod polem (`#FF8080`). Eliminuje to problem zasłaniania toastów przez klawiaturę ekranową.
+* **DEC-MON-01 (Model Egzekwowania Limitu Free Tier — Monotoniczny Licznik Życiowy Ptaków): Opcja A (18.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Wdrożenie monotonicznego licznika zaobrączkowanych ptaków w SQLite (`total_created_pigeons_count`). Usunięcie ptaka ze stada (np. sprzedaż, upadek, darowizna) nie cofa licznika darmowych prób. Użytkownik w darmowym rdzeniu ma do dyspozycji 10 slotów życiowych na przetestowanie aplikacji, po czym kolejne ptaki wymagają planu Pro. Usunięte ptaki pozostają dostępne w trybie tylko do odczytu w archiwum rodowodowym.
+* **DEC-MON-02 (Architektura Weryfikacji Uprawnień w Kodzie UI — Scentralizowany AccessProvider): Opcja A (18.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Likwidacja lokalnych, podatnych na wycieki stanów `useState(false)` na rzecz scentralizowanego kontekstu `AccessProvider` i hooka `useAppAccess()` zasilanego bezpośrednio z bazy SQLite WAL. Zakup planu Pro natychmiast reaktywnie odblokowuje wszystkie ekrany aplikacji bez restartu, a funkcja `restorePurchases()` rygorystycznie weryfikuje istnienie uprawnień zamiast bezwarunkowo nadawać Pro.
+* **DEC-MON-03 (Model Monetyzacji Eksportu Rodowodów PDF — Free Preview + 1 Darmowy Eksport Powitalny): Opcja A (18.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Przeglądanie i weryfikacja rodowodów na ekranie oraz kalkulacja inbredu Wrighta pozostają w 100% darmowe dla każdego gołębia w limicie Free Tier. Pierwszy eksport oficjalnego rodowodu do formatu PDF A4 jest darmowy jako powitalny pokaz kunsztu graficznego (Craft Gem). Kolejne generowanie i udostępnianie plików PDF/AirPrint wymaga planu Pro.
+* **DEC-MON-04 (Doświadczenie Użytkownika i Moment Wyświetlenia Paywalla — Kontekstowy Paywall przy Akcji): Opcja A (18.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Zasada Zerowej Frustracji — absolutny brak agresywnych pop-upów przy starcie aplikacji lub onboardingu. Użytkownik korzysta z aplikacji w pełni swobodnie, a elegancki modal Paywalla pojawia się wyłącznie w momencie intencjonalnej próby wykonania akcji Pro (dodanie 11. gołębia, drugi eksport rodowodu PDF, aktywacja transmisji na żywo, sync w tandemie).
+* **DEC-MON-05 (Wdrożenie Zbieżności Monetyzacji — AccessProvider + SQLite WAL + Likwidacja Wycieków): Opcja A (18.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Pełna konwergencja monetyzacji: wdrożenie globalnego `AccessProvider` zasilanego bezpośrednio z bazy SQLite WAL (`app_entitlements`), monotoniczny licznik stada (`lifetime_pigeons_created`), 1 darmowy powitalny eksport rodowodu PDF (`free_pdf_exports_used`), usunięcie luki w `restorePurchases()` oraz spięcie ekranów `index.tsx`, `ustawienia.tsx` i `app/modal/new-pigeon.tsx` za pomocą reaktywnego hooka `useAppAccess()`.
 
 ---
 

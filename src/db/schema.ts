@@ -225,6 +225,8 @@ export const SQLITE_SCHEMA_V1 = `
     trial_started_at TEXT NOT NULL,
     purchased_at TEXT,
     expires_at TEXT,
+    lifetime_pigeons_created INTEGER NOT NULL DEFAULT 0,
+    free_pdf_exports_used INTEGER NOT NULL DEFAULT 0,
     updated_at TEXT NOT NULL
   );
 `;

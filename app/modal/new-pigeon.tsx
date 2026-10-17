@@ -17,29 +17,39 @@ import { useRouter } from 'expo-router';
 import { FieldButton } from '../../src/components/FieldButton';
 import { PaywallModal } from '../../src/components/PaywallModal';
 import { Sex, PigeonStatus } from '../../src/domain/types';
+import { useAppAccess } from '../../src/context/AccessContext';
 
 export default function NewPigeonModal() {
   const router = useRouter();
+  const {
+    evaluation,
+    entitlements,
+    isPaywallOpen,
+    openPaywall,
+    closePaywall,
+    buyPlan,
+    restore,
+    trackPigeonCreated,
+  } = useAppAccess();
   const [countryCode, setCountryCode] = useState('PL');
   const [ringNumber, setRingNumber] = useState('');
   const [year, setYear] = useState(new Date().getFullYear().toString());
   const [sex, setSex] = useState<Sex>('cock');
   const [plumageColor, setPlumageColor] = useState('Niebieski');
   const [status, setStatus] = useState<PigeonStatus>('racing');
-  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
-  const [currentFlockCount] = useState(10); // Demonstracja limitu darmowego stada
-  const [isProUser, setIsProUser] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!ringNumber.trim()) {
       Alert.alert('Brak numeru obrączki', 'Podaj numer oficjalnej obrączki rodowej ptaka.');
       return;
     }
 
-    if (!isProUser && currentFlockCount >= 10) {
-      setIsPaywallOpen(true);
+    if (!evaluation.canAddPigeon) {
+      openPaywall();
       return;
     }
+
+    await trackPigeonCreated();
 
     Alert.alert('Sukces', `Ptak ${countryCode}-${ringNumber} został zapisany w notesie stada.`, [
       { text: 'OK', onPress: () => router.back() },
@@ -155,16 +165,33 @@ export default function NewPigeonModal() {
 
       <PaywallModal
         visible={isPaywallOpen}
-        onClose={() => setIsPaywallOpen(false)}
-        onSelectPlan={async () => {
-          setIsProUser(true);
-          Alert.alert('Sukces!', 'Plan Pigeon-Fly Pro aktywowany. Możesz dodać kolejnego ptaka do stada!');
+        onClose={closePaywall}
+        onSelectPlan={async (plan) => {
+          try {
+            await buyPlan(plan);
+            closePaywall();
+            Alert.alert(
+              'Sukces!',
+              'Plan Pigeon-Fly Pro aktywowany. Możesz dodać kolejnego ptaka do stada!'
+            );
+          } catch (e: any) {
+            Alert.alert('Błąd zakupu', e?.message || 'Nie udało się aktywować planu.');
+          }
         }}
         onRestore={async () => {
-          setIsProUser(true);
-          Alert.alert('Przywrócono', 'Przywrócono uprawnienia Pigeon-Fly Pro.');
+          try {
+            const res = await restore();
+            if (res.success) {
+              closePaywall();
+              Alert.alert('Przywrócono', res.message);
+            } else {
+              Alert.alert('Brak uprawnień', res.message);
+            }
+          } catch (e: any) {
+            Alert.alert('Błąd przywracania', e?.message || 'Nie udało się sprawdzić uprawnień.');
+          }
         }}
-        currentPigeonsCount={currentFlockCount}
+        currentPigeonsCount={entitlements?.lifetime_pigeons_created ?? 0}
       />
     </SafeAreaView>
   );

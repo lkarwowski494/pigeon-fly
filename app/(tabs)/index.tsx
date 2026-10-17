@@ -26,6 +26,7 @@ import { PigeonDecommissionModal } from '../../src/components/PigeonDecommission
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
 import { exportFlockToCsv } from '../../src/domain/csvExport';
+import { useAppAccess } from '../../src/context/AccessContext';
 
 // Initial demo pigeons for immediate offline usability
 const INITIAL_DEMO_PIGEONS: Pigeon[] = [
@@ -77,13 +78,20 @@ const INITIAL_DEMO_PIGEONS: Pigeon[] = [
 
 export default function FlockScreen() {
   const router = useRouter();
+  const {
+    evaluation,
+    isPaywallOpen,
+    openPaywall,
+    closePaywall,
+    buyPlan,
+    restore,
+    trackPdfExported,
+  } = useAppAccess();
   const [pigeons, setPigeons] = useState<Pigeon[]>(INITIAL_DEMO_PIGEONS);
   const [selectedPigeon, setSelectedPigeon] = useState<Pigeon | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'racing' | 'breeding'>('all');
-  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
-  const [isProUser, setIsProUser] = useState(false);
   const [isSosModalOpen, setIsSosModalOpen] = useState(false);
   const [isCompartmentsModalOpen, setIsCompartmentsModalOpen] = useState(false);
   const [isSquadsModalOpen, setIsSquadsModalOpen] = useState(false);
@@ -104,8 +112,8 @@ export default function FlockScreen() {
   };
 
   const exportPigeonPedigree = async (pigeon: Pigeon, mode: 'print' | 'share') => {
-    if (!isProUser) {
-      setIsPaywallOpen(true);
+    if (!evaluation.canExportPedigreePdf) {
+      openPaywall();
       return;
     }
 
@@ -123,6 +131,7 @@ export default function FlockScreen() {
         },
         mode
       );
+      await trackPdfExported();
     } catch (e: any) {
       Alert.alert('Błąd', e?.message || 'Nie udało się wygenerować rodowodu');
     }
@@ -332,16 +341,31 @@ export default function FlockScreen() {
       {/* Paywall Pro Upgrade Modal */}
       <PaywallModal
         visible={isPaywallOpen}
-        onClose={() => setIsPaywallOpen(false)}
-        onSelectPlan={async () => {
-          setIsProUser(true);
-          setIsPaywallOpen(false);
-          Alert.alert('Sukces!', 'Plan Pigeon-Fly Pro aktywowany. Dostęp do generowania profesjonalnych rodowodów PDF został odblokowany!');
+        onClose={closePaywall}
+        onSelectPlan={async (plan) => {
+          try {
+            await buyPlan(plan);
+            closePaywall();
+            Alert.alert(
+              'Sukces!',
+              'Plan Pigeon-Fly Pro aktywowany. Dostęp do generowania profesjonalnych rodowodów PDF oraz nielimitowanego stada został odblokowany!'
+            );
+          } catch (e: any) {
+            Alert.alert('Błąd zakupu', e?.message || 'Nie udało się przetworzyć transakcji.');
+          }
         }}
         onRestore={async () => {
-          setIsProUser(true);
-          setIsPaywallOpen(false);
-          Alert.alert('Przywrócono', 'Przywrócono uprawnienia Pigeon-Fly Pro.');
+          try {
+            const res = await restore();
+            if (res.success) {
+              closePaywall();
+              Alert.alert('Przywrócono', res.message);
+            } else {
+              Alert.alert('Brak uprawnień', res.message);
+            }
+          } catch (e: any) {
+            Alert.alert('Błąd weryfikacji', e?.message || 'Nie udało się sprawdzić uprawnień.');
+          }
         }}
         currentPigeonsCount={pigeons.length}
       />
