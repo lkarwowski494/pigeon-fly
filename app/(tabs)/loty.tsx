@@ -21,6 +21,7 @@ import { RaceWeatherModal } from '../../src/components/RaceWeatherModal';
 import { BasketingSessionModal } from '../../src/components/BasketingSessionModal';
 import { LiveDerbyModal } from '../../src/components/LiveDerbyModal';
 import { ConcourseSheetModal } from '../../src/components/ConcourseSheetModal';
+import { EskImportModal } from '../../src/components/EskImportModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -82,6 +83,16 @@ export default function RacesScreen() {
   const [isBasketingModalVisible, setIsBasketingModalVisible] = useState(false);
   const [isDerbyModalVisible, setIsDerbyModalVisible] = useState(false);
   const [isConcourseModalVisible, setIsConcourseModalVisible] = useState(false);
+  const [isEskModalVisible, setIsEskModalVisible] = useState(false);
+
+  const handleImportEskArrivals = (importedArrivals: ArrivalWithPigeon[]) => {
+    setArrivals((prev) => {
+      const existingRings = new Set(prev.map((a) => a.ringNumber));
+      const newBirds = importedArrivals.filter((a) => !existingRings.has(a.ringNumber));
+      const merged = [...newBirds, ...prev];
+      return merged.sort((a, b) => b.velocityMPerMin - a.velocityMPerMin);
+    });
+  };
 
   const handleSaveBasketing = (entries: BasketEntry[]) => {
     setBasketedCount(entries.length > 0 ? entries.length : 120);
@@ -312,6 +323,13 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="📥 Importuj z Zegara ESK (Tauris/Benzing)"
+            onPress={() => setIsEskModalVisible(true)}
+            testID="btn-open-esk-import"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -390,6 +408,16 @@ export default function RacesScreen() {
         distanceKm={raceDistanceMeters / 1000}
         totalBasketed={basketedCount}
         arrivals={arrivals}
+      />
+
+      {/* Electronic Clock Import Modal (ESK) */}
+      <EskImportModal
+        visible={isEskModalVisible}
+        onClose={() => setIsEskModalVisible(false)}
+        raceDistanceMeters={raceDistanceMeters}
+        releaseTimeIso={releaseTimeIso}
+        raceName={raceName}
+        onImportArrivals={handleImportEskArrivals}
       />
     </SafeAreaView>
   );

@@ -93,7 +93,7 @@ export interface Arrival {
   arrivalTime: string; // ISO 8601
   distanceMeters: number;
   velocityMPerMin: number;
-  scanType: 'qr' | 'manual' | 'nfc';
+  scanType: 'qr' | 'manual' | 'nfc' | 'esk';
   isManualOverride: boolean;
   overrideReason?: string;
   createdAt: string;

@@ -19,6 +19,7 @@ import { AddTreatmentModal } from '../../src/components/AddTreatmentModal';
 import { PhotoperiodModal } from '../../src/components/PhotoperiodModal';
 import { VeterinaryLabModal } from '../../src/components/VeterinaryLabModal';
 import { AntidopingModal } from '../../src/components/AntidopingModal';
+import { QuarantineModal } from '../../src/components/QuarantineModal';
 import { analyzeWingMoult, getPhotoperiodStatus } from '../../src/domain/moult';
 import { PdfService } from '../../src/services/pdfService';
 import { FeatherStatus, MoultLog } from '../../src/domain/types';
@@ -58,6 +59,7 @@ export default function HealthScreen() {
   const [isPhotoperiodModalVisible, setIsPhotoperiodModalVisible] = useState(false);
   const [isVetLabModalVisible, setIsVetLabModalVisible] = useState(false);
   const [isAntidopingModalVisible, setIsAntidopingModalVisible] = useState(false);
+  const [isQuarantineModalVisible, setIsQuarantineModalVisible] = useState(false);
   const [treatments, setTreatments] = useState<TreatmentRecordItem[]>(INITIAL_TREATMENTS);
   const [moultLogs, setMoultLogs] = useState<MoultLog[]>(INITIAL_MOULT_LOGS);
 
@@ -326,6 +328,13 @@ export default function HealthScreen() {
           }}
           variant="secondary"
         />
+        <FieldButton
+          title="🚑 Szpitalik & Izolatka (Kwarantanna)"
+          onPress={() => setIsQuarantineModalVisible(true)}
+          variant="secondary"
+          style={{ marginTop: 10 }}
+          testID="btn-open-quarantine"
+        />
       </ScrollView>
 
       {/* Add Treatment Modal */}
@@ -368,6 +377,13 @@ export default function HealthScreen() {
       <AntidopingModal
         visible={isAntidopingModalVisible}
         onClose={() => setIsAntidopingModalVisible(false)}
+      />
+
+      {/* Quarantine & Isolation Ward Modal (Z-308, RD-27) */}
+      <QuarantineModal
+        visible={isQuarantineModalVisible}
+        onClose={() => setIsQuarantineModalVisible(false)}
+        patientRingNumber={selectedPigeonRing}
       />
     </SafeAreaView>
   );
