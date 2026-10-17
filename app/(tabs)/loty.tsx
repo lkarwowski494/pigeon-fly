@@ -46,6 +46,7 @@ import { AntidopingSamplingModal } from '../../src/components/AntidopingSampling
 import { CrateInventoryRentalModal } from '../../src/components/CrateInventoryRentalModal';
 import { PreSeasonFlockCensusModal } from '../../src/components/PreSeasonFlockCensusModal';
 import { EmergencyCabinReleaseModal } from '../../src/components/EmergencyCabinReleaseModal';
+import { ClockOpeningAuditModal } from '../../src/components/ClockOpeningAuditModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -132,6 +133,7 @@ export default function RacesScreen() {
   const [isCrateRentalModalVisible, setIsCrateRentalModalVisible] = useState(false);
   const [isFlockCensusModalVisible, setIsFlockCensusModalVisible] = useState(false);
   const [isEmergencyReleaseModalVisible, setIsEmergencyReleaseModalVisible] = useState(false);
+  const [isClockOpeningAuditModalVisible, setIsClockOpeningAuditModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -556,6 +558,13 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="🕰️ Otwarcie Zegarów i Zgranie ESK (Z-098)"
+            onPress={() => setIsClockOpeningAuditModalVisible(true)}
+            testID="btn-open-clock-audit"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -789,6 +798,12 @@ export default function RacesScreen() {
       <EmergencyCabinReleaseModal
         visible={isEmergencyReleaseModalVisible}
         onClose={() => setIsEmergencyReleaseModalVisible(false)}
+        defaultRaceName={raceName}
+      />
+
+      <ClockOpeningAuditModal
+        visible={isClockOpeningAuditModalVisible}
+        onClose={() => setIsClockOpeningAuditModalVisible(false)}
         defaultRaceName={raceName}
       />
     </SafeAreaView>

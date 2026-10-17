@@ -29,6 +29,7 @@ import { VaccinationProtocolModal } from '../../src/components/VaccinationProtoc
 import { NewInmateQuarantineModal } from '../../src/components/NewInmateQuarantineModal';
 import { VeterinaryLabRegistryModal } from '../../src/components/VeterinaryLabRegistryModal';
 import { PigeonMortalityProtocolModal } from '../../src/components/PigeonMortalityProtocolModal';
+import { FoundPigeonRegistryModal } from '../../src/components/FoundPigeonRegistryModal';
 import { analyzeWingMoult, getPhotoperiodStatus } from '../../src/domain/moult';
 import { PdfService } from '../../src/services/pdfService';
 import { FeatherStatus, MoultLog } from '../../src/domain/types';
@@ -78,6 +79,7 @@ export default function HealthScreen() {
   const [isNewInmateQuarantineModalVisible, setIsNewInmateQuarantineModalVisible] = useState(false);
   const [isVetLabRegistryModalVisible, setIsVetLabRegistryModalVisible] = useState(false);
   const [isMortalityProtocolModalVisible, setIsMortalityProtocolModalVisible] = useState(false);
+  const [isFoundPigeonModalVisible, setIsFoundPigeonModalVisible] = useState(false);
   const [treatments, setTreatments] = useState<TreatmentRecordItem[]>(INITIAL_TREATMENTS);
   const [moultLogs, setMoultLogs] = useState<MoultLog[]>(INITIAL_MOULT_LOGS);
 
@@ -415,8 +417,15 @@ export default function HealthScreen() {
           title="⚠️ Świadectwo Zgonu i Protokół Utylizacji (Z-090)"
           onPress={() => setIsMortalityProtocolModalVisible(true)}
           variant="secondary"
-          style={{ marginTop: 10, marginBottom: 12 }}
+          style={{ marginTop: 10 }}
           testID="btn-open-mortality-protocol"
+        />
+        <FieldButton
+          title="🕊️ Ewidencja Błąkaczy i Izolatka Sanitarna (Z-097)"
+          onPress={() => setIsFoundPigeonModalVisible(true)}
+          variant="secondary"
+          style={{ marginTop: 10, marginBottom: 12 }}
+          testID="btn-open-found-pigeon-registry"
         />
       </ScrollView>
 
@@ -523,6 +532,12 @@ export default function HealthScreen() {
         visible={isMortalityProtocolModalVisible}
         onClose={() => setIsMortalityProtocolModalVisible(false)}
         defaultRingNumber={selectedPigeonRing}
+      />
+
+      {/* Found Pigeon Registry & Quarantine Modal (Z-097 / DEC-111) */}
+      <FoundPigeonRegistryModal
+        visible={isFoundPigeonModalVisible}
+        onClose={() => setIsFoundPigeonModalVisible(false)}
       />
     </SafeAreaView>
   );

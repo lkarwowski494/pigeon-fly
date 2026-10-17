@@ -1466,6 +1466,48 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('IDENTYFIKACJA LOTU I PROTOKO\u0141U');
     expect(tree).toContain('LOKALIZACJA ZDARZENIA NA TRASIE');
   });
+
+  test('FoundPigeonRegistryModal (Z-097) renders straggler stats, ring decoder, and biosecurity isolation cage', () => {
+    const { FoundPigeonRegistryModal } = require('../src/components/FoundPigeonRegistryModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <FoundPigeonRegistryModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('EWIDENCJA B\u0141\u0104KACZY & KWARANTANNA');
+    expect(tree).toContain('B\u0142\u0105kaczy');
+    expect(tree).toContain('W izolatce');
+    expect(tree).toContain('Zagraniczne');
+  });
+
+  test('ClockOpeningAuditModal (Z-098) renders verdict banner, clock drift controls, and committee members', () => {
+    const { ClockOpeningAuditModal } = require('../src/components/ClockOpeningAuditModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <ClockOpeningAuditModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('OTWARCIE ZEGAR\u00d3W & AUDYT ESK');
+    expect(tree).toContain('ZATWIERDZONY BEZ ZASTRZE\u017bE\u0143');
+    expect(tree).toContain('DANE FORMALNE LOTU I OTWARCIA');
+    expect(tree).toContain('HODOWCA I AUDYT ZEGARA');
+  });
 });
 
 
