@@ -1117,6 +1117,48 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('Zgoda na Pobranie Pr\u00f3bek Biologicznych');
     expect(tree).toContain('Drukuj Deklaracj\u0119 A4 (AirPrint)');
   });
+
+  test('StudLeaseAgreementModal (Z-081) renders lease contract, offspring sharing models, and strict housing', () => {
+    const { StudLeaseAgreementModal } = require('../src/components/StudLeaseAgreementModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <StudLeaseAgreementModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Umowa Dzier\u017cawy Rozp\u0142odowej');
+    expect(tree).toContain('PL-0284-23-1402');
+    expect(tree).toContain('ZAKAZ OBLOT\u00d3W');
+    expect(tree).toContain('Drukuj Umow\u0119 Dzier\u017cawy A4');
+  });
+
+  test('InterTeamChampionshipModal (Z-082) renders inter-team standings, Travelling Trophy, and leader banner', () => {
+    const { InterTeamChampionshipModal } = require('../src/components/InterTeamChampionshipModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <InterTeamChampionshipModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Punktacja Zespo\u0142owa Sekcji i Oddzia\u0142u');
+    expect(tree).toContain('LIDER KLASYFIKACJI');
+    expect(tree).toContain('Puchar Przechodni');
+    expect(tree).toContain('Drukuj Tabel\u0119 Punktacji A4');
+  });
 });
 
 

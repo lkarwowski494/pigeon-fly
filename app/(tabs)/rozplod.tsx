@@ -26,6 +26,7 @@ import { calculateClutchMilestones } from '../../src/domain/breeding';
 import { PdfService } from '../../src/services/pdfService';
 import { ClutchScheduleModal } from '../../src/components/ClutchScheduleModal';
 import { BreedingNutritionModal } from '../../src/components/BreedingNutritionModal';
+import { StudLeaseAgreementModal } from '../../src/components/StudLeaseAgreementModal';
 import { ClutchScheduleInput } from '../../src/domain/clutchSchedulePlanner';
 
 
@@ -87,6 +88,7 @@ export default function BreedingScreen() {
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isClutchScheduleOpen, setIsClutchScheduleOpen] = useState(false);
   const [isBreedingNutritionOpen, setIsBreedingNutritionOpen] = useState(false);
+  const [isStudLeaseModalOpen, setIsStudLeaseModalOpen] = useState(false);
 
   const scheduleInputs: ClutchScheduleInput[] = clutches.map((c) => ({
     clutchId: c.id,
@@ -358,9 +360,18 @@ export default function BreedingScreen() {
           title="🥣 Asystent Żywieniowy Lęgów i Karmnik (Z-074)"
           variant="secondary"
           onPress={() => setIsBreedingNutritionOpen(true)}
-          style={{ marginBottom: 12, minHeight: 44 }}
+          style={{ marginBottom: 10, minHeight: 44 }}
           textStyle={{ fontSize: 13 }}
           testID="btn-open-breeding-nutrition"
+        />
+
+        <FieldButton
+          title="🤝 Umowa Dzierżawy Rozpłodowej (Z-081)"
+          variant="secondary"
+          onPress={() => setIsStudLeaseModalOpen(true)}
+          style={{ marginBottom: 12, minHeight: 44 }}
+          textStyle={{ fontSize: 13 }}
+          testID="btn-open-stud-lease"
         />
 
         {/* Season Summary Bar */}
@@ -463,6 +474,12 @@ export default function BreedingScreen() {
         visible={isBreedingNutritionOpen}
         onClose={() => setIsBreedingNutritionOpen(false)}
         initialPairsCount={clutches.length}
+      />
+
+      {/* Stud Pigeon Lease Agreement Modal (Z-081) */}
+      <StudLeaseAgreementModal
+        visible={isStudLeaseModalOpen}
+        onClose={() => setIsStudLeaseModalOpen(false)}
       />
     </SafeAreaView>
   );

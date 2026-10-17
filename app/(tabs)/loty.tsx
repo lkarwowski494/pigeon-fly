@@ -35,6 +35,7 @@ import { PostRaceRestitutionModal } from '../../src/components/PostRaceRestituti
 import { TrainingTossLogModal } from '../../src/components/TrainingTossLogModal';
 import { CareerPassportModal } from '../../src/components/CareerPassportModal';
 import { FairPlayDeclarationModal } from '../../src/components/FairPlayDeclarationModal';
+import { InterTeamChampionshipModal } from '../../src/components/InterTeamChampionshipModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -110,6 +111,7 @@ export default function RacesScreen() {
   const [isTossLogModalVisible, setIsTossLogModalVisible] = useState(false);
   const [isCareerPassportModalVisible, setIsCareerPassportModalVisible] = useState(false);
   const [isFairPlayModalVisible, setIsFairPlayModalVisible] = useState(false);
+  const [isTeamChampionshipModalVisible, setIsTeamChampionshipModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -457,6 +459,13 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="🏆 Punktacja Zespołowa i Super-Cup (Z-082)"
+            onPress={() => setIsTeamChampionshipModalVisible(true)}
+            testID="btn-open-inter-team-championship"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -631,6 +640,11 @@ export default function RacesScreen() {
       <FairPlayDeclarationModal
         visible={isFairPlayModalVisible}
         onClose={() => setIsFairPlayModalVisible(false)}
+      />
+
+      <InterTeamChampionshipModal
+        visible={isTeamChampionshipModalVisible}
+        onClose={() => setIsTeamChampionshipModalVisible(false)}
       />
     </SafeAreaView>
   );
