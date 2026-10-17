@@ -20,6 +20,7 @@ import { PhotoperiodModal } from '../../src/components/PhotoperiodModal';
 import { VeterinaryLabModal } from '../../src/components/VeterinaryLabModal';
 import { AntidopingModal } from '../../src/components/AntidopingModal';
 import { QuarantineModal } from '../../src/components/QuarantineModal';
+import { MoultTrackerModal } from '../../src/components/MoultTrackerModal';
 import { analyzeWingMoult, getPhotoperiodStatus } from '../../src/domain/moult';
 import { PdfService } from '../../src/services/pdfService';
 import { FeatherStatus, MoultLog } from '../../src/domain/types';
@@ -60,6 +61,7 @@ export default function HealthScreen() {
   const [isVetLabModalVisible, setIsVetLabModalVisible] = useState(false);
   const [isAntidopingModalVisible, setIsAntidopingModalVisible] = useState(false);
   const [isQuarantineModalVisible, setIsQuarantineModalVisible] = useState(false);
+  const [isMoultTrackerModalVisible, setIsMoultTrackerModalVisible] = useState(false);
   const [treatments, setTreatments] = useState<TreatmentRecordItem[]>(INITIAL_TREATMENTS);
   const [moultLogs, setMoultLogs] = useState<MoultLog[]>(INITIAL_MOULT_LOGS);
 
@@ -231,6 +233,13 @@ export default function HealthScreen() {
               <Text style={styles.unfitnessText}>{wingAnalysis.unfitnessReason}</Text>
             )}
           </View>
+          <FieldButton
+            title="🪶 Zaawansowany Tracker Pierzenia Skrzydła (Z-055)"
+            variant="secondary"
+            onPress={() => setIsMoultTrackerModalVisible(true)}
+            style={{ marginTop: 12, minHeight: 48 }}
+            testID="btn-open-moult-tracker"
+          />
         </View>
 
         {/* Recent Treatments & PIW Withdrawal Warning Card */}
@@ -384,6 +393,13 @@ export default function HealthScreen() {
         visible={isQuarantineModalVisible}
         onClose={() => setIsQuarantineModalVisible(false)}
         patientRingNumber={selectedPigeonRing}
+      />
+
+      {/* Advanced Wing Moult & Keratin Tracker Modal (Z-055) */}
+      <MoultTrackerModal
+        visible={isMoultTrackerModalVisible}
+        onClose={() => setIsMoultTrackerModalVisible(false)}
+        pigeonRingNumber={selectedPigeonRing}
       />
     </SafeAreaView>
   );

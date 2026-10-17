@@ -1,7 +1,7 @@
 # Pigeon-Fly — Rejestr Bieżący Decyzji i Stanu Projektu
 **Data aktualizacji:** 17.10.2026 (Przyjęcie 10 Zasad Uniwersalnych i Odkrycie Ról z Biblioteki na Dysku)  
 **Właściciel:** Łukasz (`lkarwowski494`)  
-**Status projektu:** Faza wdrożeniowa — 42 zestawy testowe, 312 testów zaliczonych (100%), 0 błędów TypeScript i i18n
+**Status projektu:** Faza wdrożeniowa — 50 zestawów testowych, 359 testów zaliczonych (100%), 0 błędów TypeScript i i18n
 
 ---
 
@@ -102,6 +102,10 @@
   * *Rozstrzygnięcie:* Implementacja silnika `src/domain/trainingToss.ts` planującego prywatne wywózki treningowe: geodezyjny azymut powrotu, dekompozycja wiatru (wiatr w ogon/dziób/boczny) i predykcja czasu przelotu, ocena ryzyka drapieżników (korytarze leśne jastrzębia), napowietrznych linii 400 kV i zamglenia, indeks bezpieczeństwa (0-100) oraz rekomendacja GO / CAUTION / NO-GO. Integracja UI `src/components/TrainingTossModal.tsx` w `app/(tabs)/loty.tsx`. Pokrycie testami 100% (4/4 passing w `tests/trainingToss.test.ts`).
 * **DEC-68 (Generator Karty Oceny Fenotypowej FCI Standard — Z-054): Opcja 2 (17.10.2026 — Zatwierdzona przez Łukasza)**
   * *Rozstrzygnięcie:* Implementacja oficjalnej sędziowskiej karty ocen wystawowych `src/domain/fciStandardAppraisal.ts` w skali 90.00 – 95.00 pkt według 5 kryteriów wzorca FCI (Głowa i oko, Kościec/mostek/widełki, Plecy/lędźwie/ogon, Umięśnienie, Skrzydło/lotki/upierzenie), klasyfikacja medalowa (Złoty/Srebrny/Brązowy Medal, Kwalifikacja do Reprezentacji Polski na Olimpiadę FCI) oraz generator oficjalnej Karty Klatkowej Wystawy z drukiem AirPrint i eksportem PDF przez `PdfService.exportFciStandardShowCard`. Integracja z `src/components/AppraisalModal.tsx` w postaci Zakładki 3. Pokrycie testami 100% (4/4 passing w `tests/fciStandardAppraisal.test.ts`, stan całkowity projektu: 48 zestawów testowych, 349 testów 100% zaliczonych).
+* **DEC-69 (Moduł Monitorowania i Analizy Pierzenia Skrzydła — Z-055): Opcja 1 (17.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Implementacja silnika `src/domain/moultTracker.ts` analizującego stan 10 lotek I rzędu, stadia wzrostu (zrzucona, krwista pałka, pędzel, dojrzewająca, pełna), bezwzględne bariery koszowania dla lotek zewnętrznych 7–10 (<65%) oraz wrażliwych krwistych pałek (ryzyko pęknięcia unaczynionej dutki i krwotoku w ciasnym koszu kabiny transportowej), wymianę sterówek ogona, profilaktykę żywieniową biosyntezy keratyny (metionina, MSM, biotyna, cynk, siemię lniane) oraz agregację stadową. Integracja z interaktywnym diagramem skrzydła `src/components/MoultTrackerModal.tsx` w `app/(tabs)/zdrowie.tsx`. Pokrycie testami 100% (5/5 passing w `tests/moultTracker.test.ts`).
+* **DEC-70 (Asystent Kosztów i Budżetu Sezonu Hodowlanego — Z-056): Opcja 1 (17.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Implementacja silnika `src/domain/loftFinance.ts` modelującego precyzyjną księgowość i budżetowanie gołębnika: kategoryzacja wydatków (pasza, suplementy, profilaktyka wet, opłaty PZHGP i zegarowe, sprzęt, logistyka wywózek) i przychodów (sprzedaż młodych, nagrody), kalkulator jednostkowy kosztu odchowania 1 młodego do usamodzielnienia (pasza lęgowa, minerały, obrączka rodowa, PMV-1), kalkulator jednostkowy utrzymania 1 lotnika w sezonie sportowym oraz bilans roczny netto z kontrolą przekroczenia limitu budżetowego i wskaźnikiem ROI. Integracja UI `src/components/LoftFinanceModal.tsx` w `app/(tabs)/kalkulator.tsx`. Pokrycie testami 100% (5/5 passing w `tests/loftFinance.test.ts`).
 
 ---
 

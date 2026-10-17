@@ -27,6 +27,7 @@ import { calculateWindImpact } from '../../src/domain/weather';
 import { evaluatePigeonPrize } from '../../src/domain/concourse';
 import { calculateFlightEnergetics } from '../../src/domain/flightEnergetics';
 import { FieldButton } from '../../src/components/FieldButton';
+import { LoftFinanceModal } from '../../src/components/LoftFinanceModal';
 
 interface GpsPreset {
   name: string;
@@ -77,6 +78,9 @@ export default function CalculatorScreen() {
   // Flight Energetics state (RD-15, RD-16, Z-047, Z-284)
   const [airTempCelsius, setAirTempCelsius] = useState('20');
   const [preFlightFatGrams, setPreFlightFatGrams] = useState('35');
+
+  // Loft Finance Assistant state (Z-056)
+  const [isFinanceModalVisible, setIsFinanceModalVisible] = useState(false);
 
   // Compute distance in meters based on mode
   let effectiveDistanceMeters = parseFloat(distanceKm) * 1000;
@@ -746,7 +750,22 @@ export default function CalculatorScreen() {
             </View>
           </View>
         )}
+
+        {/* Breeding Loft Finance & Season Budget Assistant (Z-056) */}
+        <FieldButton
+          title="💰 Asystent Budżetu i Finansów Sezonu Hodowlanego (Z-056)"
+          variant="secondary"
+          onPress={() => setIsFinanceModalVisible(true)}
+          style={{ marginTop: 12, marginBottom: 12, minHeight: 52 }}
+          testID="btn-open-loft-finance"
+        />
       </ScrollView>
+
+      {/* Breeding Loft Finance Modal (Z-056) */}
+      <LoftFinanceModal
+        visible={isFinanceModalVisible}
+        onClose={() => setIsFinanceModalVisible(false)}
+      />
     </SafeAreaView>
   );
 }
