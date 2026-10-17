@@ -167,6 +167,33 @@ export const OfficialProtocolsHubModal: React.FC<OfficialProtocolsHubModalProps>
     onOpenPzhgpCertificate,
   ]);
 
+  const categoryCounts = useMemo(() => {
+    const counts: Record<ProtocolCategory, number> = {
+      all: PROTOCOLS.length,
+      racing: 0,
+      health: 0,
+      breeding: 0,
+      exhibition: 0,
+    };
+    PROTOCOLS.forEach((p) => {
+      if (counts[p.category] !== undefined) {
+        counts[p.category]++;
+      }
+    });
+    return counts;
+  }, [PROTOCOLS]);
+
+  const CATEGORIES: { key: ProtocolCategory; label: string }[] = useMemo(
+    () => [
+      { key: 'all', label: `Wszystkie (${categoryCounts.all})` },
+      { key: 'racing', label: `Loty & Koszowanie (${categoryCounts.racing})` },
+      { key: 'health', label: `Zdrowie & Bio (${categoryCounts.health})` },
+      { key: 'breeding', label: `Hodowla (${categoryCounts.breeding})` },
+      { key: 'exhibition', label: `Wystawy & Asy (${categoryCounts.exhibition})` },
+    ],
+    [categoryCounts]
+  );
+
   const filteredProtocols = useMemo(() => {
     return PROTOCOLS.filter((p) => {
       const matchCat = activeCategory === 'all' || p.category === activeCategory;
@@ -217,34 +244,35 @@ export const OfficialProtocolsHubModal: React.FC<OfficialProtocolsHubModalProps>
           />
         </View>
 
-        {/* Filter Chips */}
-        <View style={styles.filterRow}>
-          {[
-            { key: 'all', label: 'Wszystkie (10)' },
-            { key: 'racing', label: 'Loty & Koszowanie' },
-            { key: 'health', label: 'Zdrowie & Bio' },
-            { key: 'breeding', label: 'Hodowla' },
-            { key: 'exhibition', label: 'Wystawy & Asy' },
-          ].map((cat) => (
-            <TouchableOpacity
-              key={cat.key}
-              style={[
-                styles.filterChip,
-                activeCategory === cat.key && styles.filterChipActive,
-              ]}
-              onPress={() => setActiveCategory(cat.key as ProtocolCategory)}
-              testID={`tab-filter-${cat.key}`}
-            >
-              <Text
+        {/* Filter Chips Horizontal Bar (DEC-UX-03) */}
+        <View style={styles.filterBarContainer}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filterRow}
+          >
+            {CATEGORIES.map((cat) => (
+              <TouchableOpacity
+                key={cat.key}
                 style={[
-                  styles.filterChipText,
-                  activeCategory === cat.key && styles.filterChipTextActive,
+                  styles.filterChip,
+                  activeCategory === cat.key && styles.filterChipActive,
                 ]}
+                onPress={() => setActiveCategory(cat.key)}
+                testID={`tab-filter-${cat.key}`}
+                hitSlop={{ top: 6, bottom: 6, left: 4, right: 4 }}
               >
-                {cat.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text
+                  style={[
+                    styles.filterChipText,
+                    activeCategory === cat.key && styles.filterChipTextActive,
+                  ]}
+                >
+                  {cat.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
 
         {/* List of Protocols */}
@@ -305,34 +333,39 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     minHeight: 48,
   },
+  filterBarContainer: {
+    paddingBottom: 8,
+  },
   filterRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
     paddingHorizontal: 12,
-    paddingBottom: 8,
+    gap: 8,
+    alignItems: 'center',
   },
   filterChip: {
     backgroundColor: '#1E2127',
     borderWidth: 1,
     borderColor: '#2F343F',
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    minHeight: 36,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    minHeight: 44,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   filterChipActive: {
     borderColor: '#E5A93C',
     backgroundColor: '#262215',
+    borderWidth: 1.5,
   },
   filterChipText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
     color: '#8E94A0',
   },
   filterChipTextActive: {
     color: '#E5A93C',
+    fontWeight: '800',
   },
   protocolCard: {
     backgroundColor: '#1E2127',

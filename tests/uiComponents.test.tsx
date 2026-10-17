@@ -1580,6 +1580,97 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('Z-099');
     expect(tree).toContain('Z-098');
   });
+
+  test('NationalExhibitionModal (Z-099) supports ±0.25 stepper grading (DEC-UX-01)', () => {
+    const { NationalExhibitionModal } = require('../src/components/NationalExhibitionModal');
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <NationalExhibitionModal visible={true} onClose={jest.fn()} />
+      );
+    });
+
+    const root = component.root;
+    // Switch to tab 'add_eval'
+    const addEvalTab = root.findByProps({ testID: 'tab-exhibition-add' });
+    act(() => {
+      addEvalTab.props.onPress();
+    });
+
+    // Select standard division
+    const standardBtn = root.findByProps({ testID: 'btn-division-standard' });
+    act(() => {
+      standardBtn.props.onPress();
+    });
+
+    // Verify steppers exist
+    const decBtn = root.findByProps({ testID: 'btn-step-dec-appearance' });
+    const incBtn = root.findByProps({ testID: 'btn-step-inc-appearance' });
+    expect(decBtn).toBeDefined();
+    expect(incBtn).toBeDefined();
+
+    act(() => {
+      incBtn.props.onPress();
+    });
+
+    const inputAppearance = root.findByProps({ testID: 'input-score-appearance' });
+    expect(inputAppearance.props.value).toBe('9.50');
+  });
+
+  test('OfficialProtocolsHubModal renders dynamic category counters in horizontal bar (DEC-UX-03)', () => {
+    const { OfficialProtocolsHubModal } = require('../src/components/OfficialProtocolsHubModal');
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <OfficialProtocolsHubModal
+          visible={true}
+          onClose={jest.fn()}
+          onOpenNationalExhibition={jest.fn()}
+          onOpenAnnualPerformanceLedger={jest.fn()}
+          onOpenClockOpeningAudit={jest.fn()}
+          onOpenEmergencyCabinRelease={jest.fn()}
+          onOpenPreSeasonFlockCensus={jest.fn()}
+          onOpenCrateRental={jest.fn()}
+          onOpenAntidopingSampling={jest.fn()}
+          onOpenStationSanitation={jest.fn()}
+          onOpenLoftInspection={jest.fn()}
+          onOpenPzhgpCertificate={jest.fn()}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Wszystkie (10)');
+    expect(tree).toContain('Loty & Koszowanie (5)');
+    expect(tree).toContain('Zdrowie & Bio (2)');
+    expect(tree).toContain('Wystawy & Asy (2)');
+    expect(tree).toContain('Hodowla (1)');
+  });
+
+  test('RacesScreen renders Dynamic Live Szpica Banner (DEC-UX-02)', () => {
+    jest.useFakeTimers();
+    const RacesScreen = require('../app/(tabs)/loty').default;
+    let component: any;
+    act(() => {
+      component = renderer.create(<RacesScreen />);
+    });
+
+    const root = component.root;
+    const banner = root.findByProps({ testID: 'live-szpica-banner' });
+    expect(banner).toBeDefined();
+
+    const timer = root.findByProps({ testID: 'live-timer-elapsed' });
+    expect(timer).toBeDefined();
+
+    const szpicaSpeed = root.findByProps({ testID: 'live-szpica-speed' });
+    expect(szpicaSpeed).toBeDefined();
+
+    act(() => {
+      component.unmount();
+    });
+    jest.clearAllTimers();
+    jest.useRealTimers();
+  });
 });
 
 

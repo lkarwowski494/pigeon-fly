@@ -16,6 +16,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 import { FieldButton } from './FieldButton';
 import {
   NationalExhibitionDelegationProtocol,
@@ -147,15 +148,34 @@ export const NationalExhibitionModal: React.FC<NationalExhibitionModalProps> = (
   // Active Tab
   const [activeTab, setActiveTab] = useState<'roster' | 'add_eval' | 'confirm'>('roster');
 
+  const handleStepScore = (
+    setter: (val: string) => void,
+    currentVal: string,
+    delta: number,
+    max: number,
+    min: number = 0
+  ) => {
+    const parsed = parseFloat(currentVal.replace(',', '.')) || 0;
+    const next = Math.min(max, Math.max(min, Number((parsed + delta).toFixed(2))));
+    setter(next.toFixed(2));
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+  };
+
+  const parsedAppearance = parseFloat(scoreAppearance.replace(',', '.')) || 0;
+  const parsedBone = parseFloat(scoreBone.replace(',', '.')) || 0;
+  const parsedTail = parseFloat(scoreTail.replace(',', '.')) || 0;
+  const parsedMuscles = parseFloat(scoreMuscles.replace(',', '.')) || 0;
+  const parsedWings = parseFloat(scoreWings.replace(',', '.')) || 0;
+
+  const isAppearanceInvalid = parsedAppearance > 10 || parsedAppearance < 0;
+  const isBoneInvalid = parsedBone > 30 || parsedBone < 0;
+  const isTailInvalid = parsedTail > 20 || parsedTail < 0;
+  const isMusclesInvalid = parsedMuscles > 30 || parsedMuscles < 0;
+  const isWingsInvalid = parsedWings > 10 || parsedWings < 0;
+
   const standardTotalPreview = useMemo(() => {
-    return (
-      (parseFloat(scoreAppearance) || 0) +
-      (parseFloat(scoreBone) || 0) +
-      (parseFloat(scoreTail) || 0) +
-      (parseFloat(scoreMuscles) || 0) +
-      (parseFloat(scoreWings) || 0)
-    );
-  }, [scoreAppearance, scoreBone, scoreTail, scoreMuscles, scoreWings]);
+    return parsedAppearance + parsedBone + parsedTail + parsedMuscles + parsedWings;
+  }, [parsedAppearance, parsedBone, parsedTail, parsedMuscles, parsedWings]);
 
   const currentProtocol: NationalExhibitionDelegationProtocol = useMemo(
     () => ({
@@ -196,12 +216,20 @@ export const NationalExhibitionModal: React.FC<NationalExhibitionModalProps> = (
 
     let standardScores: FciStandardScores | undefined = undefined;
     if (newDivision === 'standard') {
+      if (isAppearanceInvalid || isBoneInvalid || isTailInvalid || isMusclesInvalid || isWingsInvalid) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+        Alert.alert(
+          'Błąd walidacji not sędziowskich',
+          'Jedna lub więcej ocen przekracza dopuszczalny limit punktowy kryterium wzorca FCI.'
+        );
+        return;
+      }
       standardScores = {
-        generalAppearance: parseFloat(scoreAppearance) || 0,
-        boneStructure: parseFloat(scoreBone) || 0,
-        backAndTail: parseFloat(scoreTail) || 0,
-        musculature: parseFloat(scoreMuscles) || 0,
-        wingsAndPlumage: parseFloat(scoreWings) || 0,
+        generalAppearance: parsedAppearance,
+        boneStructure: parsedBone,
+        backAndTail: parsedTail,
+        musculature: parsedMuscles,
+        wingsAndPlumage: parsedWings,
       };
     }
 
@@ -541,6 +569,7 @@ export const NationalExhibitionModal: React.FC<NationalExhibitionModalProps> = (
                       newDivision === 'sport' && styles.divisionBtnActiveSport,
                     ]}
                     onPress={() => setNewDivision('sport')}
+                    testID="btn-division-sport"
                   >
                     <Text style={styles.divisionBtnTitle}>🏆 KLASA SPORT</Text>
                     <Text style={styles.divisionBtnDesc}>Kategorie A, B, C, D, E, F, G, H</Text>
@@ -552,6 +581,7 @@ export const NationalExhibitionModal: React.FC<NationalExhibitionModalProps> = (
                       newDivision === 'standard' && styles.divisionBtnActiveStandard,
                     ]}
                     onPress={() => setNewDivision('standard')}
+                    testID="btn-division-standard"
                   >
                     <Text style={styles.divisionBtnTitle}>🎖️ KLASA STANDARD</Text>
                     <Text style={styles.divisionBtnDesc}>100-punktowy wzorzec FCI</Text>
@@ -643,73 +673,193 @@ export const NationalExhibitionModal: React.FC<NationalExhibitionModalProps> = (
                   </Text>
 
                   <View style={styles.scoreRow}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.scoreCriterionTitle}>
-                        1. Wrażenie ogólne, oko, kondycja (max 10 pkt):
-                      </Text>
+                    <View style={styles.scoreRowTop}>
+                      <View style={{ flex: 1, marginRight: 8 }}>
+                        <Text style={styles.scoreCriterionTitle}>
+                          1. Wrażenie ogólne, oko, kondycja (max 10 pkt):
+                        </Text>
+                      </View>
+                      <View style={[styles.stepperContainer, isAppearanceInvalid && styles.inputError]}>
+                        <TouchableOpacity
+                          style={styles.stepperBtn}
+                          onPress={() => handleStepScore(setScoreAppearance, scoreAppearance, -0.25, 10)}
+                          testID="btn-step-dec-appearance"
+                          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                        >
+                          <Text style={styles.stepperBtnText}>−</Text>
+                        </TouchableOpacity>
+                        <TextInput
+                          style={styles.scoreInput}
+                          value={scoreAppearance}
+                          onChangeText={setScoreAppearance}
+                          keyboardType="numeric"
+                          testID="input-score-appearance"
+                        />
+                        <TouchableOpacity
+                          style={styles.stepperBtn}
+                          onPress={() => handleStepScore(setScoreAppearance, scoreAppearance, 0.25, 10)}
+                          testID="btn-step-inc-appearance"
+                          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                        >
+                          <Text style={styles.stepperBtnText}>+</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
-                    <TextInput
-                      style={styles.scoreInput}
-                      value={scoreAppearance}
-                      onChangeText={setScoreAppearance}
-                      keyboardType="numeric"
-                    />
+                    {isAppearanceInvalid && (
+                      <Text style={styles.errorText}>Wartość poza dopuszczalnym zakresem (0.00 – 10.00 pkt)</Text>
+                    )}
                   </View>
 
                   <View style={styles.scoreRow}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.scoreCriterionTitle}>
-                        2. Kościec, mostek, widełki miednicowe (max 30 pkt):
-                      </Text>
+                    <View style={styles.scoreRowTop}>
+                      <View style={{ flex: 1, marginRight: 8 }}>
+                        <Text style={styles.scoreCriterionTitle}>
+                          2. Kościec, mostek, widełki miednicowe (max 30 pkt):
+                        </Text>
+                      </View>
+                      <View style={[styles.stepperContainer, isBoneInvalid && styles.inputError]}>
+                        <TouchableOpacity
+                          style={styles.stepperBtn}
+                          onPress={() => handleStepScore(setScoreBone, scoreBone, -0.25, 30)}
+                          testID="btn-step-dec-bone"
+                          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                        >
+                          <Text style={styles.stepperBtnText}>−</Text>
+                        </TouchableOpacity>
+                        <TextInput
+                          style={styles.scoreInput}
+                          value={scoreBone}
+                          onChangeText={setScoreBone}
+                          keyboardType="numeric"
+                          testID="input-score-bone"
+                        />
+                        <TouchableOpacity
+                          style={styles.stepperBtn}
+                          onPress={() => handleStepScore(setScoreBone, scoreBone, 0.25, 30)}
+                          testID="btn-step-inc-bone"
+                          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                        >
+                          <Text style={styles.stepperBtnText}>+</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
-                    <TextInput
-                      style={styles.scoreInput}
-                      value={scoreBone}
-                      onChangeText={setScoreBone}
-                      keyboardType="numeric"
-                    />
+                    {isBoneInvalid && (
+                      <Text style={styles.errorText}>Wartość poza dopuszczalnym zakresem (0.00 – 30.00 pkt)</Text>
+                    )}
                   </View>
 
                   <View style={styles.scoreRow}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.scoreCriterionTitle}>
-                        3. Plecy, lędźwie, sterówki ogona (max 20 pkt):
-                      </Text>
+                    <View style={styles.scoreRowTop}>
+                      <View style={{ flex: 1, marginRight: 8 }}>
+                        <Text style={styles.scoreCriterionTitle}>
+                          3. Plecy, lędźwie, sterówki ogona (max 20 pkt):
+                        </Text>
+                      </View>
+                      <View style={[styles.stepperContainer, isTailInvalid && styles.inputError]}>
+                        <TouchableOpacity
+                          style={styles.stepperBtn}
+                          onPress={() => handleStepScore(setScoreTail, scoreTail, -0.25, 20)}
+                          testID="btn-step-dec-tail"
+                          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                        >
+                          <Text style={styles.stepperBtnText}>−</Text>
+                        </TouchableOpacity>
+                        <TextInput
+                          style={styles.scoreInput}
+                          value={scoreTail}
+                          onChangeText={setScoreTail}
+                          keyboardType="numeric"
+                          testID="input-score-tail"
+                        />
+                        <TouchableOpacity
+                          style={styles.stepperBtn}
+                          onPress={() => handleStepScore(setScoreTail, scoreTail, 0.25, 20)}
+                          testID="btn-step-inc-tail"
+                          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                        >
+                          <Text style={styles.stepperBtnText}>+</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
-                    <TextInput
-                      style={styles.scoreInput}
-                      value={scoreTail}
-                      onChangeText={setScoreTail}
-                      keyboardType="numeric"
-                    />
+                    {isTailInvalid && (
+                      <Text style={styles.errorText}>Wartość poza dopuszczalnym zakresem (0.00 – 20.00 pkt)</Text>
+                    )}
                   </View>
 
                   <View style={styles.scoreRow}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.scoreCriterionTitle}>
-                        4. Umięśnienie mostka i elastyczność (max 30 pkt):
-                      </Text>
+                    <View style={styles.scoreRowTop}>
+                      <View style={{ flex: 1, marginRight: 8 }}>
+                        <Text style={styles.scoreCriterionTitle}>
+                          4. Umięśnienie mostka i elastyczność (max 30 pkt):
+                        </Text>
+                      </View>
+                      <View style={[styles.stepperContainer, isMusclesInvalid && styles.inputError]}>
+                        <TouchableOpacity
+                          style={styles.stepperBtn}
+                          onPress={() => handleStepScore(setScoreMuscles, scoreMuscles, -0.25, 30)}
+                          testID="btn-step-dec-muscles"
+                          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                        >
+                          <Text style={styles.stepperBtnText}>−</Text>
+                        </TouchableOpacity>
+                        <TextInput
+                          style={styles.scoreInput}
+                          value={scoreMuscles}
+                          onChangeText={setScoreMuscles}
+                          keyboardType="numeric"
+                          testID="input-score-muscles"
+                        />
+                        <TouchableOpacity
+                          style={styles.stepperBtn}
+                          onPress={() => handleStepScore(setScoreMuscles, scoreMuscles, 0.25, 30)}
+                          testID="btn-step-inc-muscles"
+                          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                        >
+                          <Text style={styles.stepperBtnText}>+</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
-                    <TextInput
-                      style={styles.scoreInput}
-                      value={scoreMuscles}
-                      onChangeText={setScoreMuscles}
-                      keyboardType="numeric"
-                    />
+                    {isMusclesInvalid && (
+                      <Text style={styles.errorText}>Wartość poza dopuszczalnym zakresem (0.00 – 30.00 pkt)</Text>
+                    )}
                   </View>
 
                   <View style={styles.scoreRow}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.scoreCriterionTitle}>
-                        5. Skrzydło, lotki, aksamitność upierzenia (max 10 pkt):
-                      </Text>
+                    <View style={styles.scoreRowTop}>
+                      <View style={{ flex: 1, marginRight: 8 }}>
+                        <Text style={styles.scoreCriterionTitle}>
+                          5. Skrzydło, lotki, aksamitność upierzenia (max 10 pkt):
+                        </Text>
+                      </View>
+                      <View style={[styles.stepperContainer, isWingsInvalid && styles.inputError]}>
+                        <TouchableOpacity
+                          style={styles.stepperBtn}
+                          onPress={() => handleStepScore(setScoreWings, scoreWings, -0.25, 10)}
+                          testID="btn-step-dec-wings"
+                          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                        >
+                          <Text style={styles.stepperBtnText}>−</Text>
+                        </TouchableOpacity>
+                        <TextInput
+                          style={styles.scoreInput}
+                          value={scoreWings}
+                          onChangeText={setScoreWings}
+                          keyboardType="numeric"
+                          testID="input-score-wings"
+                        />
+                        <TouchableOpacity
+                          style={styles.stepperBtn}
+                          onPress={() => handleStepScore(setScoreWings, scoreWings, 0.25, 10)}
+                          testID="btn-step-inc-wings"
+                          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                        >
+                          <Text style={styles.stepperBtnText}>+</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
-                    <TextInput
-                      style={styles.scoreInput}
-                      value={scoreWings}
-                      onChangeText={setScoreWings}
-                      keyboardType="numeric"
-                    />
+                    {isWingsInvalid && (
+                      <Text style={styles.errorText}>Wartość poza dopuszczalnym zakresem (0.00 – 10.00 pkt)</Text>
+                    )}
                   </View>
 
                   <View style={styles.totalScoreBanner}>
@@ -1159,32 +1309,65 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   scoreRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
+    flexDirection: 'column',
+    marginBottom: 10,
     backgroundColor: '#121417',
-    padding: 8,
-    borderRadius: 6,
+    padding: 10,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#2F343F',
   },
-  scoreCriterionTitle: {
-    fontSize: 11,
-    color: '#E2E8F0',
-    fontWeight: '600',
+  scoreRowTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  scoreInput: {
-    minHeight: 48,
-    minWidth: 64,
+  scoreCriterionTitle: {
+    fontSize: 12,
+    color: '#E2E8F0',
+    fontWeight: '700',
+  },
+  stepperContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#1E2127',
-    borderRadius: 6,
     borderWidth: 1,
     borderColor: '#374151',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  stepperBtn: {
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#262215',
+  },
+  stepperBtnText: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#E5A93C',
+  },
+  scoreInput: {
+    minHeight: 44,
+    minWidth: 60,
+    backgroundColor: '#1E2127',
     color: '#FFFFFF',
     textAlign: 'center',
-    fontSize: 13,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: '900',
+    fontVariant: ['tabular-nums'],
+    paddingHorizontal: 4,
+  },
+  inputError: {
+    borderColor: '#FF5252',
+    borderWidth: 1.5,
+  },
+  errorText: {
+    color: '#FF8080',
+    fontSize: 11,
+    fontWeight: '700',
+    marginTop: 4,
   },
   totalScoreBanner: {
     backgroundColor: '#052e16',

@@ -210,6 +210,14 @@
   * *Rozstrzygnięcie:* Przyjęcie sekwencji: Krok 1 — pełna kanoniczna synchronizacja dokumentacji BRD (`00-D4`) oraz wygenerowanie wektorów testowych JSON; Krok 2 — refaktoryzacja kodu (`modalTheme.ts`, migracja `react-native-safe-area-context`, `OfficialProtocolsHubModal.tsx`); Krok 3 — pełna weryfikacja jakościowa (`npm run verify`).
 * **DEC-RETRO-08 (Zakres Synchronizacji Dokumentacji BRD — Pełna Kanoniczna Synchronizacja): Opcja A (18.10.2026 — Zatwierdzona przez Łukasza)**
   * *Rozstrzygnięcie:* Pełna aktualizacja Tomów `00_START.md`, `00b_Decyzje.md`, `A3_rozdz_6_2_Tabela_Zakresu_Z_i_Etapy.md` oraz `C1_rozdz_8_Reguly_Dziedzinowe_i_Fizyka_Lotu.md`, aby idealnie odzwierciedlały 100 zaimplementowanych modułów, 114 decyzji projektowych oraz stan faktyczny kodu jako Single Source of Truth dla kolejnych etapów sztafety cyklu życia.
+* **DEC-UX-01 (Ergonomia Wprowadzania Punktacji Sędziowskiej Standard FCI — Stepper ±0.25 pkt): Opcja A (18.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Wprowadzenie dedykowanych przycisków krokowych (stepperów) `[- 0.25]` i `[+ 0.25]` o wysokości min. 48 pt obok pól oceny w klasie Standard FCI (Z-099). Umożliwia to błyskawiczne i bezbłędne korygowanie noty jednym kciukiem w gołębniku bez konieczności otwierania klawiatury ekranowej.
+* **DEC-UX-02 (Hierarchia Wizualna Ekranu Lotów — Dynamiczny Banner Oczekiwania na Szpicę): Opcja A (18.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* W trakcie trwania lotu konkursowego na samej górze ekranu `loty.tsx` prezentowany jest dynamiczny banner szpicy (zegar odliczający czas lotu, aktualna prędkość wiatru i minimalna prędkość do bazy 20%), a tuż pod nim ranking przylotów w czasie rzeczywistym. Wszystkie akcje administracyjne dostępne są przez kafel Field Mode `🏛️ Katalog Urzędowy PZHGP/FCI`.
+* **DEC-UX-03 (Ergonomia Przełączania Filtrów w Hubie Urzędowym — Chipy z Licznikami): Opcja A (18.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Wdrożenie horyzontalnego paska chipów z licznikami modułów (`Wszystkie (11)`, `Lotowe (5)`, `Zdrowie (3)`, `Wystawy (2)`, `Rozpłód (1)`) o wysokości celu dotykowego min. 48 pt. Zapewnia to natychmiastową informację o zawartości kategorii, płynne przewijanie i pełną responsywność bez obcinania etykiet na małych ekranach.
+* **DEC-UX-04 (Sygnalizacja Błędów Walidacji w Formularzach Polowych — Haptyka i Ramka Pod Polem): Opcja A (18.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Sygnalizacja błędów wejściowych w trybie polowym poprzez sprzężenie haptyczne (`Haptics.notificationAsync`), podświetlenie krawędzi błędnego pola na Crimson (`#FF5252`) oraz jednoznaczny mikro-komunikat bezpośrednio pod polem (`#FF8080`). Eliminuje to problem zasłaniania toastów przez klawiaturę ekranową.
 
 ---
 

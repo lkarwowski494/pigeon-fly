@@ -131,4 +131,47 @@ export const modalTheme = StyleSheet.create({
     marginVertical: 16,
     marginBottom: 32,
   },
+  // Field Mode Stepper Tokens (DEC-UX-01)
+  stepperContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: MODAL_COLORS.background,
+    borderWidth: 1,
+    borderColor: MODAL_COLORS.border,
+    borderRadius: 8,
+    overflow: 'hidden',
+    minHeight: 48,
+  },
+  stepperBtn: {
+    width: 52,
+    height: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#262215',
+  },
+  stepperBtnText: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: MODAL_COLORS.goldAccent,
+  },
+  stepperValueText: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '900',
+    color: MODAL_COLORS.textPrimary,
+    fontVariant: ['tabular-nums'],
+  },
+  // Field Mode Validation Tokens (DEC-UX-04)
+  inputError: {
+    borderColor: MODAL_COLORS.error,
+    borderWidth: 1.5,
+  },
+  errorMessage: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: MODAL_COLORS.error,
+    marginTop: -6,
+    marginBottom: 8,
+  },
 });

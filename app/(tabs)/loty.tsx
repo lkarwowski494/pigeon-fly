@@ -3,14 +3,14 @@
  * Live leaderboard of incoming birds with real-time speed in m/min.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrivalWithPigeon } from '../../src/db/raceRepository';
 import { ArrivalCard } from '../../src/components/ArrivalCard';
 import { FieldButton } from '../../src/components/FieldButton';
@@ -104,6 +104,20 @@ export default function RacesScreen() {
   const [releaseTimeIso, setReleaseTimeIso] = useState(
     new Date(Date.now() - 1000 * 60 * 240).toISOString() // 4 hours ago
   );
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const elapsedMillis = Math.max(0, currentTime.getTime() - new Date(releaseTimeIso).getTime());
+  const elapsedHours = Math.floor(elapsedMillis / (1000 * 60 * 60));
+  const elapsedMinutes = Math.floor((elapsedMillis % (1000 * 60 * 60)) / (1000 * 60));
+  const elapsedSecs = Math.floor((elapsedMillis % (1000 * 60)) / 1000);
+  const formattedElapsed = `${String(elapsedHours).padStart(2, '0')}:${String(elapsedMinutes).padStart(2, '0')}:${String(elapsedSecs).padStart(2, '0')}`;
   const [isTraining, setIsTraining] = useState(false);
   const [basketedCount, setBasketedCount] = useState(120);
   const [isTelemetryModalVisible, setIsTelemetryModalVisible] = useState(false);
@@ -310,29 +324,57 @@ export default function RacesScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Active Race Header Card */}
-        <View style={styles.raceCard}>
+        {/* Dynamic Live Szpica & Race Header Banner (DEC-UX-02) */}
+        <View style={styles.raceCard} testID="live-szpica-banner">
           <View style={styles.raceHeader}>
-            <Text style={styles.raceBadge}>
-              {isTraining ? 'TRENING Z GOŁĘBNIKA' : 'LOT KONKURSOWY'}
-            </Text>
-            <Text style={styles.liveIndicator}>🔴 NA ŻYWO</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Text style={styles.raceBadge}>
+                {isTraining ? 'TRENING Z GOŁĘBNIKA' : 'LOT KONKURSOWY'}
+              </Text>
+              <Text style={styles.liveIndicator}>🔴 NA ŻYWO</Text>
+            </View>
+            <View style={styles.elapsedTimerBadge}>
+              <Text style={styles.elapsedTimerLabel}>CZAS LOTU</Text>
+              <Text style={styles.elapsedTimerValue} testID="live-timer-elapsed">
+                {formattedElapsed}
+              </Text>
+            </View>
           </View>
+
           <Text style={styles.releaseName}>{releaseLocation}</Text>
+
           <View style={styles.raceStatsRow}>
             <Text style={styles.statLabel}>
               Dystans: <Text style={styles.statValue}>{(raceDistanceMeters / 1000).toFixed(1)} km</Text>
             </Text>
             <Text style={styles.statLabel}>
-              Wypuszczenie: <Text style={styles.statValue}>
-                {new Date(releaseTimeIso).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              Start:{' '}
+              <Text style={styles.statValue}>
+                {new Date(releaseTimeIso).toLocaleTimeString('pl-PL', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
               </Text>
             </Text>
           </View>
-          <View style={[styles.raceStatsRow, { borderTopWidth: 0, paddingTop: 4 }]}>
-            <Text style={styles.statLabel}>
-              Baza 20%: <Text style={[styles.statValue, { color: '#E5A93C' }]}>{calculateConcourseLimit(basketedCount, 20).prizeLimit} konkursów</Text> / {basketedCount} włożonych
-            </Text>
+
+          <View style={styles.szpicaMetricsRow}>
+            <View style={styles.szpicaMetricItem}>
+              <Text style={styles.szpicaMetricLabel}>SZPICA NA DOWODZIE</Text>
+              <Text style={styles.szpicaMetricValue} testID="live-szpica-speed">
+                {arrivals.length > 0
+                  ? `${arrivals[0].velocityMPerMin.toFixed(2)} m/min`
+                  : `est. ~${new Date(
+                      new Date(releaseTimeIso).getTime() + (raceDistanceMeters / 1250) * 60000
+                    ).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}`}
+              </Text>
+            </View>
+            <View style={styles.szpicaMetricItem}>
+              <Text style={styles.szpicaMetricLabel}>BAZA 20% (NAGRODY)</Text>
+              <Text style={[styles.szpicaMetricValue, { color: '#E5A93C' }]}>
+                {calculateConcourseLimit(basketedCount, 20).prizeLimit} z {basketedCount} pt.
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -885,6 +927,53 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 6,
+  },
+  elapsedTimerBadge: {
+    backgroundColor: '#262215',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#E5A93C',
+    alignItems: 'center',
+  },
+  elapsedTimerLabel: {
+    fontSize: 8,
+    fontWeight: '800',
+    color: '#E5A93C',
+    letterSpacing: 0.5,
+  },
+  elapsedTimerValue: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    fontVariant: ['tabular-nums'],
+  },
+  szpicaMetricsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: '#121417',
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: '#2F343F',
+  },
+  szpicaMetricItem: {
+    flex: 1,
+  },
+  szpicaMetricLabel: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#8E94A0',
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  szpicaMetricValue: {
+    fontSize: 13,
+    fontWeight: '900',
+    color: '#4CAF50',
+    fontVariant: ['tabular-nums'],
   },
   raceBadge: {
     fontSize: 12,
