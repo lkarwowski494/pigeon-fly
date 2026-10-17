@@ -32,6 +32,11 @@ import {
   PigeonRole,
   PigeonMarketValuation,
 } from '../domain/valuation';
+import {
+  calculateFciStandardAppraisal,
+  FciStandardAppraisalInput,
+} from '../domain/fciStandardAppraisal';
+import { PdfService } from '../services/pdfService';
 import { FieldButton } from './FieldButton';
 
 export interface AppraisalModalProps {
@@ -49,7 +54,7 @@ export function AppraisalModal({
 }: AppraisalModalProps) {
   if (!pigeon) return null;
 
-  const [activeTab, setActiveTab] = useState<'conformation' | 'valuation'>('conformation');
+  const [activeTab, setActiveTab] = useState<'conformation' | 'valuation' | 'fci_standard'>('conformation');
 
   // Conformation state
   const [eyeColor, setEyeColor] = useState<EyeColor>('pearl');
@@ -73,6 +78,16 @@ export function AppraisalModal({
   const [firstPrizes, setFirstPrizes] = useState<number>(0);
   const [bloodlineTier, setBloodlineTier] = useState<BloodlineTier>('regional_winner');
   const [inbreedingCoeff, setInbreedingCoeff] = useState<number>(6.25);
+
+  // FCI Standard Exhibition State (Z-054)
+  const [fciHeadScore, setFciHeadScore] = useState<number>(18.75);
+  const [fciBoneScore, setFciBoneScore] = useState<number>(18.75);
+  const [fciBackScore, setFciBackScore] = useState<number>(18.50);
+  const [fciMuscleScore, setFciMuscleScore] = useState<number>(18.75);
+  const [fciWingScore, setFciWingScore] = useState<number>(18.50);
+  const [fciExhibitionName, setFciExhibitionName] = useState('73. Ogólnopolska Wystawa PZHGP');
+  const [fciCageNumber, setFciCageNumber] = useState('Klatka 142');
+  const [fciJudgeName, setFciJudgeName] = useState('Sędzia Ekspert FCI');
 
   const evaluation: AppraisalResult = calculateAppraisalScore({
     pigeonId: pigeon.id,
@@ -98,6 +113,26 @@ export function AppraisalModal({
     inbreedingCoefficient: inbreedingCoeff,
     conformationScoreFci: evaluation.scoreStandardFci,
   });
+
+  const fciInput: FciStandardAppraisalInput = {
+    pigeonId: pigeon.id,
+    ringNumber: pigeon.ringNumber,
+    year: pigeon.year,
+    sex: pigeon.sex === 'hen' ? 'hen' : 'cock',
+    color: pigeon.plumageColor || 'Niebieski',
+    categoryStandard: pigeon.sex === 'hen' ? 'standard_sport_hen' : 'standard_sport_cock',
+    judgeName: fciJudgeName,
+    judgeLicenseNumber: 'FCI-PL-048',
+    exhibitionName: fciExhibitionName,
+    cageNumber: fciCageNumber,
+    headAndEye: { score: fciHeadScore, subcriterionNotes: [] },
+    boneAndSternum: { score: fciBoneScore, subcriterionNotes: [] },
+    backAndLoin: { score: fciBackScore, subcriterionNotes: [] },
+    musculatureAndBalance: { score: fciMuscleScore, subcriterionNotes: [] },
+    wingAndPlumage: { score: fciWingScore, subcriterionNotes: [] },
+  };
+
+  const fciJudgingResult = calculateFciStandardAppraisal(fciInput);
 
   const handleSave = () => {
     try {
@@ -156,7 +191,20 @@ export function AppraisalModal({
                     activeTab === 'valuation' && styles.tabBtnTextActive,
                   ]}
                 >
-                  💎 Wycena Rynkowa (PLN/EUR)
+                  💎 Wycena (PLN/EUR)
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.tabBtn, activeTab === 'fci_standard' && styles.tabBtnActive]}
+                onPress={() => setActiveTab('fci_standard')}
+              >
+                <Text
+                  style={[
+                    styles.tabBtnText,
+                    activeTab === 'fci_standard' && styles.tabBtnTextActive,
+                  ]}
+                >
+                  🏆 Karta FCI Standard
                 </Text>
               </TouchableOpacity>
             </View>
@@ -487,6 +535,144 @@ export function AppraisalModal({
                     : 'Lokalna aukcja sekcyjna'}
                 </Text>
               </View>
+            </View>
+          </View>
+        )}
+
+        {/* TAB 3: FCI STANDARD JUDGING (Z-054) */}
+        {activeTab === 'fci_standard' && (
+          <View>
+            {/* Hero Card for Standard Score */}
+            <View style={[styles.valHeroCard, { borderColor: fciJudgingResult.awardBadgeColor }]}>
+              <Text style={styles.heroScoreLabel}>ŁĄCZNA NOTA SĘDZIOWSKA FCI (SKALA 90-95 PKT)</Text>
+              <Text style={[styles.heroScoreValue, { color: fciJudgingResult.awardBadgeColor }]}>
+                {fciJudgingResult.totalScore.toFixed(2)}
+              </Text>
+              <View style={[styles.suitabilityBadge, { borderColor: fciJudgingResult.awardBadgeColor, backgroundColor: '#1E2127' }]}>
+                <Text style={[styles.suitabilityText, { color: fciJudgingResult.awardBadgeColor }]}>
+                  {fciJudgingResult.awardTitle}
+                </Text>
+              </View>
+              {fciJudgingResult.isEligibleForNationalTeam && (
+                <Text style={{ color: '#10B981', fontWeight: 'bold', fontSize: 12, marginTop: 4 }}>
+                  🇵🇱 Kwalifikacja do Reprezentacji Polski na Olimpiadę FCI
+                </Text>
+              )}
+            </View>
+
+            {/* Judging Criteria Score Controls (0.25 steps from 18.00 to 19.50) */}
+            <View style={styles.sectionCard}>
+              <Text style={styles.sectionHeading}>1. WRAŻENIE OGÓLNE, GŁOWA I OKO (MAX 20):</Text>
+              <View style={styles.chipsRow}>
+                {[18.0, 18.25, 18.5, 18.75, 19.0, 19.25, 19.5].map((s) => (
+                  <TouchableOpacity
+                    key={s}
+                    style={[styles.chip, fciHeadScore === s && styles.chipActive]}
+                    onPress={() => setFciHeadScore(s)}
+                  >
+                    <Text style={[styles.chipText, fciHeadScore === s && styles.chipTextActive]}>
+                      {s.toFixed(2)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.sectionCard}>
+              <Text style={styles.sectionHeading}>2. KOŚCIEC, MOSTEK I WIDEŁKI MIEDNICOWE (MAX 20):</Text>
+              <View style={styles.chipsRow}>
+                {[18.0, 18.25, 18.5, 18.75, 19.0, 19.25, 19.5].map((s) => (
+                  <TouchableOpacity
+                    key={s}
+                    style={[styles.chip, fciBoneScore === s && styles.chipActive]}
+                    onPress={() => setFciBoneScore(s)}
+                  >
+                    <Text style={[styles.chipText, fciBoneScore === s && styles.chipTextActive]}>
+                      {s.toFixed(2)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.sectionCard}>
+              <Text style={styles.sectionHeading}>3. PLECY, LĘDŹWIE I OGON NA JEDNO PIÓRO (MAX 20):</Text>
+              <View style={styles.chipsRow}>
+                {[18.0, 18.25, 18.5, 18.75, 19.0, 19.25, 19.5].map((s) => (
+                  <TouchableOpacity
+                    key={s}
+                    style={[styles.chip, fciBackScore === s && styles.chipActive]}
+                    onPress={() => setFciBackScore(s)}
+                  >
+                    <Text style={[styles.chipText, fciBackScore === s && styles.chipTextActive]}>
+                      {s.toFixed(2)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.sectionCard}>
+              <Text style={styles.sectionHeading}>4. UMIĘŚNIENIE PIERSIOWE I HARMONIA (MAX 20):</Text>
+              <View style={styles.chipsRow}>
+                {[18.0, 18.25, 18.5, 18.75, 19.0, 19.25, 19.5].map((s) => (
+                  <TouchableOpacity
+                    key={s}
+                    style={[styles.chip, fciMuscleScore === s && styles.chipActive]}
+                    onPress={() => setFciMuscleScore(s)}
+                  >
+                    <Text style={[styles.chipText, fciMuscleScore === s && styles.chipTextActive]}>
+                      {s.toFixed(2)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.sectionCard}>
+              <Text style={styles.sectionHeading}>5. SKRZYDŁO, USKOK LOTEK I UPIERZENIE (MAX 20):</Text>
+              <View style={styles.chipsRow}>
+                {[18.0, 18.25, 18.5, 18.75, 19.0, 19.25, 19.5].map((s) => (
+                  <TouchableOpacity
+                    key={s}
+                    style={[styles.chip, fciWingScore === s && styles.chipActive]}
+                    onPress={() => setFciWingScore(s)}
+                  >
+                    <Text style={[styles.chipText, fciWingScore === s && styles.chipTextActive]}>
+                      {s.toFixed(2)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Print & Share Buttons */}
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
+              <FieldButton
+                title="🖨️ Drukuj Kartę Klatkową"
+                onPress={async () => {
+                  try {
+                    await PdfService.exportFciStandardShowCard(fciInput, fciJudgingResult, 'print');
+                  } catch (e: any) {
+                    Alert.alert('Błąd wydruku', e?.message || 'Nie udało się wydrukować karty.');
+                  }
+                }}
+                style={{ flex: 1 }}
+                testID="btn-print-fci-card"
+              />
+              <FieldButton
+                title="📤 Udostępnij PDF"
+                variant="secondary"
+                onPress={async () => {
+                  try {
+                    await PdfService.exportFciStandardShowCard(fciInput, fciJudgingResult, 'share');
+                  } catch (e: any) {
+                    Alert.alert('Błąd eksportu', e?.message || 'Nie udało się udostępnić PDF.');
+                  }
+                }}
+                style={{ flex: 1 }}
+                testID="btn-share-fci-card"
+              />
             </View>
           </View>
         )}

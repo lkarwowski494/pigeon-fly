@@ -207,6 +207,26 @@ export class PdfService {
       `Zaświadczenie Szczepienia PMV-1 — ${options.certificateNumber}`
     );
   }
+
+  /**
+   * Generuje i drukuje lub udostępnia Kartę Oceny Sędziowskiej FCI Standard (Z-054)
+   */
+  static async exportFciStandardShowCard(
+    input: any,
+    result: any,
+    mode: 'print' | 'share' = 'print'
+  ): Promise<string | void> {
+    const { generateFciShowCardHtml } = await import('../domain/fciStandardAppraisal');
+    const html = generateFciShowCardHtml(input, result);
+    if (mode === 'print') {
+      await this.printHtml(html);
+      return;
+    }
+    return await this.shareHtmlAsPdf(
+      html,
+      `Karta Oceny FCI Standard — ${input.ringNumber}`
+    );
+  }
 }
 
 

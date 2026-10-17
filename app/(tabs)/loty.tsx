@@ -23,6 +23,7 @@ import { LiveDerbyModal } from '../../src/components/LiveDerbyModal';
 import { ConcourseSheetModal } from '../../src/components/ConcourseSheetModal';
 import { EskImportModal } from '../../src/components/EskImportModal';
 import { FlightComparisonModal } from '../../src/components/FlightComparisonModal';
+import { TrainingTossModal } from '../../src/components/TrainingTossModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -86,6 +87,17 @@ export default function RacesScreen() {
   const [isConcourseModalVisible, setIsConcourseModalVisible] = useState(false);
   const [isEskModalVisible, setIsEskModalVisible] = useState(false);
   const [isComparisonModalVisible, setIsComparisonModalVisible] = useState(false);
+  const [isTossModalVisible, setIsTossModalVisible] = useState(false);
+
+  const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
+    handleSaveNewRace({
+      name: tossName,
+      releaseName: tossName,
+      distanceKm,
+      releaseTimeIso: new Date().toISOString(),
+      isTraining: true,
+    });
+  };
 
   const handleImportEskArrivals = (importedArrivals: ArrivalWithPigeon[]) => {
     setArrivals((prev) => {
@@ -339,6 +351,13 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="🧭 Planer Wywózek Treningowych (Toss)"
+            onPress={() => setIsTossModalVisible(true)}
+            testID="btn-open-toss-planner"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -437,6 +456,13 @@ export default function RacesScreen() {
         loftDistanceKm={raceDistanceMeters / 1000}
         basketedCount={basketedCount}
         arrivals={arrivals}
+      />
+
+      {/* Training Toss Planner Modal */}
+      <TrainingTossModal
+        visible={isTossModalVisible}
+        onClose={() => setIsTossModalVisible(false)}
+        onStartSession={handleStartTrainingToss}
       />
     </SafeAreaView>
   );
