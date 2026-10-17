@@ -33,6 +33,8 @@ import { CabinSealingModal } from '../../src/components/CabinSealingModal';
 import { NationalChampionshipModal } from '../../src/components/NationalChampionshipModal';
 import { PostRaceRestitutionModal } from '../../src/components/PostRaceRestitutionModal';
 import { TrainingTossLogModal } from '../../src/components/TrainingTossLogModal';
+import { CareerPassportModal } from '../../src/components/CareerPassportModal';
+import { FairPlayDeclarationModal } from '../../src/components/FairPlayDeclarationModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -106,6 +108,8 @@ export default function RacesScreen() {
   const [isChampionshipModalVisible, setIsChampionshipModalVisible] = useState(false);
   const [isRestitutionModalVisible, setIsRestitutionModalVisible] = useState(false);
   const [isTossLogModalVisible, setIsTossLogModalVisible] = useState(false);
+  const [isCareerPassportModalVisible, setIsCareerPassportModalVisible] = useState(false);
+  const [isFairPlayModalVisible, setIsFairPlayModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -439,6 +443,20 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="📜 Paszport Sportowy Lotnika (Z-079)"
+            onPress={() => setIsCareerPassportModalVisible(true)}
+            testID="btn-open-career-passport"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
+            title="⚖️ Karta Etyki i Antydoping PZHGP (Z-080)"
+            onPress={() => setIsFairPlayModalVisible(true)}
+            testID="btn-open-fair-play"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -603,6 +621,16 @@ export default function RacesScreen() {
       <TrainingTossLogModal
         visible={isTossLogModalVisible}
         onClose={() => setIsTossLogModalVisible(false)}
+      />
+
+      <CareerPassportModal
+        visible={isCareerPassportModalVisible}
+        onClose={() => setIsCareerPassportModalVisible(false)}
+      />
+
+      <FairPlayDeclarationModal
+        visible={isFairPlayModalVisible}
+        onClose={() => setIsFairPlayModalVisible(false)}
       />
     </SafeAreaView>
   );

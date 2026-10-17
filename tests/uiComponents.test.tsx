@@ -1074,6 +1074,49 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('Borek Wlkp (Pola)');
     expect(tree).toContain('Drukuj Dziennik Wyw\u00f3zek A4');
   });
+
+  test('CareerPassportModal (Z-079) renders career metrics, race concourses, and FCI Exhibition tabs', () => {
+    const { CareerPassportModal } = require('../src/components/CareerPassportModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <CareerPassportModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Paszport Sportowy Lotnika');
+    expect(tree).toContain('Karta Kariery');
+    expect(tree).toContain('PL-0284-23-1402');
+    expect(tree).toContain('Wydajno\u015b\u0107 Konkursowa');
+    expect(tree).toContain('Drukuj Paszport Sportowy A4');
+  });
+
+  test('FairPlayDeclarationModal (Z-080) renders legal clauses, compliance banner, and sampling consent', () => {
+    const { FairPlayDeclarationModal } = require('../src/components/FairPlayDeclarationModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <FairPlayDeclarationModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Karta Etyki i Antydoping PZHGP');
+    expect(tree).toContain('DOPUSZCZONY DO SEZONU');
+    expect(tree).toContain('Zgoda na Pobranie Pr\u00f3bek Biologicznych');
+    expect(tree).toContain('Drukuj Deklaracj\u0119 A4 (AirPrint)');
+  });
 });
 
 
