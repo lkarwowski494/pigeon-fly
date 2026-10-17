@@ -24,6 +24,7 @@ import { PedigreeTreeModal } from './PedigreeTreeModal';
 import { AppraisalModal } from './AppraisalModal';
 import { PigeonPhotoGalleryModal } from './PigeonPhotoGalleryModal';
 import { PerformanceChartModal } from './PerformanceChartModal';
+import { CareerLedgerModal } from './CareerLedgerModal';
 
 export interface PigeonDetailModalProps {
   visible: boolean;
@@ -47,6 +48,7 @@ export function PigeonDetailModal({
   const [isAppraisalOpen, setIsAppraisalOpen] = useState(false);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [isPerformanceOpen, setIsPerformanceOpen] = useState(false);
+  const [isCareerLedgerOpen, setIsCareerLedgerOpen] = useState(false);
 
   useEffect(() => {
     if (pigeon) {
@@ -176,6 +178,13 @@ export function PigeonDetailModal({
                   style={{ marginBottom: 10 }}
                 />
                 <FieldButton
+                  title="🏆 E-Księga Lotowa i Trofea (Z-061)"
+                  onPress={() => setIsCareerLedgerOpen(true)}
+                  variant="secondary"
+                  testID="btn-open-career-ledger"
+                  style={{ marginBottom: 10 }}
+                />
+                <FieldButton
                   title="🔍 Ocena Budowy & Znak Oka (FCI)"
                   onPress={() => setIsAppraisalOpen(true)}
                   variant="secondary"
@@ -227,6 +236,13 @@ export function PigeonDetailModal({
         visible={isPerformanceOpen}
         pigeon={pigeon}
         onClose={() => setIsPerformanceOpen(false)}
+      />
+
+      {/* Career Ledger & Life Trophy Cabinet Modal (Z-061) */}
+      <CareerLedgerModal
+        visible={isCareerLedgerOpen}
+        pigeon={pigeon}
+        onClose={() => setIsCareerLedgerOpen(false)}
       />
     </Modal>
   );

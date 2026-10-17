@@ -246,6 +246,25 @@ export class PdfService {
       `Lista Startowo-Zegarowa PZHGP — Lot ${protocol.raceNumber} ${protocol.raceName}`
     );
   }
+
+  /**
+   * Generuje i drukuje lub udostępnia Urzędowy Protokół Bioasekuracji i Inspekcji Sanitarnej PIW (Z-062)
+   */
+  static async exportBiosecurityReport(
+    data: any,
+    mode: 'print' | 'share' = 'print'
+  ): Promise<string | void> {
+    const { generateBiosecurityReportHtml } = await import('../domain/biosecurityProtocol');
+    const html = generateBiosecurityReportHtml(data);
+    if (mode === 'print') {
+      await this.printHtml(html);
+      return;
+    }
+    return await this.shareHtmlAsPdf(
+      html,
+      `Protokol-Bioasekuracji-PIW-${data.loftInfo?.wniNumber || 'inspekcja'}`
+    );
+  }
 }
 
 

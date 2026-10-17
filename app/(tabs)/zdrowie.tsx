@@ -22,6 +22,7 @@ import { AntidopingModal } from '../../src/components/AntidopingModal';
 import { QuarantineModal } from '../../src/components/QuarantineModal';
 import { MoultTrackerModal } from '../../src/components/MoultTrackerModal';
 import { WinterScheduleModal } from '../../src/components/WinterScheduleModal';
+import { BiosecurityModal } from '../../src/components/BiosecurityModal';
 import { analyzeWingMoult, getPhotoperiodStatus } from '../../src/domain/moult';
 import { PdfService } from '../../src/services/pdfService';
 import { FeatherStatus, MoultLog } from '../../src/domain/types';
@@ -64,6 +65,7 @@ export default function HealthScreen() {
   const [isQuarantineModalVisible, setIsQuarantineModalVisible] = useState(false);
   const [isMoultTrackerModalVisible, setIsMoultTrackerModalVisible] = useState(false);
   const [isWinterScheduleModalVisible, setIsWinterScheduleModalVisible] = useState(false);
+  const [isBiosecurityModalVisible, setIsBiosecurityModalVisible] = useState(false);
   const [treatments, setTreatments] = useState<TreatmentRecordItem[]>(INITIAL_TREATMENTS);
   const [moultLogs, setMoultLogs] = useState<MoultLog[]>(INITIAL_MOULT_LOGS);
 
@@ -354,6 +356,13 @@ export default function HealthScreen() {
           style={{ marginTop: 10 }}
           testID="btn-open-quarantine"
         />
+        <FieldButton
+          title="🛡️ Protokół Bioasekuracji i Inspekcji PIW (Z-062)"
+          onPress={() => setIsBiosecurityModalVisible(true)}
+          variant="secondary"
+          style={{ marginTop: 10 }}
+          testID="btn-open-biosecurity-modal"
+        />
       </ScrollView>
 
       {/* Add Treatment Modal */}
@@ -416,6 +425,12 @@ export default function HealthScreen() {
       <WinterScheduleModal
         visible={isWinterScheduleModalVisible}
         onClose={() => setIsWinterScheduleModalVisible(false)}
+      />
+
+      {/* Sanitary & Biological Security Inspection Modal (Z-062) */}
+      <BiosecurityModal
+        visible={isBiosecurityModalVisible}
+        onClose={() => setIsBiosecurityModalVisible(false)}
       />
     </SafeAreaView>
   );
