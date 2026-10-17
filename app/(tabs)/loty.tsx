@@ -25,6 +25,7 @@ import { EskImportModal } from '../../src/components/EskImportModal';
 import { FlightComparisonModal } from '../../src/components/FlightComparisonModal';
 import { TrainingTossModal } from '../../src/components/TrainingTossModal';
 import { BasketingProtocolModal } from '../../src/components/BasketingProtocolModal';
+import { TransportWelfareModal } from '../../src/components/TransportWelfareModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -90,6 +91,7 @@ export default function RacesScreen() {
   const [isComparisonModalVisible, setIsComparisonModalVisible] = useState(false);
   const [isTossModalVisible, setIsTossModalVisible] = useState(false);
   const [isBasketingProtocolModalVisible, setIsBasketingProtocolModalVisible] = useState(false);
+  const [isWelfareModalVisible, setIsWelfareModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -367,6 +369,13 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="🚛 Dziennik Kabiny i Dobrostanu (Z-059)"
+            onPress={() => setIsWelfareModalVisible(true)}
+            testID="btn-open-transport-welfare"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -480,6 +489,13 @@ export default function RacesScreen() {
         onClose={() => setIsBasketingProtocolModalVisible(false)}
         defaultRaceName={raceName}
         defaultRaceDistanceKm={raceDistanceMeters / 1000}
+      />
+
+      {/* Transport Welfare & Cabin Environment Log Modal (Z-059) */}
+      <TransportWelfareModal
+        visible={isWelfareModalVisible}
+        onClose={() => setIsWelfareModalVisible(false)}
+        raceName={raceName}
       />
     </SafeAreaView>
   );

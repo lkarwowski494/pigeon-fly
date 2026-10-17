@@ -19,6 +19,7 @@ import { PairingModal } from '../../src/components/PairingModal';
 import { ClutchLifecycleModal } from '../../src/components/ClutchLifecycleModal';
 import { NestBoxMatrixModal } from '../../src/components/NestBoxMatrixModal';
 import { PairingAssistantModal } from '../../src/components/PairingAssistantModal';
+import { MaternalLineModal } from '../../src/components/MaternalLineModal';
 import { calculateClutchMilestones } from '../../src/domain/breeding';
 import { PdfService } from '../../src/services/pdfService';
 
@@ -76,6 +77,7 @@ export default function BreedingScreen() {
   const [isLifecycleModalOpen, setIsLifecycleModalOpen] = useState(false);
   const [isMatrixOpen, setIsMatrixOpen] = useState(false);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [isMaternalModalOpen, setIsMaternalModalOpen] = useState(false);
 
   const handleApplyAiPairing = (cockRing: string, henRing: string, inbreedingF: number) => {
     handlePairSaved({
@@ -265,9 +267,18 @@ export default function BreedingScreen() {
           title="🤖 Asystent Kojarzeń AI"
           variant="secondary"
           onPress={() => setIsAssistantOpen(true)}
-          style={{ marginBottom: 12, minHeight: 44 }}
+          style={{ marginBottom: 10, minHeight: 44 }}
           textStyle={{ fontSize: 13 }}
           testID="btn-open-pairing-assistant"
+        />
+
+        <FieldButton
+          title="🧬 Analiza Linii Matecznych i mtDNA (Z-060)"
+          variant="secondary"
+          onPress={() => setIsMaternalModalOpen(true)}
+          style={{ marginBottom: 12, minHeight: 44 }}
+          textStyle={{ fontSize: 13 }}
+          testID="btn-open-maternal-line"
         />
 
         {/* Season Summary Bar */}
@@ -338,6 +349,11 @@ export default function BreedingScreen() {
         visible={isAssistantOpen}
         onClose={() => setIsAssistantOpen(false)}
         onApplyPairing={handleApplyAiPairing}
+      />
+
+      <MaternalLineModal
+        visible={isMaternalModalOpen}
+        onClose={() => setIsMaternalModalOpen(false)}
       />
     </SafeAreaView>
   );
