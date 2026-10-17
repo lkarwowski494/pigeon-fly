@@ -1,7 +1,7 @@
 # Pigeon-Fly — Rejestr Bieżący Decyzji i Stanu Projektu
 **Data aktualizacji:** 17.10.2026 (Przyjęcie 10 Zasad Uniwersalnych i Odkrycie Ról z Biblioteki na Dysku)  
 **Właściciel:** Łukasz (`lkarwowski494`)  
-**Status projektu:** Faza wdrożeniowa — 50 zestawów testowych, 359 testów zaliczonych (100%), 0 błędów TypeScript i i18n
+**Status projektu:** Faza wdrożeniowa — 52 zestawy testowe, 371 testów zaliczonych (100%), 0 błędów TypeScript i i18n
 
 ---
 
@@ -106,6 +106,10 @@
   * *Rozstrzygnięcie:* Implementacja silnika `src/domain/moultTracker.ts` analizującego stan 10 lotek I rzędu, stadia wzrostu (zrzucona, krwista pałka, pędzel, dojrzewająca, pełna), bezwzględne bariery koszowania dla lotek zewnętrznych 7–10 (<65%) oraz wrażliwych krwistych pałek (ryzyko pęknięcia unaczynionej dutki i krwotoku w ciasnym koszu kabiny transportowej), wymianę sterówek ogona, profilaktykę żywieniową biosyntezy keratyny (metionina, MSM, biotyna, cynk, siemię lniane) oraz agregację stadową. Integracja z interaktywnym diagramem skrzydła `src/components/MoultTrackerModal.tsx` w `app/(tabs)/zdrowie.tsx`. Pokrycie testami 100% (5/5 passing w `tests/moultTracker.test.ts`).
 * **DEC-70 (Asystent Kosztów i Budżetu Sezonu Hodowlanego — Z-056): Opcja 1 (17.10.2026 — Zatwierdzona przez Łukasza)**
   * *Rozstrzygnięcie:* Implementacja silnika `src/domain/loftFinance.ts` modelującego precyzyjną księgowość i budżetowanie gołębnika: kategoryzacja wydatków (pasza, suplementy, profilaktyka wet, opłaty PZHGP i zegarowe, sprzęt, logistyka wywózek) i przychodów (sprzedaż młodych, nagrody), kalkulator jednostkowy kosztu odchowania 1 młodego do usamodzielnienia (pasza lęgowa, minerały, obrączka rodowa, PMV-1), kalkulator jednostkowy utrzymania 1 lotnika w sezonie sportowym oraz bilans roczny netto z kontrolą przekroczenia limitu budżetowego i wskaźnikiem ROI. Integracja UI `src/components/LoftFinanceModal.tsx` w `app/(tabs)/kalkulator.tsx`. Pokrycie testami 100% (5/5 passing w `tests/loftFinance.test.ts`).
+* **DEC-71 (Generator Zestawień do Druku Koszowego — Lista Startowo-Zegarowa PZHGP — Z-057): Opcja 1 (17.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Implementacja silnika `src/domain/basketingProtocol.ts` formatującego urzędowy protokół wkładaniowy do kosza PZHGP / FCI: weryfikacja unikalności obrączek rodowych, kontrola przypisania chipów elektronicznych ESK, urzędowe kody płci PZHGP (1.0 / 0.1), typowanie serii mistrzowskiej (T), podział na klatki transportowe oraz generator oficjalnego arkusza A4 z podpisami Komisji Wkładaniowej i pieczęcią. Dodanie metody `PdfService.exportBasketingClockingList` oraz integracja UI `src/components/BasketingProtocolModal.tsx` w `app/(tabs)/loty.tsx`. Pokrycie testami 100% (6/6 passing w `tests/basketingProtocol.test.ts`).
+* **DEC-72 (Harmonogram Sezonu Zimowego i Profilaktyki Przedlęgowej — Z-058): Opcja 2 (17.10.2026 — Zatwierdzona przez Łukasza)**
+  * *Rozstrzygnięcie:* Implementacja silnika `src/domain/winterSchedule.ts` modelującego zoohigienę i weterynarię okresu zimowego: 3 fazy spoczynku stada (separacja płci, głęboki spoczynek/hartowanie, przygotowanie przedlęgowe), termiczna receptura karmy (oczyszczająca 65% jęczmienia przy >5°C vs mrozowa z kardi i kukurydzą przy <-5°C), 8-etapowy chronometraż przedlęgowy wstecz od daty parowania z gwarantowanym min. 14-dniowym odstępem między szczepieniem na salmonellozę i PMV-1/ospę oraz doświetlanie i witaminizacja E + Selen. Integracja UI `src/components/WinterScheduleModal.tsx` w `app/(tabs)/zdrowie.tsx`. Pokrycie testami 100% (6/6 passing w `tests/winterSchedule.test.ts`).
 
 ---
 

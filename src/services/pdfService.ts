@@ -227,6 +227,25 @@ export class PdfService {
       `Karta Oceny FCI Standard — ${input.ringNumber}`
     );
   }
+
+  /**
+   * Generuje i drukuje lub udostępnia Oficjalną Listę Startowo-Zegarową PZHGP (Z-057)
+   */
+  static async exportBasketingClockingList(
+    protocol: any,
+    mode: 'print' | 'share' = 'print'
+  ): Promise<string | void> {
+    const { generateBasketingProtocolHtml } = await import('../domain/basketingProtocol');
+    const html = generateBasketingProtocolHtml(protocol);
+    if (mode === 'print') {
+      await this.printHtml(html);
+      return;
+    }
+    return await this.shareHtmlAsPdf(
+      html,
+      `Lista Startowo-Zegarowa PZHGP — Lot ${protocol.raceNumber} ${protocol.raceName}`
+    );
+  }
 }
 
 

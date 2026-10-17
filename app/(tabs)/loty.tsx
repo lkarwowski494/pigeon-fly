@@ -24,6 +24,7 @@ import { ConcourseSheetModal } from '../../src/components/ConcourseSheetModal';
 import { EskImportModal } from '../../src/components/EskImportModal';
 import { FlightComparisonModal } from '../../src/components/FlightComparisonModal';
 import { TrainingTossModal } from '../../src/components/TrainingTossModal';
+import { BasketingProtocolModal } from '../../src/components/BasketingProtocolModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -88,6 +89,7 @@ export default function RacesScreen() {
   const [isEskModalVisible, setIsEskModalVisible] = useState(false);
   const [isComparisonModalVisible, setIsComparisonModalVisible] = useState(false);
   const [isTossModalVisible, setIsTossModalVisible] = useState(false);
+  const [isBasketingProtocolModalVisible, setIsBasketingProtocolModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -358,6 +360,13 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="📋 Lista Startowo-Zegarowa PZHGP (Z-057)"
+            onPress={() => setIsBasketingProtocolModalVisible(true)}
+            testID="btn-open-basketing-protocol"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -463,6 +472,14 @@ export default function RacesScreen() {
         visible={isTossModalVisible}
         onClose={() => setIsTossModalVisible(false)}
         onStartSession={handleStartTrainingToss}
+      />
+
+      {/* Official PZHGP Basketing & Clocking Protocol Modal (Z-057) */}
+      <BasketingProtocolModal
+        visible={isBasketingProtocolModalVisible}
+        onClose={() => setIsBasketingProtocolModalVisible(false)}
+        defaultRaceName={raceName}
+        defaultRaceDistanceKm={raceDistanceMeters / 1000}
       />
     </SafeAreaView>
   );

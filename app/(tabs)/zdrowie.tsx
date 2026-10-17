@@ -21,6 +21,7 @@ import { VeterinaryLabModal } from '../../src/components/VeterinaryLabModal';
 import { AntidopingModal } from '../../src/components/AntidopingModal';
 import { QuarantineModal } from '../../src/components/QuarantineModal';
 import { MoultTrackerModal } from '../../src/components/MoultTrackerModal';
+import { WinterScheduleModal } from '../../src/components/WinterScheduleModal';
 import { analyzeWingMoult, getPhotoperiodStatus } from '../../src/domain/moult';
 import { PdfService } from '../../src/services/pdfService';
 import { FeatherStatus, MoultLog } from '../../src/domain/types';
@@ -62,6 +63,7 @@ export default function HealthScreen() {
   const [isAntidopingModalVisible, setIsAntidopingModalVisible] = useState(false);
   const [isQuarantineModalVisible, setIsQuarantineModalVisible] = useState(false);
   const [isMoultTrackerModalVisible, setIsMoultTrackerModalVisible] = useState(false);
+  const [isWinterScheduleModalVisible, setIsWinterScheduleModalVisible] = useState(false);
   const [treatments, setTreatments] = useState<TreatmentRecordItem[]>(INITIAL_TREATMENTS);
   const [moultLogs, setMoultLogs] = useState<MoultLog[]>(INITIAL_MOULT_LOGS);
 
@@ -182,6 +184,14 @@ export default function HealthScreen() {
             style={{ marginTop: 12, minHeight: 44 }}
             textStyle={{ fontSize: 13 }}
             testID="btn-open-vet-lab-modal"
+          />
+          <FieldButton
+            title="❄️ Harmonogram Zimowania i Profilaktyki (Z-058)"
+            variant="secondary"
+            onPress={() => setIsWinterScheduleModalVisible(true)}
+            style={{ marginTop: 8, minHeight: 44 }}
+            textStyle={{ fontSize: 13 }}
+            testID="btn-open-winter-schedule-modal"
           />
         </View>
 
@@ -400,6 +410,12 @@ export default function HealthScreen() {
         visible={isMoultTrackerModalVisible}
         onClose={() => setIsMoultTrackerModalVisible(false)}
         pigeonRingNumber={selectedPigeonRing}
+      />
+
+      {/* Winter Rest & Vaccination Schedule Modal (Z-058) */}
+      <WinterScheduleModal
+        visible={isWinterScheduleModalVisible}
+        onClose={() => setIsWinterScheduleModalVisible(false)}
       />
     </SafeAreaView>
   );
