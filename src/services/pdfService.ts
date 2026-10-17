@@ -305,6 +305,45 @@ export class PdfService {
       `Umowa-Transferu-${contract.contractNumber || 'pigeons'}`
     );
   }
+
+  /**
+   * Generuje i drukuje lub udostępnia Oświadczenie Geodezyjne WGS-84 dla PZHGP (Z-067)
+   */
+  static async exportGeodeticLoftDeclaration(
+    input: any,
+    result: any,
+    mode: 'print' | 'share' = 'print'
+  ): Promise<string | void> {
+    const { generateGeodeticDeclarationHtml } = await import('../domain/loftGeodesy');
+    const html = generateGeodeticDeclarationHtml(input, result);
+    if (mode === 'print') {
+      await this.printHtml(html);
+      return;
+    }
+    return await this.shareHtmlAsPdf(
+      html,
+      `Oswiadczenie-Geodezyjne-PZHGP-${input.loftName || 'loft'}`
+    );
+  }
+
+  /**
+   * Generuje i drukuje lub udostępnia Protokół Wykreślenia i Rejestr Zdarzeń Losowych dla PZHGP (Z-068)
+   */
+  static async exportPigeonDecommissionProtocol(
+    data: any,
+    mode: 'print' | 'share' = 'print'
+  ): Promise<string | void> {
+    const { generateDecommissionProtocolHtml } = await import('../domain/pigeonDecommission');
+    const html = generateDecommissionProtocolHtml(data);
+    if (mode === 'print') {
+      await this.printHtml(html);
+      return;
+    }
+    return await this.shareHtmlAsPdf(
+      html,
+      `Protokol-Wykreslenia-${data.protocolNumber || 'PZHGP'}`
+    );
+  }
 }
 
 

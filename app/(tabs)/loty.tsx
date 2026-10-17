@@ -26,6 +26,7 @@ import { FlightComparisonModal } from '../../src/components/FlightComparisonModa
 import { TrainingTossModal } from '../../src/components/TrainingTossModal';
 import { BasketingProtocolModal } from '../../src/components/BasketingProtocolModal';
 import { TransportWelfareModal } from '../../src/components/TransportWelfareModal';
+import { LoftGeodesyModal } from '../../src/components/LoftGeodesyModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -92,6 +93,7 @@ export default function RacesScreen() {
   const [isTossModalVisible, setIsTossModalVisible] = useState(false);
   const [isBasketingProtocolModalVisible, setIsBasketingProtocolModalVisible] = useState(false);
   const [isWelfareModalVisible, setIsWelfareModalVisible] = useState(false);
+  const [isGeodesyModalVisible, setIsGeodesyModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -376,6 +378,13 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="📐 Geodezyjna Kalibracja Koordynat (Z-067)"
+            onPress={() => setIsGeodesyModalVisible(true)}
+            testID="btn-open-loft-geodesy"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -496,6 +505,12 @@ export default function RacesScreen() {
         visible={isWelfareModalVisible}
         onClose={() => setIsWelfareModalVisible(false)}
         raceName={raceName}
+      />
+
+      {/* Geodetic Loft Coordinate Calibration Modal (Z-067) */}
+      <LoftGeodesyModal
+        visible={isGeodesyModalVisible}
+        onClose={() => setIsGeodesyModalVisible(false)}
       />
     </SafeAreaView>
   );

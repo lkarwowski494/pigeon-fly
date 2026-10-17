@@ -22,6 +22,7 @@ import { PigeonDetailModal } from '../../src/components/PigeonDetailModal';
 import { LostPigeonReportModal } from '../../src/components/LostPigeonReportModal';
 import { CompartmentsModal } from '../../src/components/CompartmentsModal';
 import { SquadsModal } from '../../src/components/SquadsModal';
+import { PigeonDecommissionModal } from '../../src/components/PigeonDecommissionModal';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
 import { exportFlockToCsv } from '../../src/domain/csvExport';
@@ -86,6 +87,7 @@ export default function FlockScreen() {
   const [isSosModalOpen, setIsSosModalOpen] = useState(false);
   const [isCompartmentsModalOpen, setIsCompartmentsModalOpen] = useState(false);
   const [isSquadsModalOpen, setIsSquadsModalOpen] = useState(false);
+  const [isDecommissionModalOpen, setIsDecommissionModalOpen] = useState(false);
 
   const handlePigeonPress = (pigeon: Pigeon) => {
     setSelectedPigeon(pigeon);
@@ -267,6 +269,16 @@ export default function FlockScreen() {
           />
         </View>
 
+        {/* Pigeon Decommission & Random Event Protocol (Z-068) */}
+        <View style={{ marginBottom: 12 }}>
+          <FieldButton
+            title="🕊️ Ewidencja Zdarzeń i Wykreślenia (Z-068)"
+            variant="secondary"
+            onPress={() => setIsDecommissionModalOpen(true)}
+            testID="btn-open-decommission-modal"
+          />
+        </View>
+
         {/* Search input */}
         <View style={styles.searchContainer}>
           <TextInput
@@ -364,6 +376,13 @@ export default function FlockScreen() {
         visible={isSquadsModalOpen}
         onClose={() => setIsSquadsModalOpen(false)}
         pigeons={pigeons}
+      />
+
+      {/* Pigeon Decommission & Random Event Protocol Modal (Z-068) */}
+      <PigeonDecommissionModal
+        visible={isDecommissionModalOpen}
+        onClose={() => setIsDecommissionModalOpen(false)}
+        initialFlockSize={pigeons.length}
       />
     </SafeAreaView>
   );
