@@ -27,6 +27,7 @@ import { VetPassportModal } from '../../src/components/VetPassportModal';
 import { LoftVentilationModal } from '../../src/components/LoftVentilationModal';
 import { VaccinationProtocolModal } from '../../src/components/VaccinationProtocolModal';
 import { NewInmateQuarantineModal } from '../../src/components/NewInmateQuarantineModal';
+import { VeterinaryLabRegistryModal } from '../../src/components/VeterinaryLabRegistryModal';
 import { analyzeWingMoult, getPhotoperiodStatus } from '../../src/domain/moult';
 import { PdfService } from '../../src/services/pdfService';
 import { FeatherStatus, MoultLog } from '../../src/domain/types';
@@ -74,6 +75,7 @@ export default function HealthScreen() {
   const [isVentilationModalVisible, setIsVentilationModalVisible] = useState(false);
   const [isVaccinationModalVisible, setIsVaccinationModalVisible] = useState(false);
   const [isNewInmateQuarantineModalVisible, setIsNewInmateQuarantineModalVisible] = useState(false);
+  const [isVetLabRegistryModalVisible, setIsVetLabRegistryModalVisible] = useState(false);
   const [treatments, setTreatments] = useState<TreatmentRecordItem[]>(INITIAL_TREATMENTS);
   const [moultLogs, setMoultLogs] = useState<MoultLog[]>(INITIAL_MOULT_LOGS);
 
@@ -400,6 +402,13 @@ export default function HealthScreen() {
           style={{ marginTop: 10 }}
           testID="btn-open-ventilation-modal"
         />
+        <FieldButton
+          title="🔬 Kartoteka Badań Kału i Wymazów (Z-088)"
+          onPress={() => setIsVetLabRegistryModalVisible(true)}
+          variant="secondary"
+          style={{ marginTop: 10 }}
+          testID="btn-open-vet-lab-registry"
+        />
       </ScrollView>
 
       {/* Add Treatment Modal */}
@@ -492,6 +501,12 @@ export default function HealthScreen() {
       <NewInmateQuarantineModal
         visible={isNewInmateQuarantineModalVisible}
         onClose={() => setIsNewInmateQuarantineModalVisible(false)}
+      />
+
+      {/* Veterinary Laboratory Registry & Antibiogram Modal (Z-088) */}
+      <VeterinaryLabRegistryModal
+        visible={isVetLabRegistryModalVisible}
+        onClose={() => setIsVetLabRegistryModalVisible(false)}
       />
     </SafeAreaView>
   );

@@ -40,6 +40,7 @@ import { CarboLipidSupercompensationModal } from '../../src/components/CarboLipi
 import { EskRegistrationProtocolModal } from '../../src/components/EskRegistrationProtocolModal';
 import { CabinDehydrationModal } from '../../src/components/CabinDehydrationModal';
 import { PzhgpMembershipCertificateModal } from '../../src/components/PzhgpMembershipCertificateModal';
+import { LoftInspectionProtocolModal } from '../../src/components/LoftInspectionProtocolModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -120,6 +121,7 @@ export default function RacesScreen() {
   const [isEskProtocolModalVisible, setIsEskProtocolModalVisible] = useState(false);
   const [isCabinDehydrationModalVisible, setIsCabinDehydrationModalVisible] = useState(false);
   const [isPzhgpCertificateModalVisible, setIsPzhgpCertificateModalVisible] = useState(false);
+  const [isLoftInspectionModalVisible, setIsLoftInspectionModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -502,6 +504,13 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="🕵️ Protokół Kontroli Gołębnika (Z-087)"
+            onPress={() => setIsLoftInspectionModalVisible(true)}
+            testID="btn-open-loft-inspection"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -703,6 +712,11 @@ export default function RacesScreen() {
       <PzhgpMembershipCertificateModal
         visible={isPzhgpCertificateModalVisible}
         onClose={() => setIsPzhgpCertificateModalVisible(false)}
+      />
+
+      <LoftInspectionProtocolModal
+        visible={isLoftInspectionModalVisible}
+        onClose={() => setIsLoftInspectionModalVisible(false)}
       />
     </SafeAreaView>
   );

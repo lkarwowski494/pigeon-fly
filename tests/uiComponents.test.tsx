@@ -1247,6 +1247,49 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('WARUNKI STATUTOWE I SANITARNE');
     expect(tree).toContain('Drukuj Za\u015bwiadczenie A4');
   });
+
+  test('LoftInspectionProtocolModal (Z-087) renders unannounced inspection checklist, headcount, and security audit', () => {
+    const { LoftInspectionProtocolModal } = require('../src/components/LoftInspectionProtocolModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <LoftInspectionProtocolModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Protok\u00f3\u0142 Kontroli Go\u0142\u0119bnika');
+    expect(tree).toContain('Niezapowiedziana Wizytacja PZHGP');
+    expect(tree).toContain('SPIS STADA I STAN LICZBOWY');
+    expect(tree).toContain('AUDYT ZABEZPIECZE\u0143 I INSTALACJI ESK');
+    expect(tree).toContain('Drukuj Protok\u00f3\u0142 A4');
+  });
+
+  test('VeterinaryLabRegistryModal (Z-088) renders coproscopy, antibiogram, and targeted prescription', () => {
+    const { VeterinaryLabRegistryModal } = require('../src/components/VeterinaryLabRegistryModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <VeterinaryLabRegistryModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Kartoteka Bada\u0144 Laboratoryjnych');
+    expect(tree).toContain('Koproskopia, Wymazy i Antybiogram');
+    expect(tree).toContain('KOPROSKOPIA I PASO\u017bYTY');
+    expect(tree).toContain('Drukuj Raport A4');
+  });
 });
 
 
