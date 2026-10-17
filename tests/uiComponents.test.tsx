@@ -1203,6 +1203,50 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('Test Czu\u0142o\u015bci Chipa');
     expect(tree).toContain('Drukuj Protok\u00f3\u0142 A4');
   });
+
+  test('CabinDehydrationModal (Z-085) renders cabin microclimate, dehydration % KPI, and welfare presets', () => {
+    const { CabinDehydrationModal } = require('../src/components/CabinDehydrationModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <CabinDehydrationModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Bilans Wodny Kabiny i Dobrostan');
+    expect(tree).toContain('SCENARIUSZE TRANSPORTOWE KABINY');
+    expect(tree).toContain('Ubytek Masy Cia\u0142a');
+    expect(tree).toContain('PARAMETRY MIKROKLIMATU I CZASU');
+    expect(tree).toContain('Drukuj Raport A4');
+  });
+
+  test('PzhgpMembershipCertificateModal (Z-086) renders PZHGP certificate, ring series, and legal validity', () => {
+    const { PzhgpMembershipCertificateModal } = require('../src/components/PzhgpMembershipCertificateModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <PzhgpMembershipCertificateModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Za\u015bwiadczenie i Obr\u0105czki PZHGP');
+    expect(tree).toContain('ZA\u015aWIADCZENIE WA\u017bNE');
+    expect(tree).toContain('PIW (Weterynaria)');
+    expect(tree).toContain('WARUNKI STATUTOWE I SANITARNE');
+    expect(tree).toContain('Drukuj Za\u015bwiadczenie A4');
+  });
 });
 
 
