@@ -26,6 +26,7 @@ import { BiosecurityModal } from '../../src/components/BiosecurityModal';
 import { VetPassportModal } from '../../src/components/VetPassportModal';
 import { LoftVentilationModal } from '../../src/components/LoftVentilationModal';
 import { VaccinationProtocolModal } from '../../src/components/VaccinationProtocolModal';
+import { NewInmateQuarantineModal } from '../../src/components/NewInmateQuarantineModal';
 import { analyzeWingMoult, getPhotoperiodStatus } from '../../src/domain/moult';
 import { PdfService } from '../../src/services/pdfService';
 import { FeatherStatus, MoultLog } from '../../src/domain/types';
@@ -72,6 +73,7 @@ export default function HealthScreen() {
   const [isVetPassportModalVisible, setIsVetPassportModalVisible] = useState(false);
   const [isVentilationModalVisible, setIsVentilationModalVisible] = useState(false);
   const [isVaccinationModalVisible, setIsVaccinationModalVisible] = useState(false);
+  const [isNewInmateQuarantineModalVisible, setIsNewInmateQuarantineModalVisible] = useState(false);
   const [treatments, setTreatments] = useState<TreatmentRecordItem[]>(INITIAL_TREATMENTS);
   const [moultLogs, setMoultLogs] = useState<MoultLog[]>(INITIAL_MOULT_LOGS);
 
@@ -371,6 +373,13 @@ export default function HealthScreen() {
           testID="btn-open-quarantine"
         />
         <FieldButton
+          title="🛡️ E-Księga Kwarantanny Nowych Nabytków (Z-076)"
+          onPress={() => setIsNewInmateQuarantineModalVisible(true)}
+          variant="secondary"
+          style={{ marginTop: 10 }}
+          testID="btn-open-new-inmate-quarantine"
+        />
+        <FieldButton
           title="🛡️ Protokół Bioasekuracji i Inspekcji PIW (Z-062)"
           onPress={() => setIsBiosecurityModalVisible(true)}
           variant="secondary"
@@ -477,6 +486,12 @@ export default function HealthScreen() {
       <VaccinationProtocolModal
         visible={isVaccinationModalVisible}
         onClose={() => setIsVaccinationModalVisible(false)}
+      />
+
+      {/* New Inmate Quarantine & Isolation Ward Modal (Z-076) */}
+      <NewInmateQuarantineModal
+        visible={isNewInmateQuarantineModalVisible}
+        onClose={() => setIsNewInmateQuarantineModalVisible(false)}
       />
     </SafeAreaView>
   );

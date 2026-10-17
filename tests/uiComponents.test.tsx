@@ -985,7 +985,52 @@ describe('UI Components — Interactive Modals', () => {
     expect(tree).toContain('KALKULATOR KARMNIKA L\u0118GOWEGO');
     expect(tree).toContain('Drukuj Kart\u0119 \u017bywieniow\u0105');
   });
+
+  test('NationalChampionshipModal (Z-075) renders GMP points, Intermistrzostwo, and Ace ranking', () => {
+    const { NationalChampionshipModal } = require('../src/components/NationalChampionshipModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <NationalChampionshipModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('Mistrzostwo Polski PZHGP');
+    expect(tree).toContain('PUNKTY GMP');
+    expect(tree).toContain('INTER COEFF');
+    expect(tree).toContain('Asy Lotowe');
+    expect(tree).toContain('Drukuj Protok\u00f3\u0142 Mistrzostwa');
+  });
+
+  test('NewInmateQuarantineModal (Z-076) renders 21-day quarantine protocol and lab checklist', () => {
+    const { NewInmateQuarantineModal } = require('../src/components/NewInmateQuarantineModal');
+    const onClose = jest.fn();
+
+    let component: any;
+    act(() => {
+      component = renderer.create(
+        <NewInmateQuarantineModal
+          visible={true}
+          onClose={onClose}
+        />
+      );
+    });
+
+    const tree = JSON.stringify(component.toJSON());
+    expect(tree).toContain('E-Księga Kwarantanny');
+    expect(tree).toContain('BE-2025-6012488');
+    expect(tree).toContain('Badanie koproskopowe');
+    expect(tree).toContain('Wymaz z wola');
+    expect(tree).toContain('Drukuj \u015awiadectwo Kwarantanny');
+  });
 });
+
 
 
 

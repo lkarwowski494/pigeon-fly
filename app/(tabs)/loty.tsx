@@ -30,6 +30,7 @@ import { LoftGeodesyModal } from '../../src/components/LoftGeodesyModal';
 import { WindTacticsModal } from '../../src/components/WindTacticsModal';
 import { ClockSyncModal } from '../../src/components/ClockSyncModal';
 import { CabinSealingModal } from '../../src/components/CabinSealingModal';
+import { NationalChampionshipModal } from '../../src/components/NationalChampionshipModal';
 import { BasketEntry } from '../../src/domain/basketing';
 import { PdfService } from '../../src/services/pdfService';
 import { CsvService } from '../../src/services/csvService';
@@ -100,6 +101,7 @@ export default function RacesScreen() {
   const [isWindTacticsModalVisible, setIsWindTacticsModalVisible] = useState(false);
   const [isClockSyncModalVisible, setIsClockSyncModalVisible] = useState(false);
   const [isCabinSealingModalVisible, setIsCabinSealingModalVisible] = useState(false);
+  const [isChampionshipModalVisible, setIsChampionshipModalVisible] = useState(false);
 
   const handleStartTrainingToss = (tossName: string, distanceKm: number) => {
     handleSaveNewRace({
@@ -412,6 +414,13 @@ export default function RacesScreen() {
             style={{ marginBottom: 10 }}
           />
           <FieldButton
+            title="🏆 Mistrzostwo Polski PZHGP i Asy (Z-075)"
+            onPress={() => setIsChampionshipModalVisible(true)}
+            testID="btn-open-national-championship"
+            variant="secondary"
+            style={{ marginBottom: 10 }}
+          />
+          <FieldButton
             title="📄 Drukuj Listę Wkładaniową (PDF)"
             onPress={handleExportBasketingList}
             testID="btn-export-basketing"
@@ -560,6 +569,11 @@ export default function RacesScreen() {
         onClose={() => setIsCabinSealingModalVisible(false)}
         defaultRaceName={raceName}
         defaultReleasePlace={releaseLocation}
+      />
+
+      <NationalChampionshipModal
+        visible={isChampionshipModalVisible}
+        onClose={() => setIsChampionshipModalVisible(false)}
       />
     </SafeAreaView>
   );
