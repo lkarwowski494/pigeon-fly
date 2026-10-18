@@ -218,8 +218,9 @@ export function validateBackupEnvelope(jsonString: string): {
     }
 
     return { valid: true, data: state };
-  } catch (err: any) {
-    return { valid: false, error: `Błąd parsowania: ${err.message}` };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { valid: false, error: `Błąd parsowania: ${message}` };
   }
 }
 

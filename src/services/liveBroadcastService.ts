@@ -158,14 +158,15 @@ export class LiveBroadcastService {
             deliveredVia: 'supabase_realtime',
           };
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         // Enqueue if broadcast failed
         this.offlineQueue.push(enrichedPayload);
+        const errMsg = err instanceof Error ? err.message : String(err);
         return {
           success: false,
           channel: channelName,
           deliveredVia: 'offline_queue',
-          error: err?.message || 'Błąd transmisji WebSocket Supabase.',
+          error: errMsg || 'Błąd transmisji WebSocket Supabase.',
         };
       }
     }
@@ -277,9 +278,9 @@ export class LiveBroadcastService {
     const channel = this.supabase!.channel(channelName);
 
     channel
-      .on('broadcast', { event: 'arrival' }, (response: any) => {
+      .on('broadcast', { event: 'arrival' }, (response: { type: 'broadcast'; event: string; payload?: LiveBroadcastArrivalPayload }) => {
         if (response && response.payload) {
-          this.notifyLocalListeners(derbyCode, response.payload as LiveBroadcastArrivalPayload);
+          this.notifyLocalListeners(derbyCode, response.payload);
         }
       })
       .subscribe((status: string) => {

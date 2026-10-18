@@ -45,7 +45,7 @@ export interface BasketingCsvOptions {
 /**
  * Escapes CSV field value according to RFC 4180 with European semicolon delimiter support.
  */
-export function escapeCsvField(value: any): string {
+export function escapeCsvField(value: unknown): string {
   if (value === null || value === undefined) {
     return '';
   }

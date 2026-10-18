@@ -6,11 +6,22 @@
 import { FeedingLog } from '../domain/types';
 import { DatabaseConnection } from './database';
 
+export interface FeedingDbRow {
+  id: string;
+  loft_id: string;
+  date: string;
+  phase: string;
+  mix_name: string;
+  water_supplements: string | null;
+  feed_supplements: string | null;
+  created_at: string;
+}
+
 export class FeedingRepository {
   constructor(private db: DatabaseConnection) {}
 
   async getAllFeedingLogs(loftId: string): Promise<FeedingLog[]> {
-    const rows = await this.db.getAllAsync<any>(
+    const rows = await this.db.getAllAsync<FeedingDbRow>(
       `SELECT * FROM feeding_logs WHERE loft_id = ? ORDER BY date DESC, created_at DESC`,
       [loftId]
     );
@@ -40,12 +51,12 @@ export class FeedingRepository {
     await this.db.runAsync(`DELETE FROM feeding_logs WHERE id = ?`, [id]);
   }
 
-  private mapRowToFeedingLog(row: any): FeedingLog {
+  private mapRowToFeedingLog(row: FeedingDbRow): FeedingLog {
     return {
       id: row.id,
       loftId: row.loft_id,
       date: row.date,
-      phase: row.phase,
+      phase: row.phase as FeedingLog['phase'],
       mixName: row.mix_name,
       waterSupplements: row.water_supplements || undefined,
       feedSupplements: row.feed_supplements || undefined,

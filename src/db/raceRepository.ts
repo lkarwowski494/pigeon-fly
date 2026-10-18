@@ -14,11 +14,50 @@ export interface ArrivalWithPigeon extends Arrival {
   plumageColor: string;
 }
 
+export interface RaceDbRow {
+  id: string;
+  loft_id: string;
+  name: string;
+  release_name: string;
+  release_lat: number;
+  release_lon: number;
+  release_time: string;
+  category: Race['category'];
+  is_training: number;
+  neutral_start_time: string | null;
+  neutral_end_time: string | null;
+  is_live_broadcast: number;
+  broadcast_slug: string | null;
+  status: Race['status'];
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ArrivalDbRow {
+  id: string;
+  race_id: string;
+  pigeon_id: string;
+  arrival_time: string;
+  distance_meters: number;
+  velocity_m_per_min: number;
+  scan_type: Arrival['scanType'];
+  is_manual_override: number;
+  override_reason: string | null;
+  created_at: string;
+  updated_at: string;
+  ring_number: string;
+  country_code: string;
+  year: number;
+  sex: string;
+  plumage_color: string;
+}
+
 export class RaceRepository {
   constructor(private db: DatabaseConnection) {}
 
   async getAllRaces(loftId: string): Promise<Race[]> {
-    const rows = await this.db.getAllAsync<any>(
+    const rows = await this.db.getAllAsync<RaceDbRow>(
       `SELECT * FROM races WHERE loft_id = ? ORDER BY release_time DESC`,
       [loftId]
     );
@@ -26,7 +65,7 @@ export class RaceRepository {
   }
 
   async getRaceById(id: string): Promise<Race | null> {
-    const row = await this.db.getFirstAsync<any>(
+    const row = await this.db.getFirstAsync<RaceDbRow>(
       `SELECT * FROM races WHERE id = ?`,
       [id]
     );
@@ -87,7 +126,7 @@ export class RaceRepository {
   }
 
   async getRaceArrivals(raceId: string): Promise<ArrivalWithPigeon[]> {
-    const rows = await this.db.getAllAsync<any>(
+    const rows = await this.db.getAllAsync<ArrivalDbRow>(
       `SELECT
         a.*,
         p.ring_number,
@@ -122,7 +161,7 @@ export class RaceRepository {
     }));
   }
 
-  private mapRowToRace(row: any): Race {
+  private mapRowToRace(row: RaceDbRow): Race {
     return {
       id: row.id,
       loftId: row.loft_id,

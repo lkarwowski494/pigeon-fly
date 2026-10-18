@@ -7,11 +7,37 @@
 import { HealthLog, MoultLog } from '../domain/types';
 import { DatabaseConnection } from './database';
 
+export interface HealthDbRow {
+  id: string;
+  loft_id: string;
+  pigeon_id: string | null;
+  event_type: HealthLog['eventType'];
+  date: string;
+  product_name: string;
+  batch_number: string | null;
+  withdrawal_days: number;
+  next_due_date: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MoultDbRow {
+  id: string;
+  pigeon_id: string;
+  check_date: string;
+  primary_feather_number: number;
+  status: MoultLog['status'];
+  length_pct: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export class HealthRepository {
   constructor(private db: DatabaseConnection) {}
 
   async getAllHealthLogs(loftId: string): Promise<HealthLog[]> {
-    const rows = await this.db.getAllAsync<any>(
+    const rows = await this.db.getAllAsync<HealthDbRow>(
       `SELECT * FROM health_logs WHERE loft_id = ? ORDER BY date DESC, created_at DESC`,
       [loftId]
     );
@@ -19,7 +45,7 @@ export class HealthRepository {
   }
 
   async getHealthLogsForPigeon(pigeonId: string): Promise<HealthLog[]> {
-    const rows = await this.db.getAllAsync<any>(
+    const rows = await this.db.getAllAsync<HealthDbRow>(
       `SELECT * FROM health_logs WHERE pigeon_id = ? OR pigeon_id IS NULL ORDER BY date DESC`,
       [pigeonId]
     );
@@ -55,7 +81,7 @@ export class HealthRepository {
   }
 
   async getLatestMoultForPigeon(pigeonId: string): Promise<MoultLog[]> {
-    const rows = await this.db.getAllAsync<any>(
+    const rows = await this.db.getAllAsync<MoultDbRow>(
       `SELECT * FROM moult_logs
        WHERE pigeon_id = ?
        GROUP BY primary_feather_number
@@ -85,7 +111,7 @@ export class HealthRepository {
     );
   }
 
-  private mapRowToHealthLog(row: any): HealthLog {
+  private mapRowToHealthLog(row: HealthDbRow): HealthLog {
     return {
       id: row.id,
       loftId: row.loft_id,
@@ -102,7 +128,7 @@ export class HealthRepository {
     };
   }
 
-  private mapRowToMoultLog(row: any): MoultLog {
+  private mapRowToMoultLog(row: MoultDbRow): MoultLog {
     return {
       id: row.id,
       pigeonId: row.pigeon_id,

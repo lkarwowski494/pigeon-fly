@@ -6,11 +6,33 @@
 import { Pigeon, PedigreeNode } from '../domain/types';
 import { DatabaseConnection } from './database';
 
+export interface PigeonDbRow {
+  id: string;
+  loft_id: string;
+  ring_number: string;
+  country_code: string;
+  year: number;
+  sex: Pigeon['sex'];
+  plumage_color: string;
+  eye_sign: string | null;
+  status: Pigeon['status'];
+  father_id: string | null;
+  mother_id: string | null;
+  photo_url: string | null;
+  eye_photo_url: string | null;
+  wing_photo_url: string | null;
+  qr_code_uuid: string;
+  notes: string | null;
+  is_deleted: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export class PigeonRepository {
   constructor(private db: DatabaseConnection) {}
 
   async getAllPigeons(loftId: string): Promise<Pigeon[]> {
-    const rows = await this.db.getAllAsync<any>(
+    const rows = await this.db.getAllAsync<PigeonDbRow>(
       `SELECT * FROM pigeons WHERE loft_id = ? AND is_deleted = 0 ORDER BY ring_number ASC`,
       [loftId]
     );
@@ -18,7 +40,7 @@ export class PigeonRepository {
   }
 
   async getPigeonById(id: string): Promise<Pigeon | null> {
-    const row = await this.db.getFirstAsync<any>(
+    const row = await this.db.getFirstAsync<PigeonDbRow>(
       `SELECT * FROM pigeons WHERE id = ? AND is_deleted = 0`,
       [id]
     );
@@ -26,7 +48,7 @@ export class PigeonRepository {
   }
 
   async getPigeonByRing(loftId: string, ringNumber: string): Promise<Pigeon | null> {
-    const row = await this.db.getFirstAsync<any>(
+    const row = await this.db.getFirstAsync<PigeonDbRow>(
       `SELECT * FROM pigeons WHERE loft_id = ? AND ring_number = ? AND is_deleted = 0`,
       [loftId, ringNumber]
     );
@@ -34,7 +56,7 @@ export class PigeonRepository {
   }
 
   async getPigeonByQrUuid(qrCodeUuid: string): Promise<Pigeon | null> {
-    const row = await this.db.getFirstAsync<any>(
+    const row = await this.db.getFirstAsync<PigeonDbRow>(
       `SELECT * FROM pigeons WHERE qr_code_uuid = ? AND is_deleted = 0`,
       [qrCodeUuid]
     );
@@ -142,7 +164,7 @@ export class PigeonRepository {
     return node;
   }
 
-  private mapRowToPigeon(row: any): Pigeon {
+  private mapRowToPigeon(row: PigeonDbRow): Pigeon {
     return {
       id: row.id,
       loftId: row.loft_id,

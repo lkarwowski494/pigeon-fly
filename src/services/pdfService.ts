@@ -30,6 +30,15 @@ import {
   VaccinationCertificatePdfOptions,
 } from '../domain/pdfExport';
 import { PedigreeNode } from '../domain/types';
+import type { FciStandardAppraisalInput, FciStandardJudgingResult } from '../domain/fciStandardAppraisal';
+import type { BasketingProtocol } from '../domain/basketingProtocol';
+import type { BiosecurityLoftInfo, BiosecurityChecklist, BiosecurityComplianceResult } from '../domain/biosecurityProtocol';
+import type { TracesConsignmentInfo, TracesValidationResult } from '../domain/vetPassportTraces';
+import type { PigeonTransferContract, TransferEvaluationResult } from '../domain/pigeonTransfer';
+import type { GeodesyCalibrationInput, GeodesyCalibrationResult } from '../domain/loftGeodesy';
+import type { DecommissionProtocolData } from '../domain/pigeonDecommission';
+import type { ClockProtocolData } from '../domain/clockSynchronization';
+import type { CabinSealingProtocolData } from '../domain/cabinSealingProtocol';
 
 export class PdfService {
   /**
@@ -212,8 +221,8 @@ export class PdfService {
    * Generuje i drukuje lub udostępnia Kartę Oceny Sędziowskiej FCI Standard (Z-054)
    */
   static async exportFciStandardShowCard(
-    input: any,
-    result: any,
+    input: FciStandardAppraisalInput,
+    result: FciStandardJudgingResult,
     mode: 'print' | 'share' = 'print'
   ): Promise<string | void> {
     const { generateFciShowCardHtml } = await import('../domain/fciStandardAppraisal');
@@ -232,7 +241,7 @@ export class PdfService {
    * Generuje i drukuje lub udostępnia Oficjalną Listę Startowo-Zegarową PZHGP (Z-057)
    */
   static async exportBasketingClockingList(
-    protocol: any,
+    protocol: BasketingProtocol,
     mode: 'print' | 'share' = 'print'
   ): Promise<string | void> {
     const { generateBasketingProtocolHtml } = await import('../domain/basketingProtocol');
@@ -251,7 +260,11 @@ export class PdfService {
    * Generuje i drukuje lub udostępnia Urzędowy Protokół Bioasekuracji i Inspekcji Sanitarnej PIW (Z-062)
    */
   static async exportBiosecurityReport(
-    data: any,
+    data: {
+      loftInfo: BiosecurityLoftInfo;
+      checklist: BiosecurityChecklist;
+      result: BiosecurityComplianceResult;
+    },
     mode: 'print' | 'share' = 'print'
   ): Promise<string | void> {
     const { generateBiosecurityReportHtml } = await import('../domain/biosecurityProtocol');
@@ -270,8 +283,8 @@ export class PdfService {
    * Generuje i drukuje lub udostępnia Urzędowe Świadectwo Zdrowia TRACES-NT (Z-063)
    */
   static async exportTracesHealthCertificate(
-    consignment: any,
-    validation: any,
+    consignment: TracesConsignmentInfo,
+    validation: TracesValidationResult,
     mode: 'print' | 'share' = 'print'
   ): Promise<string | void> {
     const { generateTracesCertificateHtml } = await import('../domain/vetPassportTraces');
@@ -290,8 +303,8 @@ export class PdfService {
    * Generuje i drukuje lub udostępnia Umowę Zbycia / Protokół Transferu Gołębi (Z-065)
    */
   static async exportPigeonTransferAgreement(
-    contract: any,
-    evaluation: any,
+    contract: PigeonTransferContract,
+    evaluation: TransferEvaluationResult,
     mode: 'print' | 'share' = 'print'
   ): Promise<string | void> {
     const { generateTransferContractHtml } = await import('../domain/pigeonTransfer');
@@ -310,8 +323,8 @@ export class PdfService {
    * Generuje i drukuje lub udostępnia Oświadczenie Geodezyjne WGS-84 dla PZHGP (Z-067)
    */
   static async exportGeodeticLoftDeclaration(
-    input: any,
-    result: any,
+    input: GeodesyCalibrationInput,
+    result: GeodesyCalibrationResult,
     mode: 'print' | 'share' = 'print'
   ): Promise<string | void> {
     const { generateGeodeticDeclarationHtml } = await import('../domain/loftGeodesy');
@@ -330,7 +343,7 @@ export class PdfService {
    * Generuje i drukuje lub udostępnia Protokół Wykreślenia i Rejestr Zdarzeń Losowych dla PZHGP (Z-068)
    */
   static async exportPigeonDecommissionProtocol(
-    data: any,
+    data: DecommissionProtocolData,
     mode: 'print' | 'share' = 'print'
   ): Promise<string | void> {
     const { generateDecommissionProtocolHtml } = await import('../domain/pigeonDecommission');
@@ -349,7 +362,7 @@ export class PdfService {
    * Generuje i drukuje lub udostępnia Protokół Zegarowy Otwierania i Rozliczania Zegarów dla PZHGP (Z-071)
    */
   static async exportClockSyncProtocol(
-    data: any,
+    data: ClockProtocolData,
     mode: 'print' | 'share' = 'print'
   ): Promise<string | void> {
     const { generateClockProtocolHtml } = await import('../domain/clockSynchronization');
@@ -368,7 +381,7 @@ export class PdfService {
    * Generuje i drukuje lub udostępnia Protokół Plombowania i Stanu Technicznego Kabiny PZHGP (Z-072)
    */
   static async exportCabinSealingProtocol(
-    data: any,
+    data: CabinSealingProtocolData,
     mode: 'print' | 'share' = 'print'
   ): Promise<string | void> {
     const { generateCabinSealingProtocolHtml } = await import('../domain/cabinSealingProtocol');

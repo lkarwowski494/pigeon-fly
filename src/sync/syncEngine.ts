@@ -13,10 +13,23 @@ export interface SyncMutation {
   entityName: string;
   recordId: string;
   action: 'INSERT' | 'UPDATE' | 'DELETE';
-  payload: Record<string, any>;
+  payload: Record<string, unknown>;
   createdAt: string;
   attempts: number;
   lastError?: string;
+}
+
+export interface SyncQueueRow {
+  id: string;
+  client_mutation_id: string;
+  loft_id: string;
+  entity_name: string;
+  record_id: string;
+  action: 'INSERT' | 'UPDATE' | 'DELETE';
+  payload: string;
+  created_at: string;
+  attempts: number;
+  last_error: string | null;
 }
 
 export interface SyncResult {
@@ -40,7 +53,7 @@ export class SyncEngine {
     entityName: string,
     recordId: string,
     action: 'INSERT' | 'UPDATE' | 'DELETE',
-    payload: Record<string, any>
+    payload: Record<string, unknown>
   ): Promise<string> {
     const id = `mut_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     const clientMutationId = `cmi_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
@@ -60,7 +73,7 @@ export class SyncEngine {
    * Retrieves pending offline mutations ordered by creation time.
    */
   async getPendingMutations(): Promise<SyncMutation[]> {
-    const rows = await this.db.getAllAsync<any>(
+    const rows = await this.db.getAllAsync<SyncQueueRow>(
       `SELECT * FROM sync_queue ORDER BY created_at ASC`
     );
 
@@ -116,9 +129,9 @@ export class SyncEngine {
         // Mutation pushed successfully, remove from local queue
         await this.db.runAsync(`DELETE FROM sync_queue WHERE id = ?`, [mutation.id]);
         pushedCount++;
-      } catch (err: any) {
+      } catch (err: unknown) {
         failedCount++;
-        const errMsg = err?.message || String(err);
+        const errMsg = err instanceof Error ? err.message : String(err);
         errors.push(`Błąd synchronizacji ${mutation.entityName} (${mutation.recordId}): ${errMsg}`);
 
         // Update retry attempt counter

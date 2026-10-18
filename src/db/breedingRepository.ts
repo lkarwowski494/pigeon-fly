@@ -11,11 +11,36 @@ export interface ClutchWithParents extends ClutchRecord {
   henRingNumber: string;
 }
 
+export interface ClutchDbRow {
+  id: string;
+  loft_id: string;
+  round_number: number;
+  nest_box: string;
+  cock_id: string;
+  hen_id: string;
+  paired_date: string;
+  egg1_date: string | null;
+  egg2_date: string | null;
+  egg1_status: string;
+  egg2_status: string;
+  hatch_date: string | null;
+  chick1_ring_number: string | null;
+  chick2_ring_number: string | null;
+  chick1_banded: number;
+  chick2_banded: number;
+  weaned_date: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  cock_ring: string | null;
+  hen_ring: string | null;
+}
+
 export class BreedingRepository {
   constructor(private db: DatabaseConnection) {}
 
   async getAllClutches(loftId: string): Promise<ClutchWithParents[]> {
-    const rows = await this.db.getAllAsync<any>(
+    const rows = await this.db.getAllAsync<ClutchDbRow>(
       `SELECT
         c.*,
         cock.ring_number AS cock_ring,
@@ -32,7 +57,7 @@ export class BreedingRepository {
   }
 
   async getClutchById(id: string): Promise<ClutchWithParents | null> {
-    const row = await this.db.getFirstAsync<any>(
+    const row = await this.db.getFirstAsync<ClutchDbRow>(
       `SELECT
         c.*,
         cock.ring_number AS cock_ring,
@@ -115,7 +140,7 @@ export class BreedingRepository {
     await this.db.runAsync(`DELETE FROM clutches WHERE id = ?`, [id]);
   }
 
-  private mapRowToClutch(row: any): ClutchWithParents {
+  private mapRowToClutch(row: ClutchDbRow): ClutchWithParents {
     return {
       id: row.id,
       loftId: row.loft_id,
