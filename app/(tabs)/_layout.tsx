@@ -6,6 +6,7 @@
 import React from 'react';
 import { Tabs, useRouter } from 'expo-router';
 import { Text, TouchableOpacity } from 'react-native';
+import { t } from '../../src/lib/i18n';
 
 export default function TabsLayout() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function TabsLayout() {
       onPress={() => router.push('/ustawienia')}
       style={{ paddingRight: 16 }}
       accessibilityRole="button"
-      accessibilityLabel="Ustawienia i Chmura"
+      accessibilityLabel={t('Ustawienia')}
     >
       <Text style={{ fontSize: 20 }}>⚙️</Text>
     </TouchableOpacity>
@@ -54,40 +55,40 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Notes Stada',
-          tabBarLabel: 'Stado',
+          title: t('Pigeon-Fly'),
+          tabBarLabel: t('Stado'),
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🕊️</Text>,
         }}
       />
       <Tabs.Screen
         name="rozplod"
         options={{
-          title: 'Rozpłód i Lęgi',
-          tabBarLabel: 'Rozpłód',
+          title: t('Rozpłód'),
+          tabBarLabel: t('Rozpłód'),
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🥚</Text>,
         }}
       />
       <Tabs.Screen
         name="zywienie"
         options={{
-          title: 'Żywienie i Dieta',
-          tabBarLabel: 'Żywienie',
+          title: t('Żywienie'),
+          tabBarLabel: t('Żywienie'),
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🌾</Text>,
         }}
       />
       <Tabs.Screen
         name="loty"
         options={{
-          title: 'Loty i Treningi',
-          tabBarLabel: 'Loty',
+          title: t('Loty i Treningi'),
+          tabBarLabel: t('Loty i Treningi'),
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🏁</Text>,
         }}
       />
       <Tabs.Screen
         name="zdrowie"
         options={{
-          title: 'Zdrowie i Pierzenie',
-          tabBarLabel: 'Zdrowie',
+          title: t('Zdrowie'),
+          tabBarLabel: t('Zdrowie'),
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>💊</Text>,
         }}
       />

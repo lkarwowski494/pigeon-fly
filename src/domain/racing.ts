@@ -32,7 +32,9 @@ export function calculateGeodesicDistanceMeters(
     return 0.0;
   }
 
-  const L = lon2 - lon1;
+  let L = lon2 - lon1;
+  while (L > Math.PI) L -= 2 * Math.PI;
+  while (L < -Math.PI) L += 2 * Math.PI;
   const U1 = Math.atan((1 - WGS84_F) * Math.tan(lat1));
   const U2 = Math.atan((1 - WGS84_F) * Math.tan(lat2));
   const sinU1 = Math.sin(U1);
@@ -123,7 +125,9 @@ export function calculateHaversineDistanceMeters(
   const lon2 = (point2.longitude * Math.PI) / 180;
 
   const dLat = lat2 - lat1;
-  const dLon = lon2 - lon1;
+  let dLon = lon2 - lon1;
+  while (dLon > Math.PI) dLon -= 2 * Math.PI;
+  while (dLon < -Math.PI) dLon += 2 * Math.PI;
 
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
