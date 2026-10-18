@@ -49,9 +49,9 @@ export const modalTheme = StyleSheet.create({
     color: MODAL_COLORS.textPrimary,
   },
   closeButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: MODAL_COLORS.cardBackground,
     justifyContent: 'center',
     alignItems: 'center',

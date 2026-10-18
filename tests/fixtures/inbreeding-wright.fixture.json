@@ -1,6 +1,7 @@
 {
   "domain": "inbreeding_sewall_wright",
   "formula": "F = sum((1/2)^(n1 + n2 + 1) * (1 + FA))",
+  "bibliographic_source": "Wright, S. (1922). Coefficients of inbreeding and relationship. The American Naturalist, 56(645), 330-338.",
   "vectors": [
     {
       "id": "INB-VEC-01",

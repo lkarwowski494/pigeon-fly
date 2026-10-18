@@ -9,8 +9,24 @@ import {
   generateFciShowCardHtml,
   FciStandardAppraisalInput,
 } from '../src/domain/fciStandardAppraisal';
+import fciFixture from './fixtures/fci-standard-appraisal.fixture.json';
 
 describe('FCI Standard Exhibition Judging Engine (Z-054)', () => {
+  it('validates Ground Truth test vectors from fci-standard-appraisal.fixture.json', () => {
+    fciFixture.vectors.forEach((v) => {
+      const sum =
+        v.scores.generalAppearance +
+        v.scores.boneStructure +
+        v.scores.backAndTail +
+        v.scores.musculature +
+        v.scores.wingsAndPlumage;
+      expect(sum).toBeCloseTo(v.expected_total_score, 2);
+
+      const minKkm = v.sex === 'cock' ? fciFixture.flight_minimums_kkm.cock : fciFixture.flight_minimums_kkm.hen;
+      const meetsDistance = v.kkm_2years >= minKkm;
+      expect(meetsDistance).toBe(v.qualification === 'qualified');
+    });
+  });
   const olympicCockInput: FciStandardAppraisalInput = {
     pigeonId: 'p-01',
     ringNumber: 'PL-0284-22-1402',

@@ -84,7 +84,7 @@ export function getDefaultSquadPresets(loftId: string): RacingSquad[] {
       loftId,
       name: 'Drużyna C (Maraton >700 km)',
       type: 'marathon_c',
-      color: '#8B5CF6', // Fiolet maratoński
+      color: '#1E40AF', // Granat maratoński
       targetCategory: 'Kat. M',
       maxCapacity: 25,
       assignedPigeonIds: [],

@@ -13,7 +13,7 @@ Zgodnie ze standardem studia Apps4Brew wypracowanym w repozytorium `organizer`, 
 ```
                        10 WARSTW JAKOŚCI PIGEON-FLY
  ┌────────────────────────────────────────────────────────────────────────┐
- │ 1. CZYSTA LOGIKA DOMENOWA (100% Line Coverage, Pure Swift / TS)        │
+ │ 1. CZYSTA LOGIKA DOMENOWA (100% Line Coverage, Pure TypeScript / Expo) │
  ├────────────────────────────────────────────────────────────────────────┤
  │ 2. NIEZMIENNIKI MATEMATYCZNE I PBT (Property-Based fast-check)        │
  ├────────────────────────────────────────────────────────────────────────┤

@@ -15,7 +15,7 @@ Aplikacja Pigeon-Fly łączy suwerenność danych i odporność polową bazy **S
  │                                                                             │
  │  ┌─────────────────────────┐          ┌──────────────────────────────────┐  │
  │  │ Interfejs Użytkownika   │          │ Silnik Synchronizacji w Tle      │  │
- │  │ (SwiftUI / Field Mode)  │          │ (Delta Sync Engine + SyncQueue)  │  │
+ │  │ (React Native / Field)  │          │ (Delta Sync Engine + SyncQueue)  │  │
  │  └────────────┬────────────┘          └─────────────────┬────────────────┘  │
  │               │ (Zapis natychmiastowy)                  │                   │
  │  ┌────────────▼─────────────────────────────────────────▼────────────────┐  │

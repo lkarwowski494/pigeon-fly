@@ -4,6 +4,7 @@
  */
 
 import fc from 'fast-check';
+import vincentyFixture from './fixtures/vincenty-geodesy.fixture.json';
 import {
   calculateGeodesicDistanceMeters,
   calculateHaversineDistanceMeters,
@@ -13,6 +14,14 @@ import {
 } from '../src/domain/racing';
 
 describe('Racing Engine — Geodesic Distance', () => {
+  test('validates Ground Truth test vectors from vincenty-geodesy.fixture.json', () => {
+    vincentyFixture.vectors.forEach((v) => {
+      const p1 = { latitude: v.p1.lat, longitude: v.p1.lng };
+      const p2 = { latitude: v.p2.lat, longitude: v.p2.lng };
+      const dist = calculateGeodesicDistanceMeters(p1, p2);
+      expect(Math.abs(dist - v.expected_distance_meters)).toBeLessThanOrEqual(0.1);
+    });
+  });
   // Known benchmark coordinates:
   // Warsaw, Poland: 52.2297° N, 21.0122° E
   // Berlin, Germany: 52.5200° N, 13.4050° E

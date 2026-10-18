@@ -4,6 +4,7 @@
 
 import { calculateWrightInbreeding } from '../src/domain/genetics';
 import { Pigeon } from '../src/domain/types';
+import inbreedingFixture from './fixtures/inbreeding-wright.fixture.json';
 
 describe('Genetics Engine — Wright Inbreeding Coefficient (F)', () => {
   const pigeons = new Map<string, Pigeon>();
@@ -27,6 +28,43 @@ describe('Genetics Engine — Wright Inbreeding Coefficient (F)', () => {
 
   beforeEach(() => {
     pigeons.clear();
+  });
+
+  test('validates Ground Truth test vectors from inbreeding-wright.fixture.json', () => {
+    expect(inbreedingFixture.vectors).toHaveLength(4);
+    
+    // INB-VEC-01: Full siblings
+    pigeons.set('P1', createPigeon('P1'));
+    pigeons.set('P2', createPigeon('P2'));
+    pigeons.set('S1', createPigeon('S1', 'P1', 'P2'));
+    pigeons.set('S2', createPigeon('S2', 'P1', 'P2'));
+    const fullSib = calculateWrightInbreeding('S1', 'S2', pigeons);
+    expect(fullSib.coefficientF).toBe(inbreedingFixture.vectors[0].expected_F);
+
+    // INB-VEC-02: Half siblings
+    pigeons.set('A', createPigeon('A'));
+    pigeons.set('D1', createPigeon('D1'));
+    pigeons.set('D2', createPigeon('D2'));
+    pigeons.set('HS1', createPigeon('HS1', 'A', 'D1'));
+    pigeons.set('HS2', createPigeon('HS2', 'A', 'D2'));
+    const halfSib = calculateWrightInbreeding('HS1', 'HS2', pigeons);
+    expect(halfSib.coefficientF).toBe(inbreedingFixture.vectors[1].expected_F);
+
+    // INB-VEC-03: First cousins
+    pigeons.set('GF', createPigeon('GF'));
+    pigeons.set('GM', createPigeon('GM'));
+    pigeons.set('P1c', createPigeon('P1c', 'GF', 'GM'));
+    pigeons.set('P2c', createPigeon('P2c', 'GF', 'GM'));
+    pigeons.set('C1', createPigeon('C1', 'P1c', 'unrelated1'));
+    pigeons.set('C2', createPigeon('C2', 'P2c', 'unrelated2'));
+    const cousins = calculateWrightInbreeding('C1', 'C2', pigeons);
+    expect(cousins.coefficientF).toBe(inbreedingFixture.vectors[2].expected_F);
+
+    // INB-VEC-04: Outcross
+    pigeons.set('out1', createPigeon('out1'));
+    pigeons.set('out2', createPigeon('out2'));
+    const outcross = calculateWrightInbreeding('out1', 'out2', pigeons);
+    expect(outcross.coefficientF).toBe(inbreedingFixture.vectors[3].expected_F);
   });
 
   test('returns F = 0 for unrelated cock and hen', () => {

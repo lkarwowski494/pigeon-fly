@@ -1,5 +1,6 @@
 {
   "domain": "fci_standard_appraisal_100pt",
+  "bibliographic_source": "Fédération Colombophile Internationale (FCI). International Racing Regulations & Standard of the Olympic Classes. Brussels.",
   "max_points": 100,
   "criteria_weights": {
     "generalAppearance": 10,

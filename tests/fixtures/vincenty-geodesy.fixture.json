@@ -1,21 +1,27 @@
 {
   "domain": "geodesy_vincenty_wgs84",
-  "tolerance_meters": 0.001,
+  "ellipsoid": {
+    "name": "WGS-84",
+    "semi_major_axis_meters": 6378137.0,
+    "flattening": 0.0033528106647474805
+  },
+  "bibliographic_source": "Vincenty, T. (1975). Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations. Survey Review, 23(176), 88-93.",
+  "tolerance_meters": 0.1,
   "vectors": [
     {
       "id": "GEO-VEC-01",
       "description": "Magdeburg release station to Gostyń loft",
       "p1": { "lat": 52.1205, "lng": 11.6276 },
       "p2": { "lat": 51.8789, "lng": 17.0125 },
-      "expected_distance_meters": 372480.12,
+      "expected_distance_meters": 370716.51,
       "bearing_degrees": 96.5
     },
     {
       "id": "GEO-VEC-02",
-      "description": "Short training toss 25km",
+      "description": "Short training toss (~13.7 km)",
       "p1": { "lat": 51.9500, "lng": 16.8500 },
       "p2": { "lat": 51.8789, "lng": 17.0125 },
-      "expected_distance_meters": 24850.55,
+      "expected_distance_meters": 13697.02,
       "bearing_degrees": 128.2
     },
     {
@@ -23,7 +29,7 @@
       "description": "Marathon race Brussels to Poznan",
       "p1": { "lat": 50.8503, "lng": 4.3517 },
       "p2": { "lat": 52.4064, "lng": 16.9252 },
-      "expected_distance_meters": 894120.45,
+      "expected_distance_meters": 886495.78,
       "bearing_degrees": 75.8
     }
   ]

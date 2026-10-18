@@ -251,9 +251,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: '#2A2E38',
     alignItems: 'center',
     justifyContent: 'center',

@@ -4,8 +4,15 @@ import {
   validateClockOpeningProtocol,
   generateClockOpeningAuditHtml,
 } from '../src/domain/clockOpeningAuditProtocol';
+import clockFixture from './fixtures/clock-opening-audit.fixture.json';
 
 describe('ClockOpeningAuditProtocol Domain (Z-098 / DEC-112)', () => {
+  test('validates Ground Truth test vectors from clock-opening-audit.fixture.json', () => {
+    clockFixture.vectors.forEach((v) => {
+      const status = determineDriftStatus(v.drift_seconds, false);
+      expect(status).toBe(v.expected_status);
+    });
+  });
   const sampleProtocol: ClockOpeningAuditProtocol = {
     id: 'clock-audit-2026-001',
     protocolNumber: 'OTWARCIE-2026/0284/01',

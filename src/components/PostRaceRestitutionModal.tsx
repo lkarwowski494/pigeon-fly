@@ -546,7 +546,7 @@ export const PostRaceRestitutionModal: React.FC<PostRaceRestitutionModalProps> =
               <View style={styles.card}>
                 <View style={styles.phaseHeaderRow}>
                   <Text style={styles.cardTitle}>Faza II: Odbudowa Mięśni & BCAA</Text>
-                  <Text style={[styles.pillBadge, { backgroundColor: '#8B5CF6' }]}>
+                  <Text style={[styles.pillBadge, { backgroundColor: '#2563EB' }]}>
                     Czas: {evaluation.phase2.recoveryEstimatedHours}h
                   </Text>
                 </View>

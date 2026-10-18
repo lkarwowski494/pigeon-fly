@@ -14,7 +14,7 @@
 2. **ZP-02: Zero-Friction Wejścia (Anonimowy Start $\rightarrow$ Apple Sign-In).** Aplikacja nie zmusza do rejestracji. Hodowca zaczyna z lokalną bazą lub anonimową sesją Supabase. Dopiero włączenie tandemu, relacji live lub chmurowego backupu oferuje 1-tap powiązanie z *Sign in with Apple*.
 3. **ZP-03: Bezpieczeństwo i Izolacja Danych (Row Level Security).** Dostęp do danych gołębnika jest chroniony na poziomie silnika PostgreSQL (Supabase RLS). Współrzędne gołębnika i prywatne notatki są ściśle ukryte przed światem.
 4. **ZP-04: Ergofizyka Field Mode (Tryb Gołębnika).** Przyciski $\ge 56 \times 56\,\text{pt}$, obsługa jedną ręką, kontrast w słońcu, blokada wygaszania ekranu (`isIdleTimerDisabled = true`).
-5. **ZP-05: Prawda Matematyczna i Geodezyjna (Zero Halucynacji AI).** Deterministyczne algorytmy Vincenty'ego, Wrighta, Weende i wzory FCI zaimplementowane w Swift oraz w procedurach PostgreSQL.
+5. **ZP-05: Prawda Matematyczna i Geodezyjna (Zero Halucynacji AI).** Deterministyczne algorytmy Vincenty'ego, Wrighta, Weende i wzory FCI zaimplementowane w TypeScript (React Native / Expo) oraz w procedurach PostgreSQL.
 6. **ZP-06: Suwerenność Danych i Podwójna Kopia.** Hodowca ma prawo do swoich danych: darmowy eksport pliku `.sqlite` i `.json` lokalnie oraz bezpieczny skarbiec replikacji w chmurze Supabase.
 7. **ZP-07: Uczciwa Monetyzacja z Opcją Lifetime.** Darmowy rdzeń do 10 ptaków; wersja Pro (1,99 EUR/msc, 6,99 EUR/rok, 19,99 EUR Lifetime) odblokowuje nielimitowane stado, tandem hodowlany, transmisje live i chmurę.
 8. **ZP-08: Równoprawny Apple Watch Companion.** Zegarek z niezależnym 1-tap rejestrowaniem przylotu i buforem offline.

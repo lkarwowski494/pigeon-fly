@@ -40,6 +40,13 @@
 | **Z-077** | Sport / Restytucja| Dwufazowa restytucja powrotowa: poidło hipotoniczne i BCAA 2:1:1 | ZROBIONE | Karta Restytucji | `postRaceRestitution.test.ts` |
 | **Z-078** | Trening / Wywózki| Dziennik lotów próbnych i wskaźnik zwartości stada (Flock Cohesion) | ZROBIONE | Dziennik Wywózek | `trainingTossLog.test.ts` |
 | **Z-079** | Sport / Paszport | Lotowy paszport kariery, suma kkm i historia konkursów | ZROBIONE | Paszport Kariery | `careerPassport.test.ts` |
+
+---
+
+### 2. Pakiet Urzędowy Związku, Sędziów i Konwojów (Z-080 do Z-100 — Dostępny przez OfficialProtocolsHubModal)
+
+| ID | Kategoria / Moduł | Zakres Funkcjonalności & Cel Rzemieślniczy | Status | Generator A4 PDF | Testy Jednostkowe |
+| :--- | :--- | :--- | :---: | :---: | :---: |
 | **Z-080** | Prawo / Etyka | Deklaracja Fair-Play i zgoda na niezapowiedziany antydoping | ZROBIONE | Karta Etyki | `fairPlayDeclaration.test.ts` |
 | **Z-081** | Prawo / Hodowla | Umowa użyczenia / dzierżawy reproduktora z podziałem młodych | ZROBIONE | Umowa Dzierżawy | `studLeaseAgreement.test.ts` |
 | **Z-082** | Sport / Liga | Kalkulator rywalizacji drużynowej sekcji, puchar przechodni | ZROBIONE | Tabela Ligi | `interTeamChampionship.test.ts` |

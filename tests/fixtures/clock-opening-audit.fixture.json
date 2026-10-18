@@ -1,5 +1,6 @@
 {
   "domain": "pzhgp_clock_opening_drift_audit",
+  "bibliographic_source": "Polski Związek Hodowców Gołębi Pocztowych (PZHGP). Regulamin Lotowo-Zegarowy, Rozdział V: Kontrola zegarów i obliczanie wyników.",
   "pzhgp_rules": {
     "tolerance_seconds": 2.0,
     "max_allowed_correction_seconds": 10.0
@@ -8,19 +9,19 @@
     {
       "id": "CLK-VEC-01",
       "drift_seconds": 0.85,
-      "expected_qualification": "accepted_standard",
+      "expected_status": "normal_within_tolerance",
       "linear_correction_applied": false
     },
     {
       "id": "CLK-VEC-02",
       "drift_seconds": 4.20,
-      "expected_qualification": "corrected_linear",
+      "expected_status": "drift_corrected",
       "linear_correction_applied": true
     },
     {
       "id": "CLK-VEC-03",
       "drift_seconds": 11.40,
-      "expected_qualification": "disqualified_excessive_drift",
+      "expected_status": "disqualified_excessive_drift",
       "linear_correction_applied": false
     }
   ]

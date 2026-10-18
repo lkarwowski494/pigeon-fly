@@ -404,6 +404,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     borderWidth: 1,
     borderColor: '#334155',
+    minHeight: 48,
   },
   birdRowDesignated: {
     borderColor: '#F59E0B',
