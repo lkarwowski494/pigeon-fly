@@ -14,6 +14,7 @@
  */
 
 import { Database } from '../db/database';
+import { runPendingMigrations } from '../db/migrator';
 
 export type PlanType = 'trial' | 'free' | 'monthly' | 'annual' | 'lifetime';
 export type EntitlementStatus = 'active' | 'expired';
@@ -229,18 +230,9 @@ export function evaluateAccess(
  */
 export async function ensureEntitlementsSchema(db: Database): Promise<void> {
   try {
-    await db.execAsync(
-      'ALTER TABLE app_entitlements ADD COLUMN lifetime_pigeons_created INTEGER NOT NULL DEFAULT 0;'
-    );
+    await runPendingMigrations(db);
   } catch {
-    // Kolumna już istnieje
-  }
-  try {
-    await db.execAsync(
-      'ALTER TABLE app_entitlements ADD COLUMN free_pdf_exports_used INTEGER NOT NULL DEFAULT 0;'
-    );
-  } catch {
-    // Kolumna już istnieje
+    // If running in mock DB where PRAGMA is not supported, ignore
   }
 }
 

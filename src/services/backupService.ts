@@ -33,18 +33,20 @@ export interface PigeonFlyBackupMetadata {
   };
 }
 
+export type TableRow = Record<string, string | number | boolean | null>;
+
 export interface PigeonFlyBackupData {
   metadata: PigeonFlyBackupMetadata;
-  lofts: any[];
-  pigeons: any[];
-  races: any[];
-  arrivals: any[];
-  clutches: any[];
-  feeding_logs: any[];
-  health_logs: any[];
-  moult_logs: any[];
-  pairings: any[];
-  app_entitlements?: any[];
+  lofts: TableRow[];
+  pigeons: TableRow[];
+  races: TableRow[];
+  arrivals: TableRow[];
+  clutches: TableRow[];
+  feeding_logs: TableRow[];
+  health_logs: TableRow[];
+  moult_logs: TableRow[];
+  pairings: TableRow[];
+  app_entitlements?: TableRow[];
 }
 
 export interface PigeonFlyBackupEnvelope {
@@ -89,16 +91,16 @@ export async function getDatabaseStats(db: Database): Promise<PigeonFlyBackupMet
     pairings,
     entitlements,
   ] = await Promise.all([
-    db.getAllAsync<any>('SELECT * FROM lofts'),
-    db.getAllAsync<any>('SELECT * FROM pigeons'),
-    db.getAllAsync<any>('SELECT * FROM races'),
-    db.getAllAsync<any>('SELECT * FROM arrivals'),
-    db.getAllAsync<any>('SELECT * FROM clutches'),
-    db.getAllAsync<any>('SELECT * FROM feeding_logs'),
-    db.getAllAsync<any>('SELECT * FROM health_logs'),
-    db.getAllAsync<any>('SELECT * FROM moult_logs'),
-    db.getAllAsync<any>('SELECT * FROM pairings'),
-    db.getAllAsync<any>('SELECT * FROM app_entitlements'),
+    db.getAllAsync<TableRow>('SELECT * FROM lofts'),
+    db.getAllAsync<TableRow>('SELECT * FROM pigeons'),
+    db.getAllAsync<TableRow>('SELECT * FROM races'),
+    db.getAllAsync<TableRow>('SELECT * FROM arrivals'),
+    db.getAllAsync<TableRow>('SELECT * FROM clutches'),
+    db.getAllAsync<TableRow>('SELECT * FROM feeding_logs'),
+    db.getAllAsync<TableRow>('SELECT * FROM health_logs'),
+    db.getAllAsync<TableRow>('SELECT * FROM moult_logs'),
+    db.getAllAsync<TableRow>('SELECT * FROM pairings'),
+    db.getAllAsync<TableRow>('SELECT * FROM app_entitlements'),
   ]);
 
   return {
@@ -131,16 +133,16 @@ export async function exportDatabaseBackup(db: Database): Promise<PigeonFlyBacku
     pairings,
     app_entitlements,
   ] = await Promise.all([
-    db.getAllAsync<any>('SELECT * FROM lofts'),
-    db.getAllAsync<any>('SELECT * FROM pigeons'),
-    db.getAllAsync<any>('SELECT * FROM races'),
-    db.getAllAsync<any>('SELECT * FROM arrivals'),
-    db.getAllAsync<any>('SELECT * FROM clutches'),
-    db.getAllAsync<any>('SELECT * FROM feeding_logs'),
-    db.getAllAsync<any>('SELECT * FROM health_logs'),
-    db.getAllAsync<any>('SELECT * FROM moult_logs'),
-    db.getAllAsync<any>('SELECT * FROM pairings'),
-    db.getAllAsync<any>('SELECT * FROM app_entitlements'),
+    db.getAllAsync<TableRow>('SELECT * FROM lofts'),
+    db.getAllAsync<TableRow>('SELECT * FROM pigeons'),
+    db.getAllAsync<TableRow>('SELECT * FROM races'),
+    db.getAllAsync<TableRow>('SELECT * FROM arrivals'),
+    db.getAllAsync<TableRow>('SELECT * FROM clutches'),
+    db.getAllAsync<TableRow>('SELECT * FROM feeding_logs'),
+    db.getAllAsync<TableRow>('SELECT * FROM health_logs'),
+    db.getAllAsync<TableRow>('SELECT * FROM moult_logs'),
+    db.getAllAsync<TableRow>('SELECT * FROM pairings'),
+    db.getAllAsync<TableRow>('SELECT * FROM app_entitlements'),
   ]);
 
   const metadata: PigeonFlyBackupMetadata = {
@@ -473,3 +475,12 @@ export async function restoreDatabaseBackup(
     }
   });
 }
+
+/**
+ * Tworzy asekuracyjną kopię zapasową w formacie kopii pełnej przed migracją schematu.
+ */
+export async function createPreMigrationBackup(db: Database): Promise<PigeonFlyBackupEnvelope> {
+  const data = await exportDatabaseBackup(db);
+  return buildBackupEnvelope(data);
+}
+
